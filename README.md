@@ -1,32 +1,39 @@
-# PlanningPokerFree
+# Planning Poker Free
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.0.1.
+App de Planning Poker en tiempo real.
 
-## Development server
+## Stack
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- **Svelte 5** + **SvelteKit**
+- **Cloudflare Workers** (`@sveltejs/adapter-cloudflare`)
+- Estilos portados del avance Angular (Pattaya, Montserrat, paleta `#165d70`, liquid button)
+- Durable Objects (siguiente paso para salas realtime)
 
-## Code scaffolding
+## Requisitos
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Node.js **>= 22**
 
-## Build
+```sh
+nvm use
+npm install
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Desarrollo
 
-## Running unit tests
+```sh
+npm run dev
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Abre [http://localhost:5173](http://localhost:5173).
 
-## Running end-to-end tests
+## Build / preview (Cloudflare)
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```sh
+npm run build
+npm run preview
+```
 
 ## Autores
 
-Desarrollado por [Alejandro Rodriguez Romero](https://www.linkedin.com/in/alejandro-rodriguez-romero/)  
-Imagenes diseñadas por [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/)
+- Desarrollo: [Alejandro Rodriguez Romero](https://www.linkedin.com/in/alejandro-rodriguez-romero/)
+- Imágenes: [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/)

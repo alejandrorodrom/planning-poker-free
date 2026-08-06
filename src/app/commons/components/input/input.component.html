@@ -1,3 +1,0 @@
-<label class="label" #labelTag [class.error--label]="error" [class.label--disabled]="isDisabled" (click)="focusInput()">{{ label }}</label>
-<input class="input" #inputTag [class.error--input]="error" [type]="type" [value]="value" [disabled]="isDisabled" [maxLength]="maxLength" (input)="onInput($event)">
-<span class="counter" [class.error--counter]="error">{{ counter }} / {{ maxLength }}</span>
