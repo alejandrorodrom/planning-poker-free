@@ -45,6 +45,7 @@
     "@img/sharp-webcontainers-wasm32": "-",
     "@img/sharp-wasm32": "-"
   },
+  "license": "MIT",
   "description": "Open-source web tool for SCRUM teams to estimate story complexity",
   "dependencies": {
     "@dicebear/core": "^10.4.0",

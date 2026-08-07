@@ -1,17 +1,68 @@
-# Planning Poker Free
+<p align="center">
+  <img src="static/assets/svg/planning-poker.svg" alt="Planning Poker Free" width="140" />
+</p>
 
-App de Planning Poker en tiempo real para equipos SCRUM.
+<h1 align="center">Planning Poker Free</h1>
+
+<p align="center">
+  Estimación ágil en tiempo real para equipos SCRUM.<br />
+  Sin cuentas. Sin fricción. Solo una sala y tu equipo.
+</p>
+
+<p align="center">
+  <a href="https://planning-poker-free.obsidian-yuzu.workers.dev"><strong>Probar demo</strong></a>
+  ·
+  <a href="#características">Características</a>
+  ·
+  <a href="#desarrollo">Desarrollo</a>
+  ·
+  <a href="CONTRIBUTING.md">Contribuir</a>
+</p>
+
+---
+
+## ¿Qué es?
+
+**Planning Poker Free** es una herramienta open-source para estimar historias de usuario (PBI) con Planning Poker. Cada sala corre en un Durable Object de Cloudflare: estado compartido, WebSockets y sincronización en vivo sin infraestructura propia.
+
+Ideal para dailies de estimación, refinamiento o ceremonias remotas.
+
+## Características
+
+| Área | Qué incluye |
+| --- | --- |
+| **Salas** | Públicas o privadas con contraseña; acceso por enlace `/room/{id}` |
+| **Sesión** | Rejoin automático vía `localStorage`; la última pestaña activa gana |
+| **Roles** | Moderador, votante y observador; cesión y claim de moderación |
+| **Barajas** | Fibonacci modificado, Fibonacci, potencias de 2, T-shirt, secuencial |
+| **Estimación** | Consenso, moda, mediana o media; voto oculto / revelado / auto-reveal |
+| **Equipos** | Audiencia por ronda (todos o equipos); resultados overall y por equipo |
+| **Export** | Copia de resultados en Markdown o CSV |
+
+### Moderación
+
+- El creador de la sala es Moderador (y votante por defecto).
+- Puede ceder la moderación o dejar el rol; si está offline, otro participante conectado puede reclamarla.
+- Solo participantes **conectados** pueden interactuar.
+
+### Ciclo de vida de la sala
+
+- Idle ~30 min y máximo ~8 h (alarmas internas multiplexadas).
+- Sala finalizada o expirada → pantalla de cierre con opción de crear otra o volver al inicio.
 
 ## Stack
 
-- **Svelte 5** + **SvelteKit**
-- **Cloudflare Workers** + **Durable Objects** (`Room` por sala, binding `ROOM`)
-- Plugin `@oselvar/sveltekit-add-worker-exports` (exporta la clase DO)
-- Estilos: Pattaya, Montserrat, paleta `#165d70`, liquid button
+| Capa | Tecnología |
+| --- | --- |
+| UI | [Svelte 5](https://svelte.dev/) + [SvelteKit](https://kit.svelte.dev/) |
+| Runtime | [Cloudflare Workers](https://developers.cloudflare.com/workers/) |
+| Estado en vivo | [Durable Objects](https://developers.cloudflare.com/durable-objects/) (`Room`, binding `ROOM`) |
+| Tipado Workers | `wrangler types` + plugin `@oselvar/sveltekit-add-worker-exports` |
 
 ## Requisitos
 
-- Node.js **>= 22**
+- **Node.js ≥ 22** (ver `.nvmrc`)
+- Cuenta de Cloudflare y `wrangler login` (solo para deploy)
 
 ```sh
 nvm use
@@ -21,61 +72,81 @@ npm install
 ## Desarrollo
 
 ```sh
-npm run gen   # regenera Env (ROOM, ASSETS)
-npm run dev
+npm run gen   # regenera tipos de Env (ROOM, ASSETS, …)
+npm run dev   # Vite + sidecar Wrangler para DO / WebSockets
 ```
 
 Abre [http://localhost:5173](http://localhost:5173).
 
-En dev, el plugin levanta un sidecar Wrangler para Durable Objects / WebSockets.
+En desarrollo, el plugin de Workers levanta un sidecar de Wrangler para Durable Objects y WebSockets.
 
-## Build / preview / deploy
+### Scripts útiles
+
+| Comando | Descripción |
+| --- | --- |
+| `npm run check` | `svelte-check` + sync de tipos |
+| `npm run lint` | Prettier + ESLint |
+| `npm run format` | Formato con Prettier |
+| `npm run build` | Build de producción (Workers + assets) |
+| `npm run preview` | Preview local con Wrangler |
+| `npm run deploy` | Build + deploy a Cloudflare |
+
+## Deploy
 
 ```sh
-npm run build
-npm run preview
 npm run deploy
 ```
 
-`deploy` requiere `wrangler login` (o `CLOUDFLARE_API_TOKEN`).
+Requiere autenticación (`wrangler login` o `CLOUDFLARE_API_TOKEN`).
 
-Último deploy de verificación (cuenta preview temporal):
+Demo de verificación (cuenta preview temporal):
 
-- https://planning-poker-free.obsidian-yuzu.workers.dev
+**https://planning-poker-free.obsidian-yuzu.workers.dev**
 
-Para quedarte con la cuenta: reclama el preview en el dashboard de Cloudflare (`wrangler deploy --temporary` imprime el claim URL).
+Para conservar la cuenta preview, reclámala desde el dashboard de Cloudflare (el comando de deploy temporal imprime el claim URL).
 
-## Producto
+## Arquitectura (resumen)
 
-### Sala y sesión
+```
+Cliente (SvelteKit)
+    │  HTTP + WebSocket
+    ▼
+Worker (SvelteKit adapter-cloudflare)
+    │  id de sala → stub
+    ▼
+Durable Object Room
+    · jugadores, votos, PBI, equipos
+    · broadcast en vivo
+    · alarmas (idle / TTL)
+```
 
-- Crea sala pública/privada (password), baraja y regla de estimate
-- Join por link `/room/{id}`: nombre, password si aplica, rol, equipo
-- Sesión en `localStorage` (`ppf:room:{id}`) → rejoin sin modal; última pestaña gana
-- Sala muerta / TTL / finalizar → doge + crear sala / volver al inicio
+Una instancia de `Room` por sala. El estado vive en el DO; no hace falta base de datos externa para el flujo principal.
 
-### Moderador
+## Comunidad
 
-- Creador = Moderador (+ voter por defecto)
-- Si el Moderador tiene rol **Votar**, también emite carta (incluso en rondas por equipos)
-- Ceder moderación, dejar el rol (claim inmediato), claim si el Moderador está offline
-- Solo personas **conectadas** pueden interactuar
-
-### Estimación
-
-- Barajas: Fibonacci modificado (default), Fibonacci, potencias de 2, T-shirt, secuencial
-- Regla: `consensus` (default), `mode`, `median`, `mean`
-- Historias (PBI), voto oculto/reveal, revoto o cerrar votación
-- Contador de voto visible (auto-reveal opcional); idle 30 min y max 8 h internos (un `setAlarm` multiplexado)
-
-### Equipos y audiencia (Fase 2)
-
-- Equipos libres creados por el Moderador
-- Roles `voter` / `observer` (+ label opcional)
-- Audiencia por ronda: todos los voters o equipos seleccionados
-- Resultados PBI en vivo (overall + byTeam) con copiar Markdown/CSV
+| Documento | Contenido |
+| --- | --- |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Cómo configurar el entorno y abrir PRs |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Normas de participación |
+| [SECURITY.md](SECURITY.md) | Reporte privado de vulnerabilidades |
+| [TRADEMARK.md](TRADEMARK.md) | Uso del nombre y el logo |
 
 ## Autores
 
-- Desarrollo: [Alejandro Rodriguez Romero](https://www.linkedin.com/in/alejandro-rodriguez-romero/)
-- Imágenes: [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/)
+| Rol | Persona |
+| --- | --- |
+| Desarrollo | [Alejandro Rodriguez Romero](https://www.linkedin.com/in/alejandro-rodriguez-romero/) |
+| Imágenes | [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/) |
+
+## Sponsors
+
+Si el proyecto te resulta útil, puedes apoyar su mantenimiento:
+
+- [♥ Sponsor en GitHub](https://github.com/sponsors/alejandrorodrom)
+- [♥ Ko-fi](https://ko-fi.com/alejandrorodriguezro)
+
+## Licencia
+
+El código fuente se distribuye bajo la licencia [MIT](LICENSE).
+
+El nombre **Planning Poker Free**, el logo y demás identidad visual **no** están cubiertos por la MIT: ver [TRADEMARK.md](TRADEMARK.md).
