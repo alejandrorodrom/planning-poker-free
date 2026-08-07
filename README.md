@@ -5,31 +5,40 @@
 <h1 align="center">Planning Poker Free</h1>
 
 <p align="center">
-  Estimación ágil en tiempo real para equipos SCRUM.<br />
+  <strong>Estimación ágil en tiempo real para equipos Scrum.</strong><br />
   Sin cuentas. Sin fricción. Solo una sala y tu equipo.
 </p>
 
 <p align="center">
-  <a href="#deploy-temporal-sin-cuenta-cloudflare"><strong>Deploy temporal</strong></a>
-  ·
+  <a href="https://github.com/alejandrorodrom/planning-poker-free/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <a href="https://nodejs.org/"><img alt="Node.js >= 22" src="https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg" /></a>
+  <a href="https://svelte.dev/"><img alt="Svelte 5" src="https://img.shields.io/badge/svelte-5-FF3E00.svg" /></a>
+  <a href="https://developers.cloudflare.com/workers/"><img alt="Cloudflare Workers" src="https://img.shields.io/badge/cloudflare-workers-F38020.svg" /></a>
+</p>
+
+<p align="center">
   <a href="#características">Características</a>
   ·
+  <a href="#stack">Stack</a>
+  ·
   <a href="#desarrollo">Desarrollo</a>
+  ·
+  <a href="#deploy">Deploy</a>
   ·
   <a href="CONTRIBUTING.md">Contribuir</a>
 </p>
 
 ---
 
-## ¿Qué es?
+## Descripción
 
-**Planning Poker Free** es una herramienta open-source para estimar historias de usuario (PBI) con Planning Poker. Cada sala corre en un Durable Object de Cloudflare: estado compartido, WebSockets y sincronización en vivo sin infraestructura propia.
+**Planning Poker Free** es una aplicación open source para estimar historias de usuario (PBI) mediante Planning Poker. Cada sala se ejecuta en un [Durable Object](https://developers.cloudflare.com/durable-objects/) de Cloudflare: estado compartido, WebSockets y sincronización en vivo, sin infraestructura propia ni registro de usuarios.
 
-Ideal para dailies de estimación, refinamiento o ceremonias remotas.
+Pensada para ceremonias de estimación, refinamiento y equipos remotos.
 
 ## Características
 
-| Área | Qué incluye |
+| Área | Detalle |
 | --- | --- |
 | **Salas** | Públicas o privadas con contraseña; acceso por enlace `/room/{id}` |
 | **Sesión** | Rejoin automático vía `localStorage`; la última pestaña activa gana |
@@ -47,7 +56,7 @@ Ideal para dailies de estimación, refinamiento o ceremonias remotas.
 
 ### Ciclo de vida de la sala
 
-- Idle ~30 min y máximo ~8 h (alarmas internas multiplexadas).
+- Idle ≈ 30 min y duración máxima ≈ 8 h (alarmas internas multiplexadas).
 - Sala finalizada o expirada → pantalla de cierre con opción de crear otra o volver al inicio.
 
 ## Stack
@@ -57,12 +66,12 @@ Ideal para dailies de estimación, refinamiento o ceremonias remotas.
 | UI | [Svelte 5](https://svelte.dev/) + [SvelteKit](https://kit.svelte.dev/) |
 | Runtime | [Cloudflare Workers](https://developers.cloudflare.com/workers/) |
 | Estado en vivo | [Durable Objects](https://developers.cloudflare.com/durable-objects/) (`Room`, binding `ROOM`) |
-| Tipado Workers | `wrangler types` + plugin `@oselvar/sveltekit-add-worker-exports` |
+| Tipado Workers | `wrangler types` + [`@oselvar/sveltekit-add-worker-exports`](https://www.npmjs.com/package/@oselvar/sveltekit-add-worker-exports) |
 
 ## Requisitos
 
-- **Node.js ≥ 22** (ver `.nvmrc`)
-- Para publicar: cuenta de Cloudflare **o** deploy temporal (sin cuenta, ver abajo)
+- **Node.js ≥ 22** (ver [`.nvmrc`](.nvmrc))
+- Para publicar: cuenta de Cloudflare, o [deploy temporal](#deploy-temporal-sin-cuenta-cloudflare) sin cuenta
 
 ```sh
 nvm use
@@ -73,54 +82,54 @@ npm install
 
 ```sh
 npm run gen   # regenera tipos de Env (ROOM, ASSETS, …)
-npm run dev   # Vite + sidecar Wrangler para DO / WebSockets
+npm run dev   # Vite + sidecar Wrangler (Durable Objects / WebSockets)
 ```
 
 Abre [http://localhost:5173](http://localhost:5173).
 
 En desarrollo, el plugin de Workers levanta un sidecar de Wrangler para Durable Objects y WebSockets.
 
-### Scripts útiles
+### Scripts
 
 | Comando | Descripción |
 | --- | --- |
-| `npm run check` | `svelte-check` + sync de tipos |
+| `npm run check` | `svelte-check` y sync de tipos |
 | `npm run lint` | Prettier + ESLint |
 | `npm run format` | Formato con Prettier |
 | `npm run build` | Build de producción (Workers + assets) |
 | `npm run preview` | Preview local con Wrangler |
-| `npm run deploy` | Build + deploy a tu cuenta Cloudflare (local o GitHub Actions) |
+| `npm run deploy` | Build + deploy a Cloudflare (local o CI) |
 
 ## Deploy
 
 ### Deploy temporal (sin cuenta Cloudflare)
 
-Útil si clonaste el repo y quieres una URL pública en minutos, **sin** `wrangler login`. Requiere [Wrangler ≥ 4.102](https://developers.cloudflare.com/workers/platform/claim-deployments/).
+Ideal al clonar el repositorio si quieres una URL pública en minutos, **sin** `wrangler login`. Requiere [Wrangler ≥ 4.102](https://developers.cloudflare.com/workers/platform/claim-deployments/).
 
-1. Asegúrate de **no** estar autenticado (si lo estás: `npx wrangler logout`).
-2. Build + deploy temporal:
+1. Asegúrate de **no** estar autenticado (`npx wrangler logout` si hace falta).
+2. Build y deploy temporal:
 
 ```sh
 npm run build
 npx wrangler deploy --temporary
 ```
 
-3. En la salida verás:
-   - una URL `https://planning-poker-free.<subdominio>.workers.dev`
-   - un **claim URL**
+3. La salida incluye:
+   - URL `https://planning-poker-free.<subdominio>.workers.dev`
+   - **claim URL**
 
-La demo temporal vive unos **60 minutos**. Si no la reclamas, Cloudflare la elimina.
+La instancia temporal permanece activa unos **60 minutos**. Si no la reclamas, Cloudflare la elimina.
 
 #### Conservar el deploy (claim)
 
-1. Abre el claim URL que imprimió Wrangler.
+1. Abre el claim URL impreso por Wrangler.
 2. Inicia sesión o crea una cuenta Cloudflare.
-3. Reclama la cuenta preview: el Worker (y recursos como Durable Objects) pasan a ser tuyos y dejan de caducar.
-4. Después puedes añadir un **dominio custom** (Workers → Triggers → Custom Domains) y seguir desplegando a **esa** cuenta.
+3. Reclama la cuenta preview: el Worker y sus recursos (p. ej. Durable Objects) pasan a ser tuyos.
+4. Opcional: dominio personalizado en Workers → Triggers → Custom Domains.
 
-Para redeployar a la cuenta ya reclamada (o a cualquier cuenta permanente), usa el flujo local o GitHub Actions de abajo — no `--temporary`. El flag solo funciona **sin** credenciales; si ya tienes token o login, Wrangler lo rechaza.
+Para redeployar en una cuenta permanente, usa el flujo local o GitHub Actions — no `--temporary`. Ese flag solo aplica **sin** credenciales.
 
-Docs oficiales: [Claim deployments (temporary accounts)](https://developers.cloudflare.com/workers/platform/claim-deployments/).
+Referencia: [Claim deployments (temporary accounts)](https://developers.cloudflare.com/workers/platform/claim-deployments/).
 
 ### Local (cuenta permanente)
 
@@ -129,29 +138,29 @@ wrangler login    # una vez
 npm run deploy
 ```
 
-Te da una URL estable `https://planning-poker-free.<tu-subdominio>.workers.dev`.
+URL estable: `https://planning-poker-free.<tu-subdominio>.workers.dev`.
 
-### GitHub Actions (recomendado en tu fork / repo)
+### GitHub Actions
 
-El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) hace build + deploy en cada push a `main` (también *Actions → Deploy → Run workflow*). Usa el environment de GitHub **`production`** (aparece en *Deployments* de la home del repo).
+El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) ejecuta build y deploy en cada push a `main` (también *Actions → Deploy → Run workflow*). Usa el environment de GitHub **`production`** (visible en *Deployments*).
 
-Secrets del repo (`Settings → Secrets and variables → Actions`):
+Secrets del environment `production` (`Settings → Environments → production`):
 
 | Secret | Origen |
 | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens (*Edit Cloudflare Workers*) |
 | `CLOUDFLARE_ACCOUNT_ID` | Dashboard Workers → Account ID |
 
-Usa el token y el Account ID de **la cuenta donde quieras publicar** (incluida una cuenta que hayas reclamado tras un deploy temporal). Los secrets no se clonan con el código: cada fork configura los suyos.
+Usa las credenciales de **la cuenta donde quieras publicar** (incluida una reclamada tras un deploy temporal). Los secrets no se incluyen en el código: cada fork debe configurar los suyos.
 
-### Después del primer deploy estable
+### Tras el primer deploy estable
 
-1. Añade los dos secrets en GitHub (si usas Actions).
-2. Push a `main` o lanza el workflow a mano.
-3. Comprueba la URL `*.workers.dev` en el log del job / de Wrangler.
-4. (Opcional) Dominio custom en Cloudflare → Workers → Triggers → Custom Domains.
+1. Configura los secrets en GitHub (si usas Actions).
+2. Haz push a `main` o lanza el workflow manualmente.
+3. Verifica la URL `*.workers.dev` en el log del job o de Wrangler.
+4. (Opcional) Dominio custom: Cloudflare → Workers → Triggers → Custom Domains.
 
-## Arquitectura (resumen)
+## Arquitectura
 
 ```
 Cliente (SvelteKit)
@@ -166,13 +175,13 @@ Durable Object Room
     · alarmas (idle / TTL)
 ```
 
-Una instancia de `Room` por sala. El estado vive en el DO; no hace falta base de datos externa para el flujo principal.
+Una instancia de `Room` por sala. El estado vive en el Durable Object; el flujo principal no requiere base de datos externa.
 
 ## Comunidad
 
 | Documento | Contenido |
 | --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Cómo configurar el entorno y abrir PRs |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Entorno local y proceso de PRs |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Normas de participación |
 | [SECURITY.md](SECURITY.md) | Reporte privado de vulnerabilidades |
 | [TRADEMARK.md](TRADEMARK.md) | Uso del nombre y el logo |
@@ -188,11 +197,11 @@ Una instancia de `Room` por sala. El estado vive en el DO; no hace falta base de
 
 Si el proyecto te resulta útil, puedes apoyar su mantenimiento:
 
-- [♥ Sponsor en GitHub](https://github.com/sponsors/alejandrorodrom)
-- [♥ Ko-fi](https://ko-fi.com/alejandrorodriguezro)
+- [GitHub Sponsors](https://github.com/sponsors/alejandrorodrom)
+- [Ko-fi](https://ko-fi.com/alejandrorodriguezro)
 
 ## Licencia
 
 El código fuente se distribuye bajo la licencia [MIT](LICENSE).
 
-El nombre **Planning Poker Free**, el logo y demás identidad visual **no** están cubiertos por la MIT: ver [TRADEMARK.md](TRADEMARK.md).
+El nombre **Planning Poker Free**, el logo y la identidad visual **no** están cubiertos por la MIT: ver [TRADEMARK.md](TRADEMARK.md).

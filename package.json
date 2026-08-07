@@ -1,8 +1,40 @@
 {
   "name": "planning-poker-free",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.1",
+  "description": "Real-time Planning Poker for Scrum teams — rooms, WebSockets and Durable Objects on Cloudflare Workers. No accounts required.",
+  "license": "MIT",
+  "author": {
+    "name": "Alejandro Rodriguez Romero",
+    "url": "https://www.linkedin.com/in/alejandro-rodriguez-romero/"
+  },
+  "homepage": "https://github.com/alejandrorodrom/planning-poker-free#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alejandrorodrom/planning-poker-free.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alejandrorodrom/planning-poker-free/issues"
+  },
+  "keywords": [
+    "planning-poker",
+    "scrum",
+    "agile",
+    "story-points",
+    "estimation",
+    "svelte",
+    "sveltekit",
+    "typescript",
+    "cloudflare",
+    "cloudflare-workers",
+    "durable-objects",
+    "websockets",
+    "realtime"
+  ],
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "wrangler types && vite build",
@@ -14,6 +46,10 @@
     "format": "prettier --write .",
     "gen": "wrangler types",
     "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@dicebear/core": "^10.4.0",
+    "@dicebear/styles": "^10.3.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
@@ -37,18 +73,9 @@
     "wrangler": "^4.97.0",
     "yaml": "^2.9.0"
   },
-  "engines": {
-    "node": ">=22"
-  },
   "overrides": {
     "@img/sharp-freebsd-wasm32": "-",
     "@img/sharp-webcontainers-wasm32": "-",
     "@img/sharp-wasm32": "-"
-  },
-  "license": "MIT",
-  "description": "Open-source web tool for SCRUM teams to estimate story complexity",
-  "dependencies": {
-    "@dicebear/core": "^10.4.0",
-    "@dicebear/styles": "^10.3.0"
   }
 }
