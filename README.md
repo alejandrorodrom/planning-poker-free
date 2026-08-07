@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://planning-poker-free.obsidian-yuzu.workers.dev"><strong>Probar demo</strong></a>
+  <a href="#deploy-temporal-sin-cuenta-cloudflare"><strong>Deploy temporal</strong></a>
   ·
   <a href="#características">Características</a>
   ·
@@ -62,7 +62,7 @@ Ideal para dailies de estimación, refinamiento o ceremonias remotas.
 ## Requisitos
 
 - **Node.js ≥ 22** (ver `.nvmrc`)
-- Cuenta de Cloudflare y `wrangler login` (solo para deploy)
+- Para publicar: cuenta de Cloudflare **o** deploy temporal (sin cuenta, ver abajo)
 
 ```sh
 nvm use
@@ -89,21 +89,67 @@ En desarrollo, el plugin de Workers levanta un sidecar de Wrangler para Durable 
 | `npm run format` | Formato con Prettier |
 | `npm run build` | Build de producción (Workers + assets) |
 | `npm run preview` | Preview local con Wrangler |
-| `npm run deploy` | Build + deploy a Cloudflare |
+| `npm run deploy` | Build + deploy a tu cuenta Cloudflare (local o GitHub Actions) |
 
 ## Deploy
 
+### Deploy temporal (sin cuenta Cloudflare)
+
+Útil si clonaste el repo y quieres una URL pública en minutos, **sin** `wrangler login`. Requiere [Wrangler ≥ 4.102](https://developers.cloudflare.com/workers/platform/claim-deployments/).
+
+1. Asegúrate de **no** estar autenticado (si lo estás: `npx wrangler logout`).
+2. Build + deploy temporal:
+
 ```sh
+npm run build
+npx wrangler deploy --temporary
+```
+
+3. En la salida verás:
+   - una URL `https://planning-poker-free.<subdominio>.workers.dev`
+   - un **claim URL**
+
+La demo temporal vive unos **60 minutos**. Si no la reclamas, Cloudflare la elimina.
+
+#### Conservar el deploy (claim)
+
+1. Abre el claim URL que imprimió Wrangler.
+2. Inicia sesión o crea una cuenta Cloudflare.
+3. Reclama la cuenta preview: el Worker (y recursos como Durable Objects) pasan a ser tuyos y dejan de caducar.
+4. Después puedes añadir un **dominio custom** (Workers → Triggers → Custom Domains) y seguir desplegando a **esa** cuenta.
+
+Para redeployar a la cuenta ya reclamada (o a cualquier cuenta permanente), usa el flujo local o GitHub Actions de abajo — no `--temporary`. El flag solo funciona **sin** credenciales; si ya tienes token o login, Wrangler lo rechaza.
+
+Docs oficiales: [Claim deployments (temporary accounts)](https://developers.cloudflare.com/workers/platform/claim-deployments/).
+
+### Local (cuenta permanente)
+
+```sh
+wrangler login    # una vez
 npm run deploy
 ```
 
-Requiere autenticación (`wrangler login` o `CLOUDFLARE_API_TOKEN`).
+Te da una URL estable `https://planning-poker-free.<tu-subdominio>.workers.dev`.
 
-Demo de verificación (cuenta preview temporal):
+### GitHub Actions (recomendado en tu fork / repo)
 
-**https://planning-poker-free.obsidian-yuzu.workers.dev**
+El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) hace build + deploy en cada push a `main` (también *Actions → Deploy → Run workflow*). Usa el environment de GitHub **`production`** (aparece en *Deployments* de la home del repo).
 
-Para conservar la cuenta preview, reclámala desde el dashboard de Cloudflare (el comando de deploy temporal imprime el claim URL).
+Secrets del repo (`Settings → Secrets and variables → Actions`):
+
+| Secret | Origen |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens (*Edit Cloudflare Workers*) |
+| `CLOUDFLARE_ACCOUNT_ID` | Dashboard Workers → Account ID |
+
+Usa el token y el Account ID de **la cuenta donde quieras publicar** (incluida una cuenta que hayas reclamado tras un deploy temporal). Los secrets no se clonan con el código: cada fork configura los suyos.
+
+### Después del primer deploy estable
+
+1. Añade los dos secrets en GitHub (si usas Actions).
+2. Push a `main` o lanza el workflow a mano.
+3. Comprueba la URL `*.workers.dev` en el log del job / de Wrangler.
+4. (Opcional) Dominio custom en Cloudflare → Workers → Triggers → Custom Domains.
 
 ## Arquitectura (resumen)
 
