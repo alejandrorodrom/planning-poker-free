@@ -38,6 +38,7 @@
   let draftName = $state('');
   let editingId = $state<string | null>(null);
   let editName = $state('');
+  let editInputEl: HTMLInputElement | undefined = $state();
 
   function membersOf(teamId: string) {
     return players.filter((player) => player.teamId === teamId);
@@ -54,6 +55,10 @@
     editingId = team.id;
     editName = team.name;
   }
+
+  $effect(() => {
+    if (editingId != null) editInputEl?.focus();
+  });
 
   function cancelEdit() {
     editingId = null;
@@ -110,8 +115,8 @@
                 type="text"
                 maxlength={TEAM_NAME_MAX}
                 bind:value={editName}
+                bind:this={editInputEl}
                 aria-label="Editar nombre del equipo"
-                autofocus
               />
               <button type="submit" class="teams__text-btn teams__text-btn--save">Guardar</button>
               <button type="button" class="teams__text-btn" onclick={cancelEdit}>Cancelar</button>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import AvatarPicker from '$lib/components/AvatarPicker.svelte';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
@@ -13,7 +14,7 @@
 
   let { open, avatar, onsave, onclose }: Props = $props();
 
-  let draft = $state(sanitizeAvatar(avatar));
+  let draft = $state(untrack(() => sanitizeAvatar(avatar)));
 
   $effect(() => {
     if (open) draft = sanitizeAvatar(avatar);

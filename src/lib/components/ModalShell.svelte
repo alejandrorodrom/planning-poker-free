@@ -50,9 +50,8 @@
   <div
     class="modal-shell__overlay"
     class:modal-shell__overlay--soft={variant === 'soft'}
-    role="presentation"
-    onclick={onclose}
   >
+    <button type="button" class="modal-shell__backdrop" aria-label="Cerrar" onclick={onclose}></button>
     <div
       class="modal-shell"
       class:modal-shell--panel={variant === 'panel'}
@@ -66,7 +65,6 @@
       aria-modal="true"
       aria-labelledby={titleId}
       tabindex="-1"
-      onclick={(event) => event.stopPropagation()}
     >
       <header
         class="modal-shell__header"
@@ -115,17 +113,31 @@
     display: grid;
     place-items: center;
     padding: 24px;
-    background: rgba(11, 93, 112, 0.42);
-    backdrop-filter: blur(4px);
     animation: modal-fade-in 160ms ease;
   }
 
   .modal-shell__overlay--soft {
     padding: 16px;
+  }
+
+  .modal-shell__backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: rgba(11, 93, 112, 0.42);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+  }
+
+  .modal-shell__overlay--soft .modal-shell__backdrop {
     background: rgba(8, 32, 40, 0.45);
   }
 
   .modal-shell {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     max-height: min(86vh, 720px);
