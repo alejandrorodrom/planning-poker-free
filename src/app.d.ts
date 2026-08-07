@@ -1,6 +1,6 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
 declare global {
+  const __DEV_WORKER_PORT__: number;
+
   namespace App {
     interface Platform {
       env: Env;
@@ -8,11 +8,6 @@ declare global {
       caches: CacheStorage;
       cf?: IncomingRequestCfProperties;
     }
-
-    // interface Error {}
-    // interface Locals {}
-    // interface PageData {}
-    // interface PageState {}
   }
 }
 

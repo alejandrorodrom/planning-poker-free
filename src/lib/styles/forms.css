@@ -1,0 +1,152 @@
+.form__label {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.form__input {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1.2rem;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid black;
+  outline: none;
+  width: 100%;
+  margin-bottom: 16px;
+  background: white;
+}
+
+.form__input.form__input--compact {
+  font-size: 1rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 12px;
+}
+
+.form__select {
+  cursor: pointer;
+}
+
+.form__input:focus,
+.form__input:active {
+  border-color: var(--color-brand-dark);
+}
+
+.form__input--error {
+  border-color: var(--color-error);
+}
+
+.form__input--error:focus,
+.form__input--error:active {
+  border-color: var(--color-error);
+}
+
+.form__choice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 2px solid black;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+}
+
+.form__choice:has(input:checked) {
+  border-color: var(--color-brand-dark);
+  background: #f3f7f8;
+}
+
+.form__choice input {
+  margin-top: 4px;
+}
+
+.form__choice strong {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.form__choice small {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.form__private {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.form__error {
+  color: var(--color-error);
+  font-weight: 600;
+  margin: 0;
+}
+
+.form__error--float {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  margin: 0 0 4px;
+  pointer-events: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.field__label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5a7a82;
+}
+
+.field__select {
+  width: 100%;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.6rem;
+  border: 2px solid #111;
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.field__select:focus {
+  border-color: var(--color-brand-dark);
+}
+
+.modal-ghost {
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+  cursor: pointer;
+  padding: 10px 12px;
+}
+
+.modal-ghost:hover {
+  text-decoration: underline;
+}

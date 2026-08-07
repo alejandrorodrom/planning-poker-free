@@ -1,17 +1,41 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
+  import type { Pathname } from '$app/types';
+
   type Props = {
     text: string;
-    href?: string;
+    href?: Pathname;
     type?: 'button' | 'submit' | 'reset';
     class?: string;
+    disabled?: boolean;
     onclick?: (event: MouseEvent) => void;
   };
 
-  let { text, href, type = 'button', class: className = '', onclick }: Props = $props();
+  let {
+    text,
+    href,
+    type = 'button',
+    class: className = '',
+    disabled = false,
+    onclick
+  }: Props = $props();
 </script>
 
 {#if href}
-  <a class="button {className}" {href} {onclick}>
+  <a
+    class="button {className}"
+    class:button--disabled={disabled}
+    href={disabled ? undefined : resolve(href)}
+    aria-disabled={disabled || undefined}
+    tabindex={disabled ? -1 : undefined}
+    onclick={(event) => {
+      if (disabled) {
+        event.preventDefault();
+        return;
+      }
+      onclick?.(event);
+    }}
+  >
     {text}
     <span class="button__blobs" aria-hidden="true">
       <span></span>
@@ -20,7 +44,7 @@
     </span>
   </a>
 {:else}
-  <button class="button {className}" {type} {onclick}>
+  <button class="button {className}" {type} {disabled} {onclick}>
     {text}
     <span class="button__blobs" aria-hidden="true">
       <span></span>
@@ -73,12 +97,19 @@
     appearance: none;
   }
 
-  .button:hover {
+  .button:hover:not(:disabled):not(.button--disabled) {
     color: #fff;
   }
 
-  .button:hover .button__blobs span {
+  .button:hover:not(:disabled):not(.button--disabled) .button__blobs span {
     transform: scale(1.4) translateY(0) translateZ(0);
+  }
+
+  .button:disabled,
+  .button--disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    color: var(--color-brand);
   }
 
   .button__blobs {

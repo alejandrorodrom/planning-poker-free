@@ -5,18 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "wrangler types --check && vite build",
-    "preview": "wrangler dev .svelte-kit/cloudflare/_worker.js --port 4173",
+    "build": "wrangler types && vite build",
+    "preview": "wrangler dev",
     "prepare": "svelte-kit sync || echo ''",
-    "check": "wrangler types --check && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "gen": "wrangler types"
+    "gen": "wrangler types",
+    "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
     "@eslint/js": "^10.0.1",
+    "@oselvar/sveltekit-add-worker-exports": "^2.1.2",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/kit": "^2.63.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
@@ -43,5 +45,9 @@
     "@img/sharp-webcontainers-wasm32": "-",
     "@img/sharp-wasm32": "-"
   },
-  "description": "Open-source web tool for SCRUM teams to estimate story complexity"
+  "description": "Open-source web tool for SCRUM teams to estimate story complexity",
+  "dependencies": {
+    "@dicebear/core": "^10.4.0",
+    "@dicebear/styles": "^10.3.0"
+  }
 }

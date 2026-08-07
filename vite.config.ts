@@ -1,3 +1,4 @@
+import { addWorkerExports } from '@oselvar/sveltekit-add-worker-exports';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
@@ -10,7 +11,12 @@ export default defineConfig({
         runes: ({ filename }) =>
           filename.split(/[/\\]/).includes('node_modules') ? undefined : true
       },
-      adapter: adapter()
-    })
+      adapter: adapter({
+        platformProxy: {
+          configPath: '.platform-proxy-wrangler.jsonc'
+        }
+      })
+    }),
+    addWorkerExports({ entryPoint: 'src/lib/server/index.ts' })
   ]
 });

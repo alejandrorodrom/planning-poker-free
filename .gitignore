@@ -21,3 +21,7 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Cloudflare / worker-exports plugin
+.platform-proxy-wrangler.jsonc
+.dev-worker-wrangler.jsonc
