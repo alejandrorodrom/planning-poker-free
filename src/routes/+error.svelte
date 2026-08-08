@@ -1,6 +1,12 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 </script>
+
+<svelte:head>
+  <title>{page.status === 404 ? 'Página no encontrada' : 'Error'} · Planning Poker Free</title>
+  <meta name="robots" content="noindex, nofollow" />
+</svelte:head>
 
 <section class="not-found">
   <img class="doge" src="/assets/gif/doge.gif" alt="Doge" />
@@ -8,7 +14,7 @@
   <p class="description">
     {page.status === 404 ? 'Página no encontrada' : (page.error?.message ?? 'Algo salió mal')}
   </p>
-  <a class="back" href="/">Volver al inicio</a>
+  <a class="back" href={resolve('/')}>Volver al inicio</a>
 </section>
 
 <style>

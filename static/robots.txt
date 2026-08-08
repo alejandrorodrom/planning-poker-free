@@ -1,3 +1,7 @@
-# allow crawling everything by default
+# Solo https://planningpoker.free/ es indexable.
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /room/
+Disallow: /api/
+
+Sitemap: https://planningpoker.free/sitemap.xml

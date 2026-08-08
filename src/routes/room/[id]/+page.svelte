@@ -597,6 +597,7 @@
 
 <svelte:head>
   <title>{displayRoomName} · Planning Poker</title>
+  <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 {#if goneReason}

@@ -1,7 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
+  import SeoHead from '$lib/components/SeoHead.svelte';
   import { loadStoredAvatar } from '$lib/room/avatar';
   import { DECKS, DEFAULT_DECK, type DeckId } from '$lib/room/decks';
   import {
@@ -11,6 +13,9 @@
   } from '$lib/room/limits';
   import type { EstimateRule, RevealMode } from '$lib/room/protocol';
   import { saveSession } from '$lib/room/session';
+  import { isCanonicalHost } from '$lib/seo';
+
+  const indexable = $derived(isCanonicalHost(page.url.hostname));
 
   const STEPS = [
     { id: 1, title: 'Tu nombre', hint: 'Así te verá el equipo en la mesa.' },
@@ -143,9 +148,7 @@
   }
 </script>
 
-<svelte:head>
-  <title>Planning Poker Free</title>
-</svelte:head>
+<SeoHead indexable={indexable} />
 
 <section class="hero">
   <img

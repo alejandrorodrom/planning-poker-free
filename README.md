@@ -10,6 +10,11 @@
 </p>
 
 <p align="center">
+  <a href="https://planningpoker.free/"><strong>https://planningpoker.free</strong></a>
+</p>
+
+<p align="center">
+  <a href="https://planningpoker.free/"><img alt="Live" src="https://img.shields.io/badge/live-planningpoker.free-0F9D58.svg" /></a>
   <a href="https://github.com/alejandrorodrom/planning-poker-free/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
   <a href="https://nodejs.org/"><img alt="Node.js >= 22" src="https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg" /></a>
   <a href="https://svelte.dev/"><img alt="Svelte 5" src="https://img.shields.io/badge/svelte-5-FF3E00.svg" /></a>
@@ -140,7 +145,8 @@ npm run deploy           # producción
 npm run deploy:staging   # staging (Worker aparte)
 ```
 
-- Producción: `https://planning-poker-free.<tu-subdominio>.workers.dev`
+- Producción (oficial): [https://planningpoker.free](https://planningpoker.free)
+- Producción (`workers.dev`): `https://planning-poker-free.<tu-subdominio>.workers.dev`
 - Staging: `https://planning-poker-free-staging.<tu-subdominio>.workers.dev`
 
 ### GitHub Actions
@@ -164,9 +170,9 @@ Usa las credenciales de **la cuenta donde quieras publicar** (incluida una recla
 
 1. Configura los secrets en GitHub (si usas Actions). Para staging, crea el environment `staging` con los mismos secrets.
 2. Haz push a `main` o lanza el workflow de producción manualmente.
-3. Verifica la URL `*.workers.dev` en el log del job o de Wrangler.
+3. Verifica [https://planningpoker.free](https://planningpoker.free) o la URL `*.workers.dev` en el log del job o de Wrangler.
 4. (Opcional) Prueba una rama en staging: *Actions → Deploy staging → Run workflow* → elige rama.
-5. (Opcional) Dominio custom: Cloudflare → Workers → Triggers → Custom Domains.
+5. Dominio custom (producción oficial): Cloudflare → Workers → Domains & Routes → Custom Domains → `planningpoker.free`.
 
 ## Arquitectura
 
