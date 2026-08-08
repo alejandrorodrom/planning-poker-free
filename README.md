@@ -98,7 +98,8 @@ En desarrollo, el plugin de Workers levanta un sidecar de Wrangler para Durable 
 | `npm run format` | Formato con Prettier |
 | `npm run build` | Build de producción (Workers + assets) |
 | `npm run preview` | Preview local con Wrangler |
-| `npm run deploy` | Build + deploy a Cloudflare (local o CI) |
+| `npm run deploy` | Build + deploy a Cloudflare (producción) |
+| `npm run deploy:staging` | Build + deploy al Worker de staging |
 
 ## Deploy
 
@@ -135,16 +136,22 @@ Referencia: [Claim deployments (temporary accounts)](https://developers.cloudfla
 
 ```sh
 wrangler login    # una vez
-npm run deploy
+npm run deploy           # producción
+npm run deploy:staging   # staging (Worker aparte)
 ```
 
-URL estable: `https://planning-poker-free.<tu-subdominio>.workers.dev`.
+- Producción: `https://planning-poker-free.<tu-subdominio>.workers.dev`
+- Staging: `https://planning-poker-free-staging.<tu-subdominio>.workers.dev`
 
 ### GitHub Actions
 
-El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) ejecuta build y deploy en cada push a `main` (también *Actions → Deploy → Run workflow*). Usa el environment de GitHub **`production`** (visible en *Deployments*).
+**Producción** — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): build y deploy en cada push a `main` (también *Actions → Deploy → Run workflow*). Environment de GitHub **`production`**.
 
-Secrets del environment `production` (`Settings → Environments → production`):
+**Staging** — [`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml): solo *workflow_dispatch*. En *Actions → Deploy staging → Run workflow* eliges la **rama** a desplegar. Publica el Worker `planning-poker-free-staging` (Durable Objects propios, sin tocar producción). Environment de GitHub **`staging`**.
+
+URL de staging: `https://planning-poker-free-staging.<tu-subdominio>.workers.dev`.
+
+Secrets en cada environment (`Settings → Environments → production` / `staging`):
 
 | Secret | Origen |
 | --- | --- |
@@ -155,10 +162,11 @@ Usa las credenciales de **la cuenta donde quieras publicar** (incluida una recla
 
 ### Tras el primer deploy estable
 
-1. Configura los secrets en GitHub (si usas Actions).
-2. Haz push a `main` o lanza el workflow manualmente.
+1. Configura los secrets en GitHub (si usas Actions). Para staging, crea el environment `staging` con los mismos secrets.
+2. Haz push a `main` o lanza el workflow de producción manualmente.
 3. Verifica la URL `*.workers.dev` en el log del job o de Wrangler.
-4. (Opcional) Dominio custom: Cloudflare → Workers → Triggers → Custom Domains.
+4. (Opcional) Prueba una rama en staging: *Actions → Deploy staging → Run workflow* → elige rama.
+5. (Opcional) Dominio custom: Cloudflare → Workers → Triggers → Custom Domains.
 
 ## Arquitectura
 
