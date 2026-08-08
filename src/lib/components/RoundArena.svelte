@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
   import type { ActiveRoundPublic, EstimateRule, PlayerPublic, StoryPublic, Team } from '$lib/room/protocol';
@@ -169,17 +170,21 @@
   let readyDealKey = $state('');
   let pickPulse = $state<string | null>(null);
   let pendingVote = $state<string | null>(null);
+  let arenaSettled = $state(false);
   const handReady = $derived(Boolean(handDealKey) && readyDealKey === handDealKey);
 
   $effect(() => {
-    if (!handDealKey) {
+    const key = handDealKey;
+    if (!key) {
       readyDealKey = '';
       pickPulse = null;
       pendingVote = null;
       return;
     }
 
-    const key = handDealKey;
+    // Solo reaccionar al deal key; no reiniciar la mano por re-renders del tablero/modales.
+    if (readyDealKey === key) return;
+
     pickPulse = null;
     pendingVote = null;
 
@@ -191,7 +196,7 @@
       return;
     }
 
-    const n = Math.max(1, deckCards.length);
+    const n = untrack(() => Math.max(1, deckCards.length));
     const doneAt = DEAL_FLIP_DELAY_MS + (n - 1) * DEAL_STAGGER_MS + DEAL_FLIP_MS + 60;
     const t = setTimeout(() => {
       readyDealKey = key;
@@ -217,11 +222,17 @@
 
 <div
   class="arena"
+  class:arena--settled={arenaSettled}
   class:arena--idle={!round && !storyEstimated}
   class:arena--estimated={!round && storyEstimated}
   class:arena--revealed={revealed}
   class:arena--urgent={timerUrgent && !!round && !revealed}
   class:arena--timeup={timerDone && !!round && !revealed}
+  onanimationend={(event) => {
+    if (event.target === event.currentTarget && event.animationName === 'arena-in') {
+      arenaSettled = true;
+    }
+  }}
 >
   <div class="arena__glow" aria-hidden="true"></div>
 
@@ -542,8 +553,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    transform: translateZ(0);
+    contain: paint;
     animation: arena-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
     transition: background 320ms ease;
+  }
+
+  .arena--settled {
+    animation: none;
   }
 
   .arena--idle {

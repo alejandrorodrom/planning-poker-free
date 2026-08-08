@@ -51,6 +51,7 @@
     class="modal-shell__overlay"
     class:modal-shell__overlay--soft={variant === 'soft'}
   >
+    <div class="modal-shell__frost" aria-hidden="true"></div>
     <button type="button" class="modal-shell__backdrop" aria-label="Cerrar" onclick={onclose}></button>
     <div
       class="modal-shell"
@@ -113,11 +114,25 @@
     display: grid;
     place-items: center;
     padding: 24px;
-    animation: modal-fade-in 160ms ease;
+    isolation: isolate;
   }
 
   .modal-shell__overlay--soft {
     padding: 16px;
+  }
+
+  .modal-shell__frost {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 40, 48, 0.42);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transform: translateZ(0);
+    pointer-events: none;
+  }
+
+  .modal-shell__overlay--soft .modal-shell__frost {
+    background: rgba(8, 32, 40, 0.48);
   }
 
   .modal-shell__backdrop {
@@ -126,13 +141,8 @@
     border: 0;
     padding: 0;
     margin: 0;
-    background: rgba(11, 93, 112, 0.42);
-    backdrop-filter: blur(4px);
+    background: transparent;
     cursor: pointer;
-  }
-
-  .modal-shell__overlay--soft .modal-shell__backdrop {
-    background: rgba(8, 32, 40, 0.45);
   }
 
   .modal-shell {
@@ -143,7 +153,8 @@
     max-height: min(86vh, 720px);
     overflow: hidden;
     width: min(100%, 480px);
-    animation: modal-rise-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateZ(0);
+    animation: modal-rise-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .modal-shell--sm {
@@ -179,7 +190,6 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     padding: 28px 24px 22px;
-    animation: modal-rise-in 180ms ease;
   }
 
   .modal-shell--soft {
@@ -335,23 +345,26 @@
     gap: 10px;
   }
 
-  @keyframes modal-fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
   @keyframes modal-rise-in {
     from {
       opacity: 0;
-      transform: translateY(12px) scale(0.98);
+      transform: translateZ(0) translateY(10px);
     }
     to {
       opacity: 1;
-      transform: none;
+      transform: translateZ(0) translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal-shell {
+      animation: none;
+    }
+
+    .modal-shell__frost {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgba(8, 40, 48, 0.62);
     }
   }
 
