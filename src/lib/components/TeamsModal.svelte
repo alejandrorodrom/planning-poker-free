@@ -1,5 +1,4 @@
 <script lang="ts">
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
   import TeamList from '$lib/components/TeamList.svelte';
   import type { PlayerPublic, Team } from '$lib/room/protocol';
@@ -25,6 +24,12 @@
     ondelete,
     onclose
   }: Props = $props();
+
+  const description = $derived(
+    teams.length === 0
+      ? 'Opcional. Úsalos para limitar quién vota en cada ronda.'
+      : `${teams.length} ${teams.length === 1 ? 'equipo' : 'equipos'} en la sala.`
+  );
 </script>
 
 <ModalShell
@@ -32,9 +37,9 @@
   title="Equipos"
   titleId="teams-modal-title"
   eyebrow="Sala"
-  description="Opcional. Úsalos para limitar quién vota en cada ronda."
+  {description}
   hint={creatable ? 'Crea equipos y asígnalos desde Participantes.' : undefined}
-  size="md"
+  size="lg"
   {onclose}
 >
   <TeamList
@@ -42,14 +47,18 @@
     {players}
     title=""
     hint=""
+    emptyLabel={creatable
+      ? 'Añade el primer equipo para agrupar participantes.'
+      : 'Todavía no hay equipos.'}
     {creatable}
     manageable={creatable}
+    autofocusCreate={open && creatable}
     {oncreate}
     {onrename}
     {ondelete}
   />
 
   {#snippet footer()}
-    <LiquidButton text="Cerrar" onclick={onclose} />
+    <button type="button" class="modal-ghost" onclick={onclose}>Cerrar</button>
   {/snippet}
 </ModalShell>

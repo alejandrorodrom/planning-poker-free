@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import LiquidButton from './LiquidButton.svelte';
   import { TEAM_NAME_MAX } from '$lib/room/limits';
 
@@ -15,6 +16,7 @@
     manageable?: boolean;
     createPlaceholder?: string;
     createLabel?: string;
+    autofocusCreate?: boolean;
     oncreate?: (name: string) => void;
     onrename?: (teamId: string, name: string) => void;
     ondelete?: (teamId: string) => void;
@@ -29,7 +31,8 @@
     creatable = false,
     manageable = false,
     createPlaceholder = 'Ej. Front, Back, Mobile',
-    createLabel = 'Crear equipo',
+    createLabel = 'Añadir',
+    autofocusCreate = false,
     oncreate,
     onrename,
     ondelete
@@ -39,6 +42,10 @@
   let editingId = $state<string | null>(null);
   let editName = $state('');
   let editInputEl: HTMLInputElement | undefined = $state();
+  let createInputEl: HTMLInputElement | undefined = $state();
+
+  const canCreate = $derived(draftName.trim().length > 0);
+  const canSaveEdit = $derived(editName.trim().length > 0);
 
   function membersOf(teamId: string) {
     return players.filter((player) => player.teamId === teamId);
@@ -51,14 +58,13 @@
     draftName = '';
   }
 
-  function startEdit(team: Team) {
+  async function startEdit(team: Team) {
     editingId = team.id;
     editName = team.name;
+    await tick();
+    editInputEl?.focus();
+    editInputEl?.select();
   }
-
-  $effect(() => {
-    if (editingId != null) editInputEl?.focus();
-  });
 
   function cancelEdit() {
     editingId = null;
@@ -71,6 +77,15 @@
     onrename?.(teamId, name);
     cancelEdit();
   }
+
+  $effect(() => {
+    if (!autofocusCreate) {
+      cancelEdit();
+      return;
+    }
+    if (!creatable || editingId) return;
+    void tick().then(() => createInputEl?.focus());
+  });
 </script>
 
 <section class="teams">
@@ -83,14 +98,31 @@
 
   {#if creatable}
     <form
-      class="teams__create"
+      class="create"
       onsubmit={(event) => {
         event.preventDefault();
         submitCreate();
       }}
     >
-      <input class="teams__input" type="text" maxlength={TEAM_NAME_MAX} placeholder={createPlaceholder} bind:value={draftName} />
-      <LiquidButton text={createLabel} type="submit" />
+      <label class="create__label" for="team-create-name">Nuevo equipo</label>
+      <div class="create__row">
+        <input
+          id="team-create-name"
+          class="create__input"
+          type="text"
+          maxlength={TEAM_NAME_MAX}
+          placeholder={createPlaceholder}
+          aria-describedby="team-create-hint"
+          bind:this={createInputEl}
+          bind:value={draftName}
+        />
+        <LiquidButton text={createLabel} type="submit" disabled={!canCreate} />
+      </div>
+      <p id="team-create-hint" class="create__hint">
+        {canCreate
+          ? `${draftName.trim().length}/${TEAM_NAME_MAX}`
+          : 'Escribe un nombre para poder añadirlo.'}
+      </p>
     </form>
   {/if}
 
@@ -118,7 +150,13 @@
                 bind:this={editInputEl}
                 aria-label="Editar nombre del equipo"
               />
-              <button type="submit" class="teams__text-btn teams__text-btn--save">Guardar</button>
+              <button
+                type="submit"
+                class="teams__text-btn teams__text-btn--save"
+                disabled={!canSaveEdit}
+              >
+                Guardar
+              </button>
               <button type="button" class="teams__text-btn" onclick={cancelEdit}>Cancelar</button>
             </form>
           {:else}
@@ -197,32 +235,75 @@
     margin-bottom: 0;
   }
 
-  .teams__create {
+  .create {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-    margin-bottom: 14px;
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid rgba(22, 93, 112, 0.1);
   }
 
-  .teams__input {
+  .create__label {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  .create__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .create__input {
+    flex: 1 1 12rem;
+    min-width: 0;
     font-family: var(--font-body);
     font-weight: 600;
     font-size: 1rem;
-    padding: 0.9rem 1rem;
-    border-radius: 0.5rem;
-    border: 2px solid black;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    border: 2px solid rgba(22, 93, 112, 0.28);
     outline: none;
-    width: 100%;
     background: white;
+    color: #0b3d4a;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease;
   }
 
-  .teams__create :global(.button) {
-    align-self: center;
+  .create__input::placeholder {
+    color: #8aa3aa;
+    font-weight: 500;
   }
 
-  .teams__input:focus {
-    border-color: var(--color-brand-dark);
+  .create__input:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(33, 172, 195, 0.18);
+  }
+
+  .create__row :global(.button) {
+    flex: 0 0 auto;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65em 1.35em;
+    font-size: 0.92em;
+  }
+
+  .create__hint {
+    margin: 0;
+    min-height: 1.1em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6a848c;
   }
 
   .teams__list {
@@ -311,7 +392,7 @@
     font-size: 0.95rem;
     padding: 0.55rem 0.75rem;
     border-radius: 0.45rem;
-    border: 2px solid black;
+    border: 2px solid rgba(22, 93, 112, 0.28);
     outline: none;
     background: white;
   }
@@ -331,6 +412,11 @@
     text-transform: uppercase;
     color: #5a7a82;
     cursor: pointer;
+  }
+
+  .teams__text-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   .teams__text-btn--save {
