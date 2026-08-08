@@ -12,7 +12,7 @@ Al participar, aceptas el [Código de conducta](CODE_OF_CONDUCT.md).
 
 ## Configuración local
 
-Requisitos: **Node.js ≥ 22** (ver `.nvmrc`).
+Requisitos: **Node.js ≥ 24** (ver `.nvmrc`).
 
 ```sh
 nvm use

@@ -75,7 +75,7 @@ Pensada para ceremonias de estimación, refinamiento y equipos remotos.
 
 ## Requisitos
 
-- **Node.js ≥ 22** (ver [`.nvmrc`](.nvmrc))
+- **Node.js ≥ 24** (ver [`.nvmrc`](.nvmrc))
 - Para publicar: cuenta de Cloudflare, o [deploy temporal](#deploy-temporal-sin-cuenta-cloudflare) sin cuenta
 
 ```sh
