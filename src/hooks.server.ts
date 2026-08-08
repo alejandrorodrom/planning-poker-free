@@ -8,6 +8,11 @@ export async function handle({
   resolve: (event: { url: URL }) => Promise<Response>;
 }): Promise<Response> {
   const response = await resolve(event);
+
+  if (response.status === 101 || ('webSocket' in response && response.webSocket)) {
+    return response;
+  }
+
   const path = event.url.pathname;
   const host = event.url.hostname;
 
