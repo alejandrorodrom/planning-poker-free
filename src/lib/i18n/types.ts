@@ -215,6 +215,7 @@ export type Messages = {
     timeOutReveal: string;
     timeUpWaitingReveal: string;
     reveal: string;
+    noVote: string;
   };
   invite: {
     title: string;
@@ -235,6 +236,7 @@ export type Messages = {
     editTitle: string;
     editAria: string;
     deleteAria: string;
+    lockedHint: string;
   };
   players: {
     title: string;

@@ -3,7 +3,7 @@ import { AppError, ERROR_CODES, ERROR_MESSAGES_EN, type ErrorCode } from '$lib/e
 import { isInAudience } from '$lib/room/audience';
 import { sanitizeAvatar } from '$lib/room/avatar';
 import { normalizeCreateRoomConfig } from '$lib/room/createConfig';
-import { isDeckId, isValidCard, type DeckId } from '$lib/room/decks';
+import { deckCards, isDeckId, isValidCard, type DeckId } from '$lib/room/decks';
 import { computeSuggestedEstimate } from '$lib/room/estimate';
 import {
   sanitizePlayerName,
@@ -602,6 +602,9 @@ export class Room extends DurableObject<Env> {
         break;
       case 'select_story':
         await this.requireSm(ws, async () => {
+          if (this.state!.activeRound) {
+            throw new AppError(ERROR_CODES.round_in_progress);
+          }
           const story = this.state!.stories.find((s) => s.id === msg.storyId);
           if (!story) throw new AppError(ERROR_CODES.story_not_found);
           this.state!.activeStoryId = story.id;
@@ -635,6 +638,11 @@ export class Room extends DurableObject<Env> {
       case 'revote':
         await this.requireSm(ws, async () => {
           this.revote(msg.timerSeconds);
+        });
+        break;
+      case 'set_estimate':
+        await this.requireSm(ws, async () => {
+          this.setEstimate(msg.estimate);
         });
         break;
       case 'close_voting':
@@ -1007,6 +1015,24 @@ export class Room extends DurableObject<Env> {
     this.startRound(prev.storyId, prev.audience, timerSeconds, prev.autoRevealOnTimerEnd);
   }
 
+  private setEstimate(estimate: string): void {
+    if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
+    const round = this.state.activeRound;
+    if (!round.revealed) throw new AppError(ERROR_CODES.reveal_before_close);
+
+    const value = estimate.trim();
+    if (!value) {
+      round.suggestedEstimate = undefined;
+      return;
+    }
+
+    if (!isValidCard(this.state.deck, value)) throw new AppError(ERROR_CODES.invalid_card);
+    const card = deckCards(this.state.deck).find((c) => c.value === value);
+    if (!card || card.special) throw new AppError(ERROR_CODES.invalid_card);
+
+    round.suggestedEstimate = value;
+  }
+
   private closeVoting(estimate?: string, teamId?: string): void {
     if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
     const round = this.state.activeRound;
@@ -1015,14 +1041,13 @@ export class Room extends DurableObject<Env> {
     const story = this.state.stories.find((s) => s.id === round.storyId);
     if (!story) throw new AppError(ERROR_CODES.story_not_found);
 
-    let value = estimate?.trim();
+    const value = estimate?.trim() || round.suggestedEstimate;
     if (!value) {
       if (this.state.estimateRule === 'consensus') {
         throw new AppError(ERROR_CODES.consensus_required);
       }
-      value = round.suggestedEstimate;
+      throw new AppError(ERROR_CODES.no_estimation_to_save);
     }
-    if (!value) throw new AppError(ERROR_CODES.no_estimation_to_save);
 
     if (teamId) {
       const team = this.state.teams.find((t) => t.id === teamId);

@@ -43,6 +43,7 @@
     ontoggleTeam?: (teamId: string) => void;
     onstart?: () => void;
     onreveal?: () => void;
+    onsetEstimate?: (value: string) => void;
     oncloseVoting?: () => void;
     onrevote?: () => void;
     oncancel?: () => void;
@@ -72,6 +73,7 @@
     ontoggleTeam,
     onstart,
     onreveal,
+    onsetEstimate,
     oncloseVoting,
     onrevote,
     oncancel
@@ -104,13 +106,19 @@
         return t('arena.estimate');
     }
   });
+  const agreedEstimate = $derived(closeEstimate || round?.suggestedEstimate || '');
   const resultValue = $derived.by(() => {
     if (!round) return savedEstimate ?? '—';
     if (!round.revealed) return '—';
-    if (isConsensus) return closeEstimate || (isSm ? t('arena.choose') : t('arena.pending'));
+    if (isConsensus) return agreedEstimate || (isSm ? t('arena.choose') : t('arena.pending'));
     return round.suggestedEstimate ?? '—';
   });
-  const resultPending = $derived(Boolean(round?.revealed && isConsensus && !closeEstimate));
+  const resultPending = $derived(Boolean(round?.revealed && isConsensus && !agreedEstimate));
+
+  function pickAgreedEstimate(value: string) {
+    closeEstimate = value;
+    onsetEstimate?.(value);
+  }
 
   const focusEyebrow = $derived.by(() => {
     if (!round) {
@@ -142,10 +150,10 @@
   function seatState(
     player: PlayerPublic,
     vote: string | null | 'hidden' | undefined
-  ): 'empty' | 'hidden' | 'shown' | 'idle' | 'watching' {
+  ): 'empty' | 'hidden' | 'shown' | 'idle' | 'watching' | 'novote' {
     if (!round) return 'idle';
     if (isWatchingSeat(player)) return 'watching';
-    if (vote == null || vote === undefined) return 'empty';
+    if (vote == null || vote === undefined) return revealed ? 'novote' : 'empty';
     if (vote === 'hidden') return 'hidden';
     return 'shown';
   }
@@ -321,8 +329,8 @@
           class="seat"
           class:seat--me={isMe}
           class:seat--off={!online}
-          class:seat--voted={state === 'hidden' || state === 'shown'}
-          class:seat--shown={state === 'shown'}
+          class:seat--voted={state === 'hidden' || state === 'shown' || state === 'novote'}
+          class:seat--shown={state === 'shown' || state === 'novote'}
           class:seat--watching={state === 'watching'}
           style={`--i: ${i}`}
         >
@@ -343,6 +351,10 @@
             <div class="seat__card" data-state={state}>
               {#if state === 'shown'}
                 <span class="seat__value">{vote}</span>
+              {:else if state === 'novote'}
+                <span class="seat__value seat__value--novote" title={t('arena.noVote')} aria-label={t('arena.noVote')}
+                  >—</span
+                >
               {:else if state === 'hidden'}
                 <span class="seat__back" aria-hidden="true"></span>
               {:else}
@@ -522,7 +534,11 @@
           {#if isConsensus}
             <label class="arena__estimate">
               <span class="arena__estimate-label">{t('arena.agreedEstimate')}</span>
-              <select class="arena__estimate-select" bind:value={closeEstimate}>
+              <select
+                class="arena__estimate-select"
+                value={agreedEstimate}
+                onchange={(e) => pickAgreedEstimate(e.currentTarget.value)}
+              >
                 <option value="">{t('arena.agreedPlaceholder')}</option>
                 {#each deckCards as card (card.value)}
                   {#if !card.special}
@@ -929,6 +945,12 @@
     font-size: 1.7rem;
     font-weight: 800;
     line-height: 1;
+  }
+
+  .seat__value--novote {
+    border-color: rgba(17, 17, 17, 0.35);
+    color: #8aa0a6;
+    font-weight: 700;
   }
 
   .arena__seats--revealed .seat__value {

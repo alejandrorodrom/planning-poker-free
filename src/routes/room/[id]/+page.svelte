@@ -57,6 +57,7 @@
   let storyTitle = $state('');
   let closeEstimate = $state('');
   let closeEstimateRoundKey = '';
+  let closeEstimateSynced = '';
   let timerSeconds = $state(60);
   let useRoundTimer = $state(true);
   let audienceMode = $state<'all' | 'teams'>('all');
@@ -218,9 +219,17 @@
   $effect(() => {
     const round = roomState?.activeRound;
     const key = round ? `${round.storyId}:${round.roundNumber}:${round.startedAt}` : '';
-    if (key === closeEstimateRoundKey) return;
-    closeEstimateRoundKey = key;
-    closeEstimate = '';
+    const suggested = round?.suggestedEstimate ?? '';
+    if (key !== closeEstimateRoundKey) {
+      closeEstimateRoundKey = key;
+      closeEstimate = suggested;
+      closeEstimateSynced = suggested;
+      return;
+    }
+    if (suggested !== closeEstimateSynced) {
+      closeEstimateSynced = suggested;
+      closeEstimate = suggested;
+    }
   });
 
   $effect(() => {
@@ -245,7 +254,7 @@
     if (
       (errorCode === ERROR_CODES.consensus_required ||
         errorCode === ERROR_CODES.no_estimation_to_save) &&
-      closeEstimate
+      (closeEstimate || roomState?.activeRound?.suggestedEstimate)
     ) {
       clearError();
     }
@@ -483,12 +492,18 @@
     });
   }
 
+  function setConsensusEstimate(value: string) {
+    closeEstimate = value;
+    closeEstimateSynced = value;
+    send({ type: 'set_estimate', estimate: value });
+  }
+
   function closeVoting() {
     send({
       type: 'close_voting',
       estimate:
         roomState?.estimateRule === 'consensus'
-          ? closeEstimate || undefined
+          ? closeEstimate || roomState?.activeRound?.suggestedEstimate || undefined
           : roomState?.activeRound?.suggestedEstimate
     });
   }
@@ -738,6 +753,7 @@
             ontoggleTeam={toggleAudienceTeam}
             onstart={startRound}
             onreveal={() => send({ type: 'reveal' })}
+            onsetEstimate={setConsensusEstimate}
             oncloseVoting={closeVoting}
             onrevote={revote}
             oncancel={requestCancelRound}
@@ -867,11 +883,13 @@
         activeStoryId={roomState.activeStoryId}
         selectedStoryId={roundStoryId}
         canManage
+        selectionLocked={Boolean(roomState.activeRound)}
         bind:draftTitle={storyTitle}
         oncreate={createStory}
         onupdate={updateStory}
         ondelete={requestDeleteStory}
         onselect={(storyId) => {
+          if (roomState?.activeRound) return;
           roundStoryId = storyId;
           send({ type: 'select_story', storyId });
           storiesOpen = false;

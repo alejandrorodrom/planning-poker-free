@@ -223,7 +223,8 @@ export const es: Messages = {
     waitingModeratorClose: 'Esperando cierre del Moderador.',
     timeOutReveal: 'Tiempo fuera — revela las cartas cuando quieras.',
     timeUpWaitingReveal: 'Tiempo agotado. Esperando la revelación…',
-    reveal: 'Revelar'
+    reveal: 'Revelar',
+    noVote: 'Sin voto'
   },
   invite: {
     title: 'Invitar al equipo',
@@ -243,7 +244,8 @@ export const es: Messages = {
     emptyWait: 'El Moderador aún no ha añadido historias.',
     editTitle: 'Editar título',
     editAria: 'Editar {title}',
-    deleteAria: 'Eliminar {title}'
+    deleteAria: 'Eliminar {title}',
+    lockedHint: 'Hay una ronda en curso. Ciérrala o cancélala para cambiar de historia.'
   },
   players: {
     title: 'Participantes',
@@ -368,6 +370,7 @@ export const es: Messages = {
     [ERROR_CODES.story_not_found]: 'Historia no encontrada',
     [ERROR_CODES.story_required]: 'Elige la historia a votar',
     [ERROR_CODES.no_active_round]: 'No hay ronda activa',
+    [ERROR_CODES.round_in_progress]: 'Termina o cancela la ronda actual antes de cambiar de historia',
     [ERROR_CODES.round_already_revealed]: 'La ronda ya fue revelada',
     [ERROR_CODES.observers_cannot_vote]: 'Los observers no votan',
     [ERROR_CODES.not_in_audience]: 'No estás en la audiencia de esta ronda',

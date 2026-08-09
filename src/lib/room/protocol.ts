@@ -115,6 +115,7 @@ export type ClientToServer =
   | { type: 'vote'; value: string }
   | { type: 'reveal' }
   | { type: 'revote'; timerSeconds?: number | null }
+  | { type: 'set_estimate'; estimate: string }
   | { type: 'close_voting'; estimate?: string; teamId?: string }
   | { type: 'skip_story'; storyId: string }
   | { type: 'update_config'; name?: string; deck?: DeckId; estimateRule?: EstimateRule; revealMode?: RevealMode; autoRevealOnTimerEnd?: boolean; defaultTimerSeconds?: number | null }

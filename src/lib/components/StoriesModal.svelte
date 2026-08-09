@@ -14,6 +14,7 @@
     activeStoryId?: string | null;
     selectedStoryId?: string;
     canManage?: boolean;
+    selectionLocked?: boolean;
     draftTitle?: string;
     oncreate?: () => void;
     onselect?: (storyId: string) => void;
@@ -28,6 +29,7 @@
     activeStoryId = null,
     selectedStoryId = '',
     canManage = false,
+    selectionLocked = false,
     draftTitle = $bindable(''),
     oncreate,
     onselect,
@@ -134,6 +136,10 @@
     </form>
   {/if}
 
+  {#if selectionLocked}
+    <p class="locked-hint">{t('stories.lockedHint')}</p>
+  {/if}
+
   {#if stories.length === 0}
     <div class="empty">
       <span class="empty__icon" aria-hidden="true">
@@ -198,7 +204,12 @@
                 type="button"
                 class="item__title"
                 class:item__title--active={active}
-                onclick={() => onselect?.(story.id)}
+                disabled={selectionLocked}
+                title={selectionLocked ? t('stories.lockedHint') : undefined}
+                onclick={() => {
+                  if (selectionLocked) return;
+                  onselect?.(story.id);
+                }}
               >
                 {story.title}
               </button>
@@ -322,6 +333,17 @@
     color: #6a848c;
   }
 
+  .locked-hint {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(199, 120, 0, 0.1);
+    color: #8a5a00;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
   .empty {
     display: grid;
     justify-items: center;
@@ -389,6 +411,16 @@
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
+  }
+
+  .item__title:disabled {
+    text-decoration: none;
+    cursor: default;
+  }
+
+  .item__title:disabled:not(.item__title--active) {
+    color: #7a9096;
+    opacity: 0.75;
   }
 
   .item__title--active {

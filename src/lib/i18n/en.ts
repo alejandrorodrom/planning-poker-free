@@ -223,7 +223,8 @@ export const en: Messages = {
     waitingModeratorClose: 'Waiting for the Moderator to close.',
     timeOutReveal: 'Time out — reveal the cards when you are ready.',
     timeUpWaitingReveal: 'Time up. Waiting for the reveal…',
-    reveal: 'Reveal'
+    reveal: 'Reveal',
+    noVote: 'No vote'
   },
   invite: {
     title: 'Invite the team',
@@ -243,7 +244,8 @@ export const en: Messages = {
     emptyWait: 'The Moderator has not added stories yet.',
     editTitle: 'Edit title',
     editAria: 'Edit {title}',
-    deleteAria: 'Delete {title}'
+    deleteAria: 'Delete {title}',
+    lockedHint: 'A round is in progress. Close or cancel it before changing story.'
   },
   players: {
     title: 'Participants',
@@ -368,6 +370,7 @@ export const en: Messages = {
     [ERROR_CODES.story_not_found]: 'Story not found',
     [ERROR_CODES.story_required]: 'Please select a story to vote on',
     [ERROR_CODES.no_active_round]: 'No active round',
+    [ERROR_CODES.round_in_progress]: 'Finish or cancel the current round before changing story',
     [ERROR_CODES.round_already_revealed]: 'The round has already been revealed',
     [ERROR_CODES.observers_cannot_vote]: 'Observers cannot vote',
     [ERROR_CODES.not_in_audience]: 'You are not in the audience for this round',
