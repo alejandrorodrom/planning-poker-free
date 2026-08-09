@@ -4,6 +4,7 @@
   import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
   import { t } from '$lib/i18n';
   import type { ActiveRoundPublic, EstimateRule, PlayerPublic, StoryPublic, Team } from '$lib/room/protocol';
+  import { isInAudience } from '$lib/room/audience';
   import { sanitizeRoleLabel } from '$lib/room/roleLabel';
   import { formatEstimateLabel, isPointEstimate } from '$lib/room/decks';
 
@@ -132,8 +133,18 @@
     return teams.find((team) => team.id === teamId)?.name ?? null;
   }
 
-  function seatState(vote: string | null | 'hidden' | undefined): 'empty' | 'hidden' | 'shown' | 'idle' {
+  function isWatchingSeat(player: PlayerPublic): boolean {
+    if (!round) return false;
+    if (player.role === 'observer') return true;
+    return !isInAudience(player, round.audience);
+  }
+
+  function seatState(
+    player: PlayerPublic,
+    vote: string | null | 'hidden' | undefined
+  ): 'empty' | 'hidden' | 'shown' | 'idle' | 'watching' {
     if (!round) return 'idle';
+    if (isWatchingSeat(player)) return 'watching';
     if (vote == null || vote === undefined) return 'empty';
     if (vote === 'hidden') return 'hidden';
     return 'shown';
@@ -299,23 +310,34 @@
     <ul class="arena__seats" class:arena__seats--revealed={revealed}>
       {#each players as player, i (player.id)}
         {@const vote = votes[player.id]}
-        {@const state = seatState(vote)}
+        {@const state = seatState(player, vote)}
         {@const isMe = player.id === meId}
         {@const online = player.connection === 'connected'}
         {@const team = teamName(player.teamId)}
         {@const tag = sanitizeRoleLabel(player.roleLabel)}
         {@const roleText = player.isScrumMaster ? t('roles.moderator') : tag}
+        {@const watchLabel = roleText || t('roles.spectator')}
         <li
           class="seat"
           class:seat--me={isMe}
           class:seat--off={!online}
           class:seat--voted={state === 'hidden' || state === 'shown'}
           class:seat--shown={state === 'shown'}
+          class:seat--watching={state === 'watching'}
           style={`--i: ${i}`}
         >
           {#if state === 'idle'}
             <div class="seat__figure" aria-hidden="true">
               <PlayerAvatar avatar={player.avatar} size={72} />
+            </div>
+          {:else if state === 'watching'}
+            <div class="seat__watch" title={watchLabel} aria-label={watchLabel}>
+              <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 5c-5.2 0-9.5 3.4-11 7 1.5 3.6 5.8 7 11 7s9.5-3.4 11-7c-1.5-3.6-5.8-7-11-7Zm0 11.5A4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 0 1 0 9Zm0-2.2a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z"
+                />
+              </svg>
             </div>
           {:else}
             <div class="seat__card" data-state={state}>
@@ -338,10 +360,14 @@
               {player.name}
               {#if isMe}<em>{t('arena.me')}</em>{/if}
             </span>
-            {#if roleText || team}
+            {#if roleText || team || state === 'watching'}
               <span class="seat__meta">
-                {#if roleText}{roleText}{/if}
-                {#if roleText && team} · {/if}
+                {#if roleText}
+                  {roleText}
+                {:else if state === 'watching'}
+                  {t('roles.spectator')}
+                {/if}
+                {#if (roleText || state === 'watching') && team} · {/if}
                 {#if team}{team}{/if}
               </span>
             {/if}
@@ -847,13 +873,13 @@
     opacity: 0.55;
   }
 
-  .seat__card {
+  .seat__card,
+  .seat__watch {
     width: 64px;
     height: 92px;
     border-radius: 12px;
     display: grid;
     place-items: center;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
     transition:
       transform 200ms ease,
       box-shadow 200ms ease,
@@ -861,7 +887,23 @@
       height 200ms ease;
   }
 
-  .arena__seats--revealed .seat__card {
+  .seat__card {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+  }
+
+  .seat__watch {
+    border: 2px solid rgba(22, 93, 112, 0.18);
+    background: rgba(255, 255, 255, 0.35);
+    color: rgba(22, 93, 112, 0.55);
+    box-shadow: none;
+  }
+
+  .seat--watching {
+    opacity: 0.92;
+  }
+
+  .arena__seats--revealed .seat__card,
+  .arena__seats--revealed .seat__watch {
     width: 76px;
     height: 108px;
   }
