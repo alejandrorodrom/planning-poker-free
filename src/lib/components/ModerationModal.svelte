@@ -76,7 +76,7 @@
   </div>
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
+    <LiquidButton text={t('common.close')} onclick={onclose} />
   {/snippet}
 </ModalShell>
 

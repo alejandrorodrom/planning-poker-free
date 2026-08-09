@@ -41,6 +41,7 @@ export type Messages = {
     displayNamePlaceholder: string;
     roomNameLabel: string;
     roomNamePlaceholder: string;
+    roomNamePlaceholderMobile: string;
     publicLabel: string;
     publicHint: string;
     privateLabel: string;
@@ -113,6 +114,7 @@ export type Messages = {
     noModeratorBanner: string;
     moderatorLeftBanner: string;
     claimModeration: string;
+    boardActions: string;
     storiesFab: string;
     storiesLabel: string;
     playersFab: string;

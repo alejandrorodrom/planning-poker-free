@@ -63,6 +63,7 @@
     gap: 16px;
   }
 
+  /* BP_SM — sync with src/lib/breakpoints.ts */
   @media (min-width: 576px) {
     .notice__visual {
       height: 280px;

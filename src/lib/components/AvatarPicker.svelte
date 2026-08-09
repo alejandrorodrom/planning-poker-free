@@ -447,7 +447,8 @@
     gap: 12px;
   }
 
-  @media (min-width: 720px) {
+  /* BP_MOBILE_MIN — exclusive above mobile; sync with src/lib/breakpoints.ts */
+  @media (min-width: 721px) {
     .picker:not(.picker--compact) {
       grid-template-columns: 140px 1fr;
       gap: 20px 24px;

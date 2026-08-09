@@ -758,91 +758,91 @@
             onrevote={revote}
             oncancel={requestCancelRound}
           />
-          <div class="arena-fabs">
-            <div class="arena-fabs__left">
-              {#if isSm}
-                <button
-                  type="button"
-                  class="board-fab"
-                  onclick={() => (storiesOpen = true)}
-                  aria-label={t('room.storiesFab')}
-                >
-                  {t('room.storiesLabel')}
-                  {#if roomState.stories.length}
-                    <span class="board-fab__count">{roomState.stories.length}</span>
-                  {/if}
-                </button>
-                <button
-                  type="button"
-                  class="board-fab"
-                  onclick={() => (playersOpen = true)}
-                  aria-label={t('room.playersFab')}
-                >
-                  {t('room.playersLabel')}
-                  <span class="board-fab__count">{roomState.players.length}</span>
-                </button>
-                <button
-                  type="button"
-                  class="board-fab"
-                  onclick={() => (teamsOpen = true)}
-                  aria-label={t('room.teamsFab')}
-                >
-                  {t('room.teamsLabel')}
-                  {#if roomState.teams.length}
-                    <span class="board-fab__count">{roomState.teams.length}</span>
-                  {/if}
-                </button>
-              {/if}
-            </div>
-            <div class="arena-fabs__right">
+        </div>
+        <nav class="arena-dock" aria-label={t('room.boardActions')}>
+          <div class="arena-dock__group arena-dock__group--start">
+            {#if isSm}
               <button
                 type="button"
                 class="board-fab"
-                onclick={() => (resultsOpen = true)}
-                disabled={roomState.stories.length === 0}
-                aria-label={t('room.resultsFab')}
-                title={roomState.stories.length === 0 ? t('room.resultsDisabledHint') : undefined}
+                onclick={() => (storiesOpen = true)}
+                aria-label={t('room.storiesFab')}
               >
-                {t('room.resultsLabel')}
-                {#if roomState.stories.some((s) => s.estimates.overall)}
-                  <span class="board-fab__count"
-                    >{roomState.stories.filter((s) => s.estimates.overall).length}</span
-                  >
+                {t('room.storiesLabel')}
+                {#if roomState.stories.length}
+                  <span class="board-fab__count">{roomState.stories.length}</span>
                 {/if}
               </button>
-              {#if isSm}
-                <button
-                  type="button"
-                  class="board-fab board-fab--icon"
-                  onclick={() => (moderationOpen = true)}
-                  aria-label={t('room.moderationFab')}
-                  title={t('room.moderationFab')}
-                >
-                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                    <path
-                      fill="currentColor"
-                      d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.5.42l-.36 2.54c-.58.23-1.12.54-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.83 14.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.34.69.22l2.39-.96c.5.4 1.04.72 1.62.94l.36 2.54c.05.24.26.42.5.42h3.8c.24 0 .45-.18.5-.42l.36-2.54c.58-.22 1.12-.54 1.62-.94l2.39.96c.26.1.55 0 .69-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"
-                    />
-                  </svg>
-                </button>
-              {/if}
               <button
                 type="button"
-                class="board-fab board-fab--icon board-fab--leave"
-                onclick={requestLeave}
-                aria-label={t('room.leaveFab')}
-                title={t('room.leaveFab')}
+                class="board-fab"
+                onclick={() => (playersOpen = true)}
+                aria-label={t('room.playersFab')}
               >
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                {t('room.playersLabel')}
+                <span class="board-fab__count">{roomState.players.length}</span>
+              </button>
+              <button
+                type="button"
+                class="board-fab"
+                onclick={() => (teamsOpen = true)}
+                aria-label={t('room.teamsFab')}
+              >
+                {t('room.teamsLabel')}
+                {#if roomState.teams.length}
+                  <span class="board-fab__count">{roomState.teams.length}</span>
+                {/if}
+              </button>
+            {/if}
+          </div>
+          <div class="arena-dock__group arena-dock__group--end">
+            <button
+              type="button"
+              class="board-fab"
+              onclick={() => (resultsOpen = true)}
+              disabled={roomState.stories.length === 0}
+              aria-label={t('room.resultsFab')}
+              title={roomState.stories.length === 0 ? t('room.resultsDisabledHint') : undefined}
+            >
+              {t('room.resultsLabel')}
+              {#if roomState.stories.some((s) => s.estimates.overall)}
+                <span class="board-fab__count"
+                  >{roomState.stories.filter((s) => s.estimates.overall).length}</span
+                >
+              {/if}
+            </button>
+            {#if isSm}
+              <button
+                type="button"
+                class="board-fab board-fab--icon"
+                onclick={() => (moderationOpen = true)}
+                aria-label={t('room.moderationFab')}
+                title={t('room.moderationFab')}
+              >
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                   <path
                     fill="currentColor"
-                    d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z"
+                    d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.5.42l-.36 2.54c-.58.23-1.12.54-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.83 14.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.34.69.22l2.39-.96c.5.4 1.04.72 1.62.94l.36 2.54c.05.24.26.42.5.42h3.8c.24 0 .45-.18.5-.42l.36-2.54c.58-.22 1.12-.54 1.62-.94l2.39.96c.26.1.55 0 .69-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"
                   />
                 </svg>
               </button>
-            </div>
+            {/if}
+            <button
+              type="button"
+              class="board-fab board-fab--icon board-fab--leave"
+              onclick={requestLeave}
+              aria-label={t('room.leaveFab')}
+              title={t('room.leaveFab')}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z"
+                />
+              </svg>
+            </button>
           </div>
-        </div>
+        </nav>
       </div>
 
       <InviteModal
@@ -1018,17 +1018,20 @@
     flex-direction: column;
     min-height: 0;
     margin: 0;
-    padding: 8px 12px 12px;
+    padding: 8px 12px 8px;
     overflow: hidden;
-  }
-
-  .room--arena :global(.topbar__title) {
-    font-size: 1.45rem;
   }
 
   .room--arena :global(.topbar) {
     flex-shrink: 0;
     margin-bottom: 10px;
+  }
+
+  /* BP_MOBILE_MIN — exclusive above mobile; sync with src/lib/breakpoints.ts */
+  @media (min-width: 721px) {
+    .room--arena :global(.topbar__title) {
+      font-size: 1.45rem;
+    }
   }
 
   .game {
@@ -1060,33 +1063,30 @@
     align-items: stretch;
   }
 
-  .arena-fabs {
-    position: absolute;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    z-index: 5;
+  .arena-dock {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    gap: 10px;
-    pointer-events: none;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 0 2px;
+    min-width: 0;
   }
 
-  .arena-fabs__left,
-  .arena-fabs__right {
+  .arena-dock__group {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    pointer-events: none;
+    min-width: 0;
   }
 
-  .arena-fabs__right {
+  .arena-dock__group--end {
     justify-content: flex-end;
+    margin-left: auto;
   }
 
   .board-fab {
-    pointer-events: auto;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1156,6 +1156,67 @@
   .board-fab:hover .board-fab__count {
     background: white;
     color: var(--color-brand);
+  }
+
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
+    .room--arena {
+      padding: 4px 8px 6px;
+    }
+
+    .room--arena :global(.topbar) {
+      margin-bottom: 4px;
+      padding-bottom: 6px;
+    }
+
+    .arena-dock {
+      margin-top: 8px;
+      gap: 6px;
+      justify-content: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+      padding: 2px 0 4px;
+    }
+
+    .arena-dock::-webkit-scrollbar {
+      display: none;
+    }
+
+    .arena-dock__group {
+      flex-wrap: nowrap;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .arena-dock__group--end {
+      margin-left: 0;
+    }
+
+    .arena-dock__group--start:empty {
+      display: none;
+    }
+
+    .board-fab {
+      flex-shrink: 0;
+      min-height: 40px;
+      padding: 0.4em 0.85em;
+      font-size: var(--text-xs);
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 12px rgba(15, 60, 70, 0.12);
+    }
+
+    .board-fab--icon {
+      width: 40px;
+    }
+
+    .board-fab__count {
+      min-width: 1.2rem;
+      height: 1.2rem;
+      font-size: var(--text-2xs);
+    }
   }
 
   .connecting {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
   import TeamList from '$lib/components/TeamList.svelte';
   import { t } from '$lib/i18n';
@@ -60,6 +61,6 @@
   />
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
+    <LiquidButton text={t('common.close')} onclick={onclose} />
   {/snippet}
 </ModalShell>

@@ -73,22 +73,24 @@
         class:modal-shell__header--centered={centered}
         class:modal-shell__header--split={Boolean(headerAside)}
       >
-        <div class="modal-shell__heading">
-          {#if eyebrow}
-            <p class="modal-shell__eyebrow">{eyebrow}</p>
-          {/if}
-          <h2 id={titleId} class="modal-shell__title">{title}</h2>
-          {#if description}
-            <p class="modal-shell__description">{description}</p>
-          {/if}
-          {#if hint}
-            <p class="modal-shell__hint">{hint}</p>
+        <div class="modal-shell__top">
+          <div class="modal-shell__heading">
+            {#if eyebrow}
+              <p class="modal-shell__eyebrow">{eyebrow}</p>
+            {/if}
+            <h2 id={titleId} class="modal-shell__title">{title}</h2>
+          </div>
+          {#if headerAside}
+            <div class="modal-shell__aside">
+              {@render headerAside()}
+            </div>
           {/if}
         </div>
-        {#if headerAside}
-          <div class="modal-shell__aside">
-            {@render headerAside()}
-          </div>
+        {#if description}
+          <p class="modal-shell__description">{description}</p>
+        {/if}
+        {#if hint}
+          <p class="modal-shell__hint">{hint}</p>
         {/if}
       </header>
 
@@ -219,15 +221,15 @@
   .modal-shell--simple .modal-shell__title {
     margin: 0 0 10px;
     font-family: var(--font-body);
-    font-size: 1.25rem;
+    font-size: var(--text-lg);
     font-weight: 700;
     color: var(--color-brand-dark);
   }
 
   .modal-shell--simple .modal-shell__description {
     margin: 0 0 14px;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--text-md);
+    line-height: var(--leading-normal);
     color: #333;
   }
 
@@ -241,12 +243,19 @@
     border-bottom: 1px solid rgba(22, 93, 112, 0.1);
   }
 
-  .modal-shell__header--split {
+  .modal-shell__top {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .modal-shell__header--split .modal-shell__top {
+    flex-direction: row;
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px 16px;
   }
 
   .modal-shell__header--centered {
@@ -269,7 +278,7 @@
 
   .modal-shell__eyebrow {
     margin: 0 0 4px;
-    font-size: 0.72rem;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -281,34 +290,33 @@
   }
 
   .modal-shell__title {
-    margin: 0 0 8px;
+    margin: 0;
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: var(--text-display-sm);
     font-weight: 400;
-    line-height: 1.1;
+    line-height: var(--leading-tight);
     color: #0b3d4a;
   }
 
   .modal-shell--soft .modal-shell__title {
-    margin: 0;
-    font-size: 1.85rem;
+    font-size: var(--text-display-sm);
   }
 
   .modal-shell__description {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.45;
+    margin: 10px 0 0;
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
     color: #4a6a72;
   }
 
   .modal-shell--soft .modal-shell__description {
     margin: 4px 0 0;
-    font-size: 0.88rem;
+    font-size: var(--text-sm);
   }
 
   .modal-shell__hint {
     margin: 12px 0 0;
-    font-size: 0.88rem;
+    font-size: var(--text-sm);
     font-weight: 600;
     color: var(--color-brand-dark);
   }
@@ -369,17 +377,99 @@
     }
   }
 
-  @media (max-width: 520px) {
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
+    .modal-shell__overlay {
+      padding: 10px;
+      align-items: stretch;
+    }
+
+    /* Confirm / compact dialogs: hug content like desktop */
+    .modal-shell__overlay:has(.modal-shell--simple) {
+      align-items: center;
+      justify-items: center;
+      padding: 16px;
+    }
+
+    .modal-shell__overlay--soft {
+      padding: 10px;
+    }
+
+    .modal-shell {
+      width: 100%;
+      max-height: min(92dvh, 720px);
+      border-radius: 18px;
+    }
+
+    .modal-shell--lg,
+    .modal-shell--xl,
+    .modal-shell--md,
+    .modal-shell--sm {
+      width: 100%;
+    }
+
+    .modal-shell--simple,
+    .modal-shell--simple.modal-shell--sm {
+      width: min(100%, 400px);
+      max-height: none;
+      height: auto;
+      align-self: center;
+      padding: 22px 18px 18px;
+    }
+
+    .modal-shell--simple .modal-shell__header:not(.modal-shell__header--centered) {
+      padding: 0;
+    }
+
+    .modal-shell--simple .modal-shell__title {
+      font-size: var(--text-lg);
+    }
+
+    .modal-shell--simple .modal-shell__description {
+      margin-bottom: 18px;
+    }
+
+    .modal-shell--simple .modal-shell__footer {
+      padding: 0;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
     .modal-shell__header:not(.modal-shell__header--centered) {
-      padding: 22px 18px 16px;
+      padding: 14px 12px 10px;
+    }
+
+    .modal-shell__header--split .modal-shell__top {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .modal-shell__aside {
+      width: 100%;
+    }
+
+    .modal-shell__title {
+      font-size: var(--text-display);
+    }
+
+    .modal-shell__description {
+      margin-top: 8px;
     }
 
     .modal-shell__body {
-      padding: 14px 12px;
+      padding: 10px;
     }
 
     .modal-shell__footer {
-      padding: 14px 18px 20px;
+      padding: 12px;
+    }
+
+    .modal-shell__footer :global(.button) {
+      font-size: var(--text-xs);
+      padding: 0.4em 1em;
+      border-width: 2px;
+      min-height: 40px;
     }
   }
 </style>

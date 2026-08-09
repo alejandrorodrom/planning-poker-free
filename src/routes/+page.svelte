@@ -17,6 +17,7 @@
   import { isCanonicalHost } from '$lib/seo';
   import { deckLabel } from '$lib/i18n/labels';
   import { te, t } from '$lib/i18n';
+  import { BP_MOBILE, mqMax } from '$lib/breakpoints';
 
   const indexable = $derived(isCanonicalHost(page.url.hostname));
 
@@ -31,6 +32,17 @@
   let errorCode = $state<ErrorCode | null>(null);
   let errorMessage = $state('');
   let loading = $state(false);
+  let narrow = $state(false);
+
+  $effect(() => {
+    const mq = window.matchMedia(mqMax(BP_MOBILE));
+    const sync = () => {
+      narrow = mq.matches;
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  });
 
   const steps = $derived([
     { id: 1, title: t('landing.step1Title'), hint: t('landing.step1Hint') },
@@ -157,7 +169,7 @@
 
 <SeoHead indexable={indexable} />
 
-<section class="hero">
+<section class="hero" class:hero--dense={step > 1}>
   <img
     src="/assets/svg/planning-poker.svg"
     class="hero__logo"
@@ -166,9 +178,11 @@
     height="120"
   />
   <h1 class="hero__title">Planning Poker</h1>
-  <p class="hero__paragraph">
-    {t('landing.heroSubtitle')}
-  </p>
+  {#if step === 1}
+    <p class="hero__paragraph">
+      {t('landing.heroSubtitle')}
+    </p>
+  {/if}
 
   <form
     class="form"
@@ -215,25 +229,33 @@
         type="text"
         maxlength={ROOM_NAME_MAX}
         bind:value={roomName}
-        placeholder={t('landing.roomNamePlaceholder')}
+        placeholder={narrow
+          ? t('landing.roomNamePlaceholderMobile')
+          : t('landing.roomNamePlaceholder')}
         aria-invalid={errorCode === ERROR_CODES.room_name_required}
         aria-describedby={errorCode === ERROR_CODES.room_name_required ? 'form-error' : undefined}
       />
 
-      <label class="form__choice">
-        <input type="radio" name="privacy" checked={!isPrivate} onchange={() => (isPrivate = false)} />
-        <span>
-          <strong>{t('landing.publicLabel')}</strong>
-          <small>{t('landing.publicHint')}</small>
-        </span>
-      </label>
-      <label class="form__choice">
-        <input type="radio" name="privacy" checked={isPrivate} onchange={() => (isPrivate = true)} />
-        <span>
-          <strong>{t('landing.privateLabel')}</strong>
-          <small>{t('landing.privateHint')}</small>
-        </span>
-      </label>
+      <div
+        class="form__choices"
+        role="radiogroup"
+        aria-label={`${t('landing.publicLabel')} / ${t('landing.privateLabel')}`}
+      >
+        <label class="form__choice">
+          <input type="radio" name="privacy" checked={!isPrivate} onchange={() => (isPrivate = false)} />
+          <span>
+            <strong>{t('landing.publicLabel')}</strong>
+            <small>{t('landing.publicHint')}</small>
+          </span>
+        </label>
+        <label class="form__choice">
+          <input type="radio" name="privacy" checked={isPrivate} onchange={() => (isPrivate = true)} />
+          <span>
+            <strong>{t('landing.privateLabel')}</strong>
+            <small>{t('landing.privateHint')}</small>
+          </span>
+        </label>
+      </div>
 
       {#if isPrivate}
         <label class="form__label" for="room-password">{t('landing.passwordLabel')}</label>
@@ -316,7 +338,7 @@
 
   .hero__title {
     font-family: var(--font-display);
-    font-size: 30px;
+    font-size: var(--text-2xl);
     font-weight: 400;
     text-align: center;
     margin: 10px 0;
@@ -325,9 +347,10 @@
   .hero__paragraph {
     font-family: var(--font-body);
     font-weight: 400;
+    font-size: var(--text-md);
     text-align: center;
     margin: 0 0 24px;
-    line-height: 1.5;
+    line-height: var(--leading-normal);
     max-width: 36ch;
   }
 
@@ -366,7 +389,7 @@
   .form__step-label {
     margin: 0;
     font-family: var(--font-body);
-    font-size: 0.8rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -377,7 +400,7 @@
   .form__step-title {
     margin: 6px 0 4px;
     font-family: var(--font-body);
-    font-size: 1.35rem;
+    font-size: var(--text-xl);
     font-weight: 700;
     text-align: center;
   }
@@ -385,8 +408,8 @@
   .form__step-hint {
     margin: 0 0 20px;
     font-family: var(--font-body);
-    font-size: 0.95rem;
-    line-height: 1.45;
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
     text-align: center;
     color: #555;
   }
@@ -433,24 +456,80 @@
     width: 100%;
   }
 
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
+    .hero {
+      padding: 12px 16px 16px;
+    }
+
+    .hero__logo {
+      height: 72px;
+    }
+
+    .hero__title {
+      font-size: var(--text-xl);
+      margin: 6px 0;
+    }
+
+    .hero__paragraph {
+      margin: 0 0 14px;
+      font-size: var(--text-sm);
+    }
+
+    .hero--dense .hero__logo {
+      height: 56px;
+    }
+
+    .hero--dense .hero__title {
+      margin: 4px 0 8px;
+    }
+
+    .steps {
+      margin-bottom: 10px;
+    }
+
+    .form__step-label {
+      font-size: var(--text-xs);
+    }
+
+    .form__step-title {
+      font-size: var(--text-lg);
+      margin: 4px 0 2px;
+    }
+
+    .form__step-hint {
+      margin: 0 0 10px;
+      font-size: var(--text-sm);
+    }
+
+    .form__nav {
+      margin-top: 0.75rem;
+      gap: 8px;
+    }
+  }
+
+  /* BP_SM_MAX — below --bp-sm */
   @media (max-width: 575px) {
     .hero {
       width: min(100%, 280px);
     }
   }
 
+  /* BP_SM */
   @media (min-width: 576px) {
     .hero {
       width: min(100%, 320px);
     }
   }
 
+  /* BP_MD */
   @media (min-width: 768px) {
     .hero {
       width: min(100%, 420px);
     }
   }
 
+  /* BP_LG */
   @media (min-width: 992px) {
     .hero {
       width: min(100%, 520px);

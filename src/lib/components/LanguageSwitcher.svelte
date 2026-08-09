@@ -40,12 +40,12 @@
     align-items: center;
     gap: 6px;
     font-family: var(--font-body);
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
     font-weight: 600;
   }
 
   .lang-switch--compact {
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
   }
 
   .lang-switch__sep {

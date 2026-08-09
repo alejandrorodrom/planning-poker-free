@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LiquidButton from './LiquidButton.svelte';
   import ModalShell from './ModalShell.svelte';
   import { t } from '$lib/i18n';
 
@@ -55,7 +56,7 @@
   <code class="modal__link">{roomLink}</code>
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
+    <LiquidButton text={t('common.close')} onclick={onclose} />
     <button
       type="button"
       class="modal__btn"

@@ -53,7 +53,7 @@
     margin: 0 0 0 15px;
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
   }
 
   .navbar__user {
@@ -66,9 +66,10 @@
     margin: 0;
     font-family: var(--font-body);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--text-md);
   }
 
+  /* BP_SM_MAX — below --bp-sm; sync with src/lib/breakpoints.ts */
   @media (max-width: 575px) {
     .navbar__logo-title {
       display: none;

@@ -312,7 +312,8 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  @media (max-width: 520px) {
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
     .card__controls--teams {
       grid-template-columns: 1fr;
     }

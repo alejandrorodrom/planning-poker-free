@@ -26,8 +26,50 @@
   --shadow-card: 2px 0 30px rgba(0, 0, 0, 0.15);
   --shadow-card-hover: 2px 0 30px rgba(0, 0, 0, 0.9);
 
+  /*
+   * Breakpoints (px). Keep in sync with `src/lib/breakpoints.ts`.
+   * Media queries must repeat the literal px value — `var(--bp-*)` is invalid in `@media`.
+   *   xs     420  ultra-narrow densification (cards / seats)
+   *   sm     576  small layout widths
+   *   mobile 720  primary mobile / type-scale switch
+   *   md     768
+   *   lg     992
+   *   xl    1200
+   */
+  --bp-xs: 420px;
   --bp-sm: 576px;
+  --bp-mobile: 720px;
   --bp-md: 768px;
   --bp-lg: 992px;
   --bp-xl: 1200px;
+
+  /* Type scale (desktop / default) */
+  --text-2xs: 0.62rem;
+  --text-xs: 0.72rem;
+  --text-sm: 0.82rem;
+  --text-md: 0.95rem;
+  --text-lg: 1.1rem;
+  --text-xl: 1.35rem;
+  --text-2xl: 1.6rem;
+  --text-display: clamp(1.8rem, 4.5vw, 2.6rem);
+  --text-display-sm: clamp(1.35rem, 3.5vw, 1.85rem);
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+}
+
+/* Primary mobile breakpoint — keep in sync with BP_MOBILE in breakpoints.ts */
+@media (max-width: 720px) {
+  :root {
+    --text-2xs: 0.55rem;
+    --text-xs: 0.68rem;
+    --text-sm: 0.75rem;
+    --text-md: 0.88rem;
+    --text-lg: 1rem;
+    --text-xl: 1.15rem;
+    --text-2xl: 1.35rem;
+    --text-display: clamp(1.15rem, 5.5vw, 1.55rem);
+    --text-display-sm: clamp(1.05rem, 5vw, 1.35rem);
+  }
 }

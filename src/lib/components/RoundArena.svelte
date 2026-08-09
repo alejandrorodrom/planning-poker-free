@@ -387,8 +387,9 @@
         </li>
       {/each}
     </ul>
+  </div>
 
-    <div class="arena__hand-wrap">
+  <div class="arena__hand-wrap">
       {#snippet smRevealActions()}
         <div class="arena__actions">
           <LiquidButton text={t('arena.reveal')} onclick={() => onreveal?.()} />
@@ -556,6 +557,9 @@
             <LiquidButton text={t('common.close')} onclick={() => oncloseVoting?.()} />
             <LiquidButton text={t('arena.again')} onclick={() => onrevote?.()} />
           </div>
+          <button type="button" class="arena__cancel" onclick={() => oncancel?.()}>
+            {t('room.cancelVoting')}
+          </button>
         {:else}
           <p class="arena__observe">{t('arena.waitingModeratorClose')}</p>
         {/if}
@@ -578,7 +582,6 @@
       {:else if isSm}
         {@render smRevealActions()}
       {/if}
-    </div>
   </div>
 </div>
 
@@ -586,7 +589,7 @@
   .arena {
     position: relative;
     margin: 0;
-    padding: 22px 16px 88px;
+    padding: 22px 16px 24px;
     border-radius: 28px;
     overflow: hidden;
     background:
@@ -652,6 +655,19 @@
     min-height: 0;
     justify-content: center;
     overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .arena__hand-wrap {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
   }
 
   .focus {
@@ -690,7 +706,7 @@
     font-family: var(--font-display);
     font-weight: 400;
     font-size: clamp(1.8rem, 4.5vw, 2.6rem);
-    line-height: 1.1;
+    line-height: var(--leading-tight);
     color: #0b3d4a;
     text-wrap: balance;
   }
@@ -1040,14 +1056,6 @@
     line-height: 1.2;
   }
 
-  .arena__hand-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 0 4px;
-  }
-
   .arena__hand-hint,
   .arena__observe {
     margin: 0;
@@ -1092,6 +1100,13 @@
     justify-content: center;
     gap: 10px;
     margin-top: 4px;
+  }
+
+  .arena__actions :global(.button) {
+    font-size: 0.9rem;
+    padding: 0.55em 1.35em;
+    border-width: 3px;
+    letter-spacing: 0.08em;
   }
 
   .setup {
@@ -1466,6 +1481,268 @@
     }
     50% {
       opacity: 0.55;
+    }
+  }
+
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
+    .arena {
+      padding: 8px 8px 0;
+      border-radius: 20px;
+    }
+
+    .arena__stage {
+      gap: 10px;
+      justify-content: flex-start;
+      padding-bottom: 4px;
+    }
+
+    .focus {
+      gap: 8px 12px;
+      flex-shrink: 0;
+    }
+
+    .focus__eyebrow {
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+      font-size: var(--text-xs);
+    }
+
+    .focus__title {
+      font-size: var(--text-display);
+    }
+
+    .timer {
+      width: 58px;
+      height: 58px;
+    }
+
+    .timer__value {
+      font-size: var(--text-md);
+    }
+
+    .reveal-badge {
+      min-width: 76px;
+      padding: 6px 10px;
+      border-radius: 12px;
+    }
+
+    .reveal-badge__value {
+      font-size: var(--text-xl);
+    }
+
+    .arena__seats {
+      gap: 12px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-content: center;
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .seat {
+      width: 58px;
+      gap: 2px;
+    }
+
+    .seat__name {
+      font-size: var(--text-xs);
+    }
+
+    .seat__meta {
+      font-size: var(--text-2xs);
+    }
+
+    .seat__figure {
+      width: 44px;
+      height: 52px;
+    }
+
+    .seat__figure :global(.avatar) {
+      width: 44px;
+      height: 44px;
+    }
+
+    .seat__card,
+    .seat__watch {
+      width: 40px;
+      height: 58px;
+      border-radius: 8px;
+    }
+
+    .arena__seats--revealed .seat__card,
+    .arena__seats--revealed .seat__watch {
+      width: 46px;
+      height: 66px;
+    }
+
+    .seat__value {
+      font-size: var(--text-md);
+      border-radius: 8px;
+    }
+
+    .seat__name {
+      margin-top: 6px;
+    }
+
+    .seat__meta {
+      display: block;
+      line-height: 1.15;
+      margin-top: 1px;
+    }
+
+    .seat__avatar {
+      width: 24px;
+      height: 28px;
+      margin-top: 0;
+    }
+
+    .seat__who {
+      gap: 1px;
+      margin-top: 0;
+    }
+
+    .seat__who--figure {
+      margin-top: -2px;
+    }
+
+    .seat__who--figure .seat__name {
+      margin-top: 8px;
+    }
+
+    .arena__hand-wrap {
+      z-index: 3;
+      gap: 6px;
+      width: auto;
+      margin: 0 -2px 8px;
+      padding: 10px 10px 10px;
+      border-radius: 18px 18px 16px 16px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.55) 0%,
+          rgba(255, 255, 255, 0.82) 40%,
+          rgba(248, 252, 253, 0.94) 100%
+        );
+      border: 1px solid rgba(22, 93, 112, 0.12);
+      border-bottom: none;
+      box-shadow:
+        0 -10px 28px rgba(15, 60, 70, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .arena__observe {
+      margin-bottom: 6px;
+      font-size: var(--text-sm);
+    }
+
+    .arena__actions {
+      gap: 8px;
+      margin-top: 0;
+    }
+
+    .arena__actions :global(.button) {
+      font-size: var(--text-xs);
+      padding: 0.4em 1em;
+      border-width: 2px;
+      letter-spacing: 0.06em;
+      min-height: 38px;
+    }
+
+    .arena__cancel {
+      font-size: var(--text-xs);
+    }
+
+    .setup {
+      gap: 8px;
+      width: min(100%, 360px);
+    }
+
+    .setup__label {
+      font-size: var(--text-2xs);
+    }
+
+    .setup__chip {
+      min-height: 32px;
+      padding: 0.3em 0.7em;
+      font-size: var(--text-xs);
+    }
+
+    .arena__estimate-select {
+      padding: 0.55rem 0.75rem;
+      font-size: var(--text-md);
+    }
+
+    .hand {
+      --card-w: 40px;
+      --card-h: 58px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 0 2px;
+      width: 100%;
+      max-width: none;
+    }
+
+    .hand__card {
+      font-size: var(--text-md);
+    }
+
+    .hand__card--special {
+      font-size: var(--text-sm);
+    }
+
+    .hand__card-motion {
+      animation: none;
+      transform: rotate(calc((var(--hi) - var(--mid)) * 0.6deg));
+    }
+
+    .hand__card-back,
+    .hand__card-face {
+      box-shadow: 0 4px 0 #0d3d48, 0 6px 12px rgba(0, 0, 0, 0.14);
+    }
+
+    .hand--ready .hand__card:hover {
+      --lift: -6px;
+    }
+
+    .hand--ready .hand__card--selected {
+      --lift: -10px;
+    }
+
+    .hand--ready .hand__card--selected .hand__card-face {
+      box-shadow:
+        0 6px 0 var(--color-brand-dark),
+        0 10px 18px rgba(22, 93, 112, 0.28);
+    }
+  }
+
+  /* BP_XS — ultra-narrow densification; sync with src/lib/breakpoints.ts */
+  @media (max-width: 420px) {
+    .arena {
+      padding: 6px 6px 0;
+    }
+
+    .hand {
+      --card-w: 36px;
+      --card-h: 52px;
+      gap: 5px;
+    }
+
+    .seat {
+      width: 52px;
+      gap: 2px;
+    }
+
+    .seat__card,
+    .seat__watch {
+      width: 36px;
+      height: 52px;
     }
   }
 </style>

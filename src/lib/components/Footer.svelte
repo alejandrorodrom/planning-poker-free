@@ -78,7 +78,7 @@
     gap: 12px;
     margin: 15px;
     padding: 0 15px;
-    font-size: 15px;
+    font-size: var(--text-md);
     font-family: var(--font-body);
     flex-wrap: wrap;
   }
@@ -86,8 +86,15 @@
   .container-footer--compact .footer {
     margin: 6px 12px;
     padding: 0 8px;
-    font-size: 12px;
+    font-size: var(--text-xs);
     gap: 8px;
+  }
+
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
+    :global(.app-shell:has(.room--arena)) .container-footer--compact {
+      display: none;
+    }
   }
 
   .footer__left {

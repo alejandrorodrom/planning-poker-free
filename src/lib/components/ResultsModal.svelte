@@ -68,6 +68,8 @@
         class="export-btn export-btn--photo"
         onclick={captureImage}
         disabled={capturing}
+        aria-label={t('results.photo')}
+        title={t('results.photo')}
       >
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
           <path
@@ -75,25 +77,37 @@
             d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4Zm8-9.7h-2.2l-1.4-1.8A2 2 0 0 0 14.8 3H9.2a2 2 0 0 0-1.6.7L6.2 5.5H4a2 2 0 0 0-2 2V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7.5a2 2 0 0 0-2-2ZM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"
           />
         </svg>
-        {capturing ? '…' : t('results.photo')}
+        <span class="export-btn__label">{capturing ? '…' : t('results.photo')}</span>
       </button>
-      <button type="button" class="export-btn" onclick={oncopyMd}>
+      <button
+        type="button"
+        class="export-btn"
+        onclick={oncopyMd}
+        aria-label="Markdown"
+        title="Markdown"
+      >
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
           <path
             fill="currentColor"
             d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
           />
         </svg>
-        MD
+        <span class="export-btn__label">MD</span>
       </button>
-      <button type="button" class="export-btn" onclick={oncopyCsv}>
+      <button
+        type="button"
+        class="export-btn"
+        onclick={oncopyCsv}
+        aria-label="CSV"
+        title="CSV"
+      >
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
           <path
             fill="currentColor"
             d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
           />
         </svg>
-        CSV
+        <span class="export-btn__label">CSV</span>
       </button>
     </div>
   {/snippet}
@@ -140,11 +154,13 @@
     display: flex;
     gap: 8px;
     flex-shrink: 0;
+    flex-wrap: wrap;
   }
 
   .export-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     min-height: 40px;
     padding: 0 14px;
@@ -154,7 +170,7 @@
     color: var(--color-brand);
     font-family: var(--font-body);
     font-weight: 800;
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     cursor: pointer;
@@ -200,14 +216,14 @@
     border-radius: 50%;
     background: #eef4f6;
     color: var(--color-brand);
-    font-size: 1.2rem;
+    font-size: var(--text-lg);
     font-weight: 700;
   }
 
   .empty p {
     margin: 0;
     max-width: 28ch;
-    line-height: 1.45;
+    line-height: var(--leading-snug);
   }
 
   .results {
@@ -249,7 +265,7 @@
 
   .results__title {
     font-weight: 700;
-    font-size: 1rem;
+    font-size: var(--text-md);
     color: #123;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -257,7 +273,7 @@
   }
 
   .results__teams {
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     color: #5a7a82;
   }
@@ -273,7 +289,7 @@
     min-width: 2.4rem;
     text-align: center;
     font-family: var(--font-display);
-    font-size: 1.7rem;
+    font-size: var(--text-2xl);
     font-weight: 400;
     line-height: 1;
     color: var(--color-brand-dark);
@@ -281,7 +297,7 @@
 
   .results__unit {
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 0.03em;
     color: #3d6a74;
@@ -289,13 +305,43 @@
 
   .results__value--empty {
     color: #9ab0b6;
-    font-size: 1.35rem;
+    font-size: var(--text-xl);
   }
 
-  @media (max-width: 520px) {
+  /* BP_MOBILE — sync with src/lib/breakpoints.ts */
+  @media (max-width: 720px) {
+    .exports {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .export-btn {
+      min-height: 38px;
+      padding: 0 8px;
+      width: 100%;
+      gap: 4px;
+    }
+
+    .export-btn__label {
+      font-size: var(--text-2xs);
+    }
+
     .results__item {
-      flex-direction: column;
-      align-items: flex-start;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .results__value {
+      min-width: 1.8rem;
+      font-size: var(--text-xl);
+    }
+
+    .results__meta {
+      gap: 8px;
     }
   }
 </style>

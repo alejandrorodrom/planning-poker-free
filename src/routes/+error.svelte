@@ -76,6 +76,7 @@
     text-decoration: underline;
   }
 
+  /* BP_SM / BP_MD / BP_LG — sync with src/lib/breakpoints.ts */
   @media (min-width: 576px) {
     .doge {
       height: 350px;
