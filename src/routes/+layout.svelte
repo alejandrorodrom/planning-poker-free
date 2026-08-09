@@ -21,6 +21,7 @@
   const hideNavbar = $derived(
     page.route.id === '/' || Boolean(page.route.id?.startsWith('/room'))
   );
+  const roomFooter = $derived(Boolean(page.route.id?.startsWith('/room')));
 </script>
 
 <div class="app-shell">
@@ -30,5 +31,5 @@
   <main class="app-shell__main">
     {@render children()}
   </main>
-  <Footer />
+  <Footer compact={roomFooter} />
 </div>

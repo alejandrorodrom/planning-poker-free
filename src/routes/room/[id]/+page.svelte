@@ -987,8 +987,8 @@
   .room {
     max-width: 1100px;
     width: 100%;
-    margin: 12px auto 32px;
-    padding: 0 20px 48px;
+    margin: 12px auto 0;
+    padding: 0 20px 32px;
     font-family: var(--font-body);
   }
 

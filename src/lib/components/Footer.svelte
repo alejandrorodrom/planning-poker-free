@@ -1,13 +1,21 @@
 <script lang="ts">
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
   import { t } from '$lib/i18n';
+
+  type Props = {
+    compact?: boolean;
+  };
+
+  let { compact = false }: Props = $props();
 </script>
 
-<footer class="container-footer">
+<footer class="container-footer" class:container-footer--compact={compact}>
   <section class="footer">
     <p class="footer__left">
       <span class="footer__left-code" aria-hidden="true">&lt;/&gt;</span>
-      {t('footer.developedBy')}
+      {#if !compact}
+        {t('footer.developedBy')}
+      {/if}
       <a
         class="footer__left-author"
         href="https://www.linkedin.com/in/alejandro-rodriguez-romero"
@@ -18,7 +26,9 @@
       </a>
     </p>
     <div class="footer__right">
-      <LanguageSwitcher compact />
+      {#if !compact}
+        <LanguageSwitcher compact />
+      {/if}
       <a
         class="footer__right-link"
         href="https://github.com/alejandrorodrom/planning-poker-free"
@@ -38,8 +48,8 @@
         <svg
           class="footer__sponsor-icon"
           viewBox="0 0 16 16"
-          width="16"
-          height="16"
+          width="14"
+          height="14"
           aria-hidden="true"
         >
           <path
@@ -57,6 +67,7 @@
   .container-footer {
     display: block;
     width: 100%;
+    flex-shrink: 0;
     user-select: none;
   }
 
@@ -72,6 +83,13 @@
     flex-wrap: wrap;
   }
 
+  .container-footer--compact .footer {
+    margin: 6px 12px;
+    padding: 0 8px;
+    font-size: 12px;
+    gap: 8px;
+  }
+
   .footer__left {
     display: flex;
     align-items: center;
@@ -80,10 +98,18 @@
     gap: 5px;
   }
 
+  .container-footer--compact .footer__left {
+    gap: 4px;
+  }
+
   .footer__left-code {
     margin-right: 5px;
     font-weight: 600;
     color: var(--color-brand);
+  }
+
+  .container-footer--compact .footer__left-code {
+    margin-right: 2px;
   }
 
   .footer__left-author {
@@ -100,6 +126,10 @@
     display: flex;
     align-items: center;
     gap: 14px;
+  }
+
+  .container-footer--compact .footer__right {
+    gap: 10px;
   }
 
   .footer__right-link {

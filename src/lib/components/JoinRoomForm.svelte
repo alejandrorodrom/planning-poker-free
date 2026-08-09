@@ -71,7 +71,7 @@
     }}
   >
     <span class="join__avatar-preview" aria-hidden="true">
-      <PlayerAvatar {avatar} size={72} />
+      <PlayerAvatar {avatar} size={64} />
     </span>
     <span class="join__avatar-meta">
       <strong>{t('join.yourAvatar')}</strong>
@@ -165,8 +165,8 @@
     display: flex;
     flex-direction: column;
     width: min(100%, 440px);
-    margin: 8px auto 0;
-    padding: 8px 0 32px;
+    margin: 4px auto 0;
+    padding: 4px 0 28px;
   }
 
   .join__submit-sr {
@@ -183,7 +183,7 @@
 
   .join__intro {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
 
   .join__eyebrow {
@@ -196,9 +196,9 @@
   }
 
   .join__title {
-    margin: 6px 0 8px;
+    margin: 4px 0 6px;
     font-family: var(--font-body);
-    font-size: 1.55rem;
+    font-size: 1.4rem;
     font-weight: 800;
     line-height: 1.2;
   }
@@ -206,8 +206,8 @@
   .join__hint {
     margin: 0;
     color: #555;
-    line-height: 1.5;
-    font-size: 0.98rem;
+    line-height: 1.45;
+    font-size: 0.95rem;
   }
 
   .join__avatar {
@@ -215,8 +215,8 @@
     align-items: center;
     gap: 14px;
     width: 100%;
-    margin-bottom: 18px;
-    padding: 12px 14px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
     border: 2px solid black;
     border-radius: 0.75rem;
     background: white;
@@ -233,8 +233,8 @@
   }
 
   .join__avatar-preview {
-    width: 72px;
-    height: 84px;
+    width: 64px;
+    height: 74px;
     display: grid;
     place-items: center;
     flex-shrink: 0;
@@ -259,12 +259,17 @@
   .join__roles {
     display: flex;
     flex-direction: column;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+  }
+
+  .join__roles :global(.form__choice) {
+    padding: 10px 14px;
+    margin-bottom: 8px;
   }
 
   .join__feedback {
-    min-height: 1.4rem;
-    margin-bottom: 8px;
+    min-height: 1.2rem;
+    margin-bottom: 4px;
   }
 
   .join__error {
@@ -276,6 +281,7 @@
   .join__actions {
     display: flex;
     justify-content: center;
+    padding-bottom: 4px;
   }
 
   .join__actions :global(.button) {
