@@ -1,7 +1,7 @@
 <script lang="ts">
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
-  import { MODERATOR_LABEL } from '$lib/room/roleLabel';
+  import { t } from '$lib/i18n';
   import type { PlayerPublic } from '$lib/room/protocol';
 
   type Props = {
@@ -33,52 +33,50 @@
 
 <ModalShell
   {open}
-  title="Moderación"
+  title={t('moderation.title')}
   titleId="moderation-modal-title"
-  eyebrow="Sala"
-  description="Gestiona quién facilita la sesión. Ceder pasa el rol a otra persona; dejarlo lo deja libre para que alguien lo asuma."
+  eyebrow={t('moderation.eyebrow')}
+  description={t('moderation.description')}
   size="md"
   {onclose}
 >
   <div class="body">
     <section class="block">
-      <h3 class="block__title">Rol de {MODERATOR_LABEL}</h3>
+      <h3 class="block__title">{t('moderation.roleTitle', { role: t('roles.moderator') })}</h3>
 
       <label class="field">
-        <span class="field__label">Ceder a alguien conectado</span>
+        <span class="field__label">{t('moderation.transferLabel')}</span>
         <div class="field__row">
           <select class="field__select" bind:value={transferTargetId}>
-            <option value="">Elige persona…</option>
+            <option value="">{t('moderation.choosePerson')}</option>
             {#each candidates as p (p.id)}
               <option value={p.id}>{p.name}</option>
             {/each}
           </select>
-          <LiquidButton text="Ceder" onclick={ontransfer} />
+          <LiquidButton text={t('moderation.transfer')} onclick={ontransfer} />
         </div>
       </label>
 
       {#if candidates.length === 0}
-        <p class="block__note">Nadie más está conectado para ceder el rol.</p>
+        <p class="block__note">{t('moderation.nobodyConnected')}</p>
       {/if}
 
       <button type="button" class="link-action" onclick={onrelinquish}>
-        Dejar el rol libre
+        {t('moderation.relinquish')}
       </button>
     </section>
 
     <section class="danger" aria-labelledby="danger-title">
       <div class="danger__copy">
-        <h3 id="danger-title" class="danger__title">Zona de cierre</h3>
-        <p class="danger__text">
-          Finalizar cierra la sala para todos y borra los datos de la sesión. No se puede deshacer.
-        </p>
+        <h3 id="danger-title" class="danger__title">{t('moderation.dangerTitle')}</h3>
+        <p class="danger__text">{t('moderation.dangerText')}</p>
       </div>
-      <button type="button" class="danger__btn" onclick={onfinalize}>Finalizar sala</button>
+      <button type="button" class="danger__btn" onclick={onfinalize}>{t('room.finalizeRoom')}</button>
     </section>
   </div>
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>Cerrar</button>
+    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
   {/snippet}
 </ModalShell>
 

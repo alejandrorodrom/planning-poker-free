@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { MODERATOR_LABEL } from '$lib/room/roleLabel';
   import LiquidButton from './LiquidButton.svelte';
   import RoomNotice from './RoomNotice.svelte';
+  import { t } from '$lib/i18n';
 
   type Props = {
     reason?: string;
@@ -13,31 +13,31 @@
     switch (reason) {
       case 'idle':
         return {
-          title: 'Sala cerrada',
-          description: 'La sala se cerró por inactividad.'
+          title: t('roomGone.idleTitle'),
+          description: t('roomGone.idleDesc')
         };
       case 'expired':
         return {
-          title: 'Sala expirada',
-          description: 'La sesión alcanzó el tiempo máximo.'
+          title: t('roomGone.expiredTitle'),
+          description: t('roomGone.expiredDesc')
         };
       case 'host':
         return {
-          title: 'Sala finalizada',
-          description: `El ${MODERATOR_LABEL} finalizó la sesión.`
+          title: t('roomGone.hostTitle'),
+          description: t('roomGone.hostDesc')
         };
       default:
         return {
-          title: 'Sala no disponible',
-          description: 'No encontramos esta sala o ya no está viva.'
+          title: t('roomGone.defaultTitle'),
+          description: t('roomGone.defaultDesc')
         };
     }
   });
 </script>
 
 <RoomNotice title={copy.title} description={copy.description}>
-  <LiquidButton text="Crear una nueva sala" href="/" />
-  <a class="gone__link" href="/">Volver al inicio</a>
+  <LiquidButton text={t('roomGone.createNewRoom')} href="/" />
+  <a class="gone__link" href="/">{t('common.backToHome')}</a>
 </RoomNotice>
 
 <style>

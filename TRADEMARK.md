@@ -7,6 +7,12 @@ They are **not** covered by the MIT License that applies to the software source
 code. The MIT License grants rights to the code; it does **not** grant rights
 to use the name or logo as a brand.
 
+<p>
+  <a href="TRADEMARK.es.md">Español</a>
+  ·
+  <a href="TRADEMARK.md">English</a>
+</p>
+
 ## Allowed without permission
 
 - Referring to the project by name in a factual way (e.g. “fork of Planning Poker Free”, “compatible with Planning Poker Free”).

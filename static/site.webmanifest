@@ -1,12 +1,12 @@
 {
   "name": "Planning Poker Free",
   "short_name": "Planning Poker",
-  "description": "Estima historias en tiempo real con tu equipo Scrum. Sin cuentas.",
+  "description": "Estimate stories in real-time with your Scrum team. No accounts required.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b5d70",
   "theme_color": "#0b5d70",
-  "lang": "es",
+  "lang": "en",
   "icons": [
     {
       "src": "/icon-192.png",

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { t } from '$lib/i18n';
 
   type Size = 'sm' | 'md' | 'lg' | 'xl';
   type Variant = 'panel' | 'simple' | 'soft';
@@ -52,7 +53,7 @@
     class:modal-shell__overlay--soft={variant === 'soft'}
   >
     <div class="modal-shell__frost" aria-hidden="true"></div>
-    <button type="button" class="modal-shell__backdrop" aria-label="Cerrar" onclick={onclose}></button>
+    <button type="button" class="modal-shell__backdrop" aria-label={t('common.close')} onclick={onclose}></button>
     <div
       class="modal-shell"
       class:modal-shell--panel={variant === 'panel'}

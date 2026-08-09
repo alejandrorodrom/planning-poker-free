@@ -2,16 +2,17 @@
   import { untrack } from 'svelte';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
+  import { t } from '$lib/i18n';
   import type { ActiveRoundPublic, EstimateRule, PlayerPublic, StoryPublic, Team } from '$lib/room/protocol';
-  import { MODERATOR_LABEL, sanitizeRoleLabel } from '$lib/room/roleLabel';
+  import { sanitizeRoleLabel } from '$lib/room/roleLabel';
   import { formatEstimateLabel, isPointEstimate } from '$lib/room/decks';
 
   type DeckCard = { value: string; special?: boolean };
 
-  type TimerPreset = { id: string; label: string; seconds: number | null };
+  type TimerPreset = { id: string; labelKey?: string; label?: string; seconds: number | null };
 
   const TIMER_PRESETS: TimerPreset[] = [
-    { id: 'off', label: 'Sin', seconds: null },
+    { id: 'off', labelKey: 'arena.timerOff', seconds: null },
     { id: '30', label: '30s', seconds: 30 },
     { id: '60', label: '1m', seconds: 60 },
     { id: '120', label: '2m', seconds: 120 }
@@ -91,44 +92,44 @@
   const resultLabel = $derived.by(() => {
     switch (estimateRule) {
       case 'consensus':
-        return 'Acordado';
+        return t('arena.agreed');
       case 'mode':
-        return 'Moda';
+        return t('landing.mode');
       case 'median':
-        return 'Mediana';
+        return t('landing.median');
       case 'mean':
-        return 'Media';
+        return t('landing.mean');
       default:
-        return 'Estimación';
+        return t('arena.estimate');
     }
   });
   const resultValue = $derived.by(() => {
     if (!round) return savedEstimate ?? '—';
     if (!round.revealed) return '—';
-    if (isConsensus) return closeEstimate || (isSm ? 'Elige…' : 'Pendiente');
+    if (isConsensus) return closeEstimate || (isSm ? t('arena.choose') : t('arena.pending'));
     return round.suggestedEstimate ?? '—';
   });
   const resultPending = $derived(Boolean(round?.revealed && isConsensus && !closeEstimate));
 
   const focusEyebrow = $derived.by(() => {
     if (!round) {
-      if (storyEstimated) return 'Estimada';
-      if (story) return 'En espera';
-      return 'Sin historia';
+      if (storyEstimated) return t('arena.estimated');
+      if (story) return t('arena.waiting');
+      return t('arena.noStory');
     }
-    if (revealed) return `Revelado · ronda ${round.roundNumber}`;
-    if (timerDone) return `Tiempo agotado · ronda ${round.roundNumber}`;
-    return `Votando · ronda ${round.roundNumber}`;
+    if (revealed) return t('arena.revealedRound', { n: round.roundNumber });
+    if (timerDone) return t('arena.timeUpRound', { n: round.roundNumber });
+    return t('arena.votingRound', { n: round.roundNumber });
   });
 
   const focusTitle = $derived(
-    story?.title ?? (round ? 'Historia' : 'Listos para estimar')
+    story?.title ?? (round ? t('arena.storyFallback') : t('arena.readyToEstimate'))
   );
   const canChangeStory = $derived(!round && isSm);
 
   function teamName(teamId: string | null | undefined): string | null {
     if (!teamId) return null;
-    return teams.find((t) => t.id === teamId)?.name ?? null;
+    return teams.find((team) => team.id === teamId)?.name ?? null;
   }
 
   function seatState(vote: string | null | 'hidden' | undefined): 'empty' | 'hidden' | 'shown' | 'idle' {
@@ -198,10 +199,10 @@
 
     const n = untrack(() => Math.max(1, deckCards.length));
     const doneAt = DEAL_FLIP_DELAY_MS + (n - 1) * DEAL_STAGGER_MS + DEAL_FLIP_MS + 60;
-    const t = setTimeout(() => {
+    const timeout = setTimeout(() => {
       readyDealKey = key;
     }, doneAt);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timeout);
   });
 
   $effect(() => {
@@ -213,10 +214,10 @@
   $effect(() => {
     const vote = pickPulse;
     if (!vote) return;
-    const t = setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (pickPulse === vote) pickPulse = null;
     }, 460);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timeout);
   });
 </script>
 
@@ -243,7 +244,7 @@
         <h2 class="focus__title">{focusTitle}</h2>
         {#if canChangeStory}
           <button type="button" class="story-change" onclick={() => onopenStories?.()}>
-            {story ? 'Cambiar historia' : 'Elegir historia'}
+            {story ? t('arena.changeStory') : t('arena.chooseStory')}
           </button>
         {/if}
         {#if !round && storyEstimated && savedByTeam.length}
@@ -260,7 +261,7 @@
           class:timer--done={timerDone}
           role="timer"
           aria-live="polite"
-          aria-label={timerDone ? 'Tiempo agotado' : `Tiempo restante ${timerLabel}`}
+          aria-label={timerDone ? t('arena.timeUp') : t('arena.timeLeft', { time: timerLabel })}
         >
           <svg class="timer__ring" viewBox="0 0 100 100" aria-hidden="true">
             <circle class="timer__track" cx="50" cy="50" r="45" />
@@ -274,7 +275,7 @@
               />
             {/if}
           </svg>
-          <span class="timer__value">{timerDone ? '¡Ya!' : timerLabel}</span>
+          <span class="timer__value">{timerDone ? t('arena.timesUpShort') : timerLabel}</span>
         </div>
       {/if}
 
@@ -286,9 +287,9 @@
           class:reveal-badge--saved={storyEstimated}
           aria-live="polite"
         >
-          <span class="reveal-badge__label">{storyEstimated ? 'Estimación' : resultLabel}</span>
+          <span class="reveal-badge__label">{storyEstimated ? t('arena.estimate') : resultLabel}</span>
           <strong class="reveal-badge__value">
-            {resultValue}{#if isPointEstimate(resultValue)}<span class="reveal-badge__unit"> pts</span
+            {resultValue}{#if isPointEstimate(resultValue)}<span class="reveal-badge__unit">{t('decks.pointsSuffix')}</span
               >{/if}
           </strong>
         </div>
@@ -303,7 +304,7 @@
         {@const online = player.connection === 'connected'}
         {@const team = teamName(player.teamId)}
         {@const tag = sanitizeRoleLabel(player.roleLabel)}
-        {@const roleText = player.isScrumMaster ? MODERATOR_LABEL : tag}
+        {@const roleText = player.isScrumMaster ? t('roles.moderator') : tag}
         <li
           class="seat"
           class:seat--me={isMe}
@@ -335,7 +336,7 @@
             {/if}
             <span class="seat__name">
               {player.name}
-              {#if isMe}<em>yo</em>{/if}
+              {#if isMe}<em>{t('arena.me')}</em>{/if}
             </span>
             {#if roleText || team}
               <span class="seat__meta">
@@ -352,18 +353,18 @@
     <div class="arena__hand-wrap">
       {#snippet smRevealActions()}
         <div class="arena__actions">
-          <LiquidButton text="Revelar" onclick={() => onreveal?.()} />
+          <LiquidButton text={t('arena.reveal')} onclick={() => onreveal?.()} />
         </div>
         <button type="button" class="arena__cancel" onclick={() => oncancel?.()}>
-          Cancelar votación
+          {t('room.cancelVoting')}
         </button>
       {/snippet}
 
       {#snippet roundSetup(cta: string)}
         <div class="setup">
           {#if teams.length > 0}
-            <div class="setup__block" role="group" aria-label="Quién vota">
-              <p class="setup__label">Quién vota</p>
+            <div class="setup__block" role="group" aria-label={t('arena.whoVotes')}>
+              <p class="setup__label">{t('arena.whoVotes')}</p>
               <div class="setup__chips">
                 <button
                   type="button"
@@ -371,7 +372,7 @@
                   class:setup__chip--on={audienceMode === 'all'}
                   onclick={() => (audienceMode = 'all')}
                 >
-                  Todo el equipo
+                  {t('arena.wholeTeam')}
                 </button>
                 <button
                   type="button"
@@ -379,7 +380,7 @@
                   class:setup__chip--on={audienceMode === 'teams'}
                   onclick={() => (audienceMode = 'teams')}
                 >
-                  Algunos
+                  {t('arena.someTeams')}
                 </button>
               </div>
               {#if audienceMode === 'teams'}
@@ -398,8 +399,8 @@
               {/if}
             </div>
           {/if}
-          <div class="setup__block" role="group" aria-label="Contador">
-            <p class="setup__label">Contador</p>
+          <div class="setup__block" role="group" aria-label={t('arena.timer')}>
+            <p class="setup__label">{t('arena.timer')}</p>
             <div class="setup__chips">
               {#each TIMER_PRESETS as preset (preset.id)}
                 <button
@@ -408,7 +409,7 @@
                   class:setup__chip--on={activeTimerId === preset.id}
                   onclick={() => selectTimer(preset.seconds)}
                 >
-                  {preset.label}
+                  {preset.labelKey ? t(preset.labelKey) : preset.label}
                 </button>
               {/each}
             </div>
@@ -422,39 +423,41 @@
       {#if !round}
         {#if storyEstimated}
           <p class="arena__observe">
-            Estimación guardada{savedEstimate ? `: ${formatEstimateLabel(savedEstimate)}` : ''}.
+            {savedEstimate
+              ? t('arena.estimateSavedWith', { value: formatEstimateLabel(savedEstimate) })
+              : t('arena.estimateSaved')}
           </p>
           {#if isSm}
-            {@render roundSetup('Volver a votar')}
+            {@render roundSetup(t('arena.revote'))}
           {:else}
             <p class="arena__observe arena__observe--soft">
-              El {MODERATOR_LABEL} puede volver a abrir la votación si hace falta.
+              {t('arena.moderatorCanRevote')}
             </p>
           {/if}
         {:else if isSm}
           {#if story}
-            {@render roundSetup('Iniciar votación')}
+            {@render roundSetup(t('arena.startVoting'))}
           {:else}
-            <p class="arena__observe">Elige una historia y luego inicia la votación.</p>
+            <p class="arena__observe">{t('arena.pickStoryFirst')}</p>
             <div class="arena__actions">
-              <LiquidButton text="Ver historias" onclick={() => onopenStories?.()} />
+              <LiquidButton text={t('arena.viewStories')} onclick={() => onopenStories?.()} />
             </div>
           {/if}
         {:else}
           <p class="arena__observe">
-            Esperando a que el {MODERATOR_LABEL} inicie la votación.
+            {t('arena.waitingModeratorStart')}
           </p>
         {/if}
       {:else if eligibleToVote}
         <p class="arena__hand-hint" class:arena__hand-hint--ready={handReady}>
-          Tu mano — elige una carta
+          {t('arena.yourHand')}
         </p>
         {#key handDealKey}
           <div
             class="hand"
             class:hand--ready={handReady}
             role="group"
-            aria-label="Cartas para votar"
+            aria-label={t('arena.cardsToVote')}
             aria-busy={!handReady}
           >
             {#each deckCards as card, i (card.value)}
@@ -492,9 +495,9 @@
         {#if isSm}
           {#if isConsensus}
             <label class="arena__estimate">
-              <span class="arena__estimate-label">Estimación acordada</span>
+              <span class="arena__estimate-label">{t('arena.agreedEstimate')}</span>
               <select class="arena__estimate-select" bind:value={closeEstimate}>
-                <option value="">Acordada…</option>
+                <option value="">{t('arena.agreedPlaceholder')}</option>
                 {#each deckCards as card (card.value)}
                   {#if !card.special}
                     <option value={card.value}>{card.value}</option>
@@ -508,21 +511,21 @@
             </p>
           {/if}
           <div class="arena__actions">
-            <LiquidButton text="Cerrar" onclick={() => oncloseVoting?.()} />
-            <LiquidButton text="Otra vez" onclick={() => onrevote?.()} />
+            <LiquidButton text={t('common.close')} onclick={() => oncloseVoting?.()} />
+            <LiquidButton text={t('arena.again')} onclick={() => onrevote?.()} />
           </div>
         {:else}
-          <p class="arena__observe">Esperando cierre del {MODERATOR_LABEL}.</p>
+          <p class="arena__observe">{t('arena.waitingModeratorClose')}</p>
         {/if}
       {:else if timerDone}
         {#if isSm}
           <p class="arena__observe arena__observe--pulse">
-            Tiempo fuera — revela las cartas cuando quieras.
+            {t('arena.timeOutReveal')}
           </p>
           {@render smRevealActions()}
         {:else}
           <p class="arena__observe arena__observe--pulse">
-            Tiempo agotado. Esperando la revelación…
+            {t('arena.timeUpWaitingReveal')}
           </p>
         {/if}
       {:else if voteStatusMessage}

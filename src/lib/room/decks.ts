@@ -16,13 +16,17 @@ const SPECIAL: DeckCard[] = [
   { value: '☕', special: true }
 ];
 
-export const DECKS: Record<
-  DeckId,
-  { id: DeckId; label: string; numeric: boolean; cards: DeckCard[] }
-> = {
+export const DECK_IDS: DeckId[] = [
+  'fibonacci',
+  'fibonacci_strict',
+  'powers_of_2',
+  'tshirt',
+  'sequential'
+];
+
+export const DECKS: Record<DeckId, { id: DeckId; numeric: boolean; cards: DeckCard[] }> = {
   fibonacci: {
     id: 'fibonacci',
-    label: 'Fibonacci modificado',
     numeric: true,
     cards: [
       { value: '0', numeric: 0 },
@@ -41,7 +45,6 @@ export const DECKS: Record<
   },
   fibonacci_strict: {
     id: 'fibonacci_strict',
-    label: 'Fibonacci',
     numeric: true,
     cards: [
       { value: '1', numeric: 1 },
@@ -57,7 +60,6 @@ export const DECKS: Record<
   },
   powers_of_2: {
     id: 'powers_of_2',
-    label: 'Potencias de 2',
     numeric: true,
     cards: [
       { value: '1', numeric: 1 },
@@ -71,7 +73,6 @@ export const DECKS: Record<
   },
   tshirt: {
     id: 'tshirt',
-    label: 'T-shirt',
     numeric: false,
     cards: [
       { value: 'XS' },
@@ -85,7 +86,6 @@ export const DECKS: Record<
   },
   sequential: {
     id: 'sequential',
-    label: 'Secuencial 0–10',
     numeric: true,
     cards: [
       { value: '0', numeric: 0 },

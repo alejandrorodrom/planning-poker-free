@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { StoryStatus } from '$lib/room/protocol';
-  import { storyStatusLabel } from '$lib/room/storyStatus';
+  import { storyStatusLabel } from '$lib/i18n/labels';
 
   type Props = {
     status: StoryStatus | string;

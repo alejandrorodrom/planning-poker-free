@@ -1,6 +1,8 @@
 <script lang="ts">
+  import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
+  import { t } from '$lib/i18n';
   import type { PlayerAvatarConfig } from '$lib/room/avatar';
   import { ROOM_NAME_MAX } from '$lib/room/limits';
 
@@ -42,7 +44,7 @@
 </script>
 
 <header class="topbar">
-  <a class="topbar__brand" href="/" aria-label="Planning Poker — inicio">
+  <a class="topbar__brand" href="/" aria-label="Planning Poker">
     <img
       src="/assets/svg/planning-poker.svg"
       class="topbar__brand-icon"
@@ -54,7 +56,7 @@
   </a>
 
   <div class="topbar__identity">
-    <p class="topbar__eyebrow">{isPrivate ? 'Sala privada' : 'Sala pública'}</p>
+    <p class="topbar__eyebrow">{isPrivate ? t('room.privateRoom') : t('room.publicRoom')}</p>
     {#if editingName && isSm}
       <form
         class="topbar__rename"
@@ -67,11 +69,11 @@
           class="form__input form__input--compact topbar__rename-input"
           maxlength={ROOM_NAME_MAX}
           bind:value={draftName}
-          aria-label="Nombre de la sala"
+          aria-label={t('room.roomNameLabel')}
         />
         <div class="topbar__rename-actions">
-          <LiquidButton text="Guardar" type="submit" />
-          <button type="button" class="linkish" onclick={oncancelEditName}>Cancelar</button>
+          <LiquidButton text={t('common.save')} type="submit" />
+          <button type="button" class="linkish" onclick={oncancelEditName}>{t('common.cancel')}</button>
         </div>
       </form>
     {:else}
@@ -79,7 +81,7 @@
         <h1 class="topbar__title">{roomName}</h1>
         {#if isSm && !needsJoin}
           <button type="button" class="linkish topbar__edit-name" onclick={onstartEditName}>
-            Editar
+            {t('common.edit')}
           </button>
         {/if}
       </div>
@@ -87,6 +89,7 @@
   </div>
 
   <div class="topbar__status">
+    <LanguageSwitcher compact />
     {#if showInvite}
       <button type="button" class="topbar__invite" onclick={oninvite}>
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -95,11 +98,11 @@
             d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11A2.99 2.99 0 0 0 21 5a3 3 0 1 0-5.91.7L8.04 9.81A3 3 0 1 0 8 14.2l7.12 4.16c.05.02.09.04.14.04A2.99 2.99 0 1 0 18 16.08Z"
           />
         </svg>
-        Invitar
+        {t('room.invite')}
       </button>
     {/if}
     {#if me}
-      <button type="button" class="you" onclick={oneditAvatar} title="Editar avatar">
+      <button type="button" class="you" onclick={oneditAvatar} title={t('join.editAvatar')}>
         <span class="you__avatar" aria-hidden="true">
           <PlayerAvatar avatar={me.avatar} size={40} />
         </span>
@@ -113,7 +116,7 @@
     {:else if connection === 'connecting' || connection === 'closed'}
       <span class="you you--plain you--connecting" role="status">
         <span class="connecting-dot" aria-hidden="true"></span>
-        {connection === 'closed' ? 'Reconectando…' : 'Conectando…'}
+        {connection === 'closed' ? t('room.reconnecting') : t('room.connecting')}
       </span>
     {/if}
   </div>

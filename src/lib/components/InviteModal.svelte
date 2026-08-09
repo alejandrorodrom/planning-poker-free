@@ -1,5 +1,6 @@
 <script lang="ts">
   import ModalShell from './ModalShell.svelte';
+  import { t } from '$lib/i18n';
 
   type Props = {
     open: boolean;
@@ -44,9 +45,9 @@
 
 <ModalShell
   {open}
-  title="Invitar al equipo"
+  title={t('invite.title')}
   titleId="invite-modal-title"
-  description={`Comparte el link para que entren a “${roomName}”.`}
+  description={t('invite.description', { roomName })}
   size="sm"
   variant="simple"
   {onclose}
@@ -54,7 +55,7 @@
   <code class="modal__link">{roomLink}</code>
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>Cerrar</button>
+    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
     <button
       type="button"
       class="modal__btn"
@@ -69,7 +70,7 @@
             d="M9.55 18.2 3.8 12.45l1.9-1.9 3.85 3.85L18.3 5.65l1.9 1.9L9.55 18.2Z"
           />
         </svg>
-        Copiado
+        {t('common.copied')}
       {:else}
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
           <path
@@ -77,7 +78,7 @@
             d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
           />
         </svg>
-        Copiar
+        {t('invite.copy')}
       {/if}
     </button>
     {#if canNativeShare && onshare}
@@ -88,7 +89,7 @@
             d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11A2.99 2.99 0 0 0 21 5a3 3 0 1 0-5.91.7L8.04 9.81A3 3 0 1 0 8 14.2l7.12 4.16c.05.02.09.04.14.04A2.99 2.99 0 1 0 18 16.08Z"
           />
         </svg>
-        Enviar
+        {t('invite.send')}
       </button>
     {/if}
   {/snippet}

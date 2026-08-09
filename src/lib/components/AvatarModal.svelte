@@ -3,6 +3,7 @@
   import AvatarPicker from '$lib/components/AvatarPicker.svelte';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
+  import { t } from '$lib/i18n';
   import { sanitizeAvatar, type PlayerAvatarConfig } from '$lib/room/avatar';
 
   type Props = {
@@ -23,10 +24,10 @@
 
 <ModalShell
   {open}
-  title="Avatar"
+  title={t('avatar.title')}
   titleId="avatar-modal-title"
-  eyebrow="Tu perfil"
-  description="Elige un estilo o genera uno al azar. Se verá en la mesa."
+  eyebrow={t('avatar.eyebrow')}
+  description={t('avatar.description')}
   size="xl"
   variant="soft"
   centered
@@ -35,9 +36,9 @@
   <AvatarPicker bind:value={draft} />
 
   {#snippet footer()}
-    <button type="button" class="ghost" onclick={onclose}>Cancelar</button>
+    <button type="button" class="ghost" onclick={onclose}>{t('common.cancel')}</button>
     <LiquidButton
-      text="Guardar"
+      text={t('common.save')}
       onclick={() => {
         onsave(sanitizeAvatar(draft));
         onclose();

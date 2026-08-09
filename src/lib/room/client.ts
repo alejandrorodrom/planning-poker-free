@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '$lib/errors';
 import type { ClientToServer, RoomPublicState, ServerToClient, StoryPublic } from './protocol';
 import { roomWebSocketUrl } from './wsUrl';
 
@@ -73,7 +74,7 @@ export class RoomClient {
 
     ws.onerror = () => {
       if (generation !== this.generation || this.ws !== ws) return;
-      this.handlers.onError('Error de conexión');
+      this.handlers.onError(ERROR_CODES.connection_error, ERROR_CODES.connection_error);
     };
 
     ws.onmessage = (event) => {

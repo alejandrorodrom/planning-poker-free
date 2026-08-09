@@ -3,9 +3,9 @@
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
   import StoryStatusChip from '$lib/components/StoryStatusChip.svelte';
+  import { t } from '$lib/i18n';
   import { formatEstimateLabel } from '$lib/room/decks';
   import { STORY_TITLE_MAX } from '$lib/room/limits';
-  import { MODERATOR_LABEL } from '$lib/room/roleLabel';
   import type { StoryPublic } from '$lib/room/protocol';
 
   type Props = {
@@ -44,8 +44,8 @@
   const estimatedCount = $derived(stories.filter((s) => s.status === 'estimated').length);
   const description = $derived(
     stories.length === 0
-      ? 'Aún no hay historias en esta sesión.'
-      : `${estimatedCount} de ${stories.length} estimadas.`
+      ? t('stories.emptyDesc')
+      : t('stories.progressDesc', { estimated: estimatedCount, total: stories.length })
   );
   const canCreate = $derived(draftTitle.trim().length > 0);
   const canSaveEdit = $derived(editTitle.trim().length > 0);
@@ -96,9 +96,9 @@
 
 <ModalShell
   {open}
-  title="Historias"
+  title={t('stories.title')}
   titleId="stories-modal-title"
-  eyebrow="Sala"
+  eyebrow={t('moderation.eyebrow')}
   {description}
   size="lg"
   {onclose}
@@ -112,24 +112,24 @@
         submitCreate();
       }}
     >
-      <label class="create__label" for="story-create-title">Nueva historia</label>
+      <label class="create__label" for="story-create-title">{t('stories.newStory')}</label>
       <div class="create__row">
         <input
           id="story-create-title"
           class="create__input"
           type="text"
           maxlength={STORY_TITLE_MAX}
-          placeholder="Ej. Login con SSO"
+          placeholder={t('stories.placeholder')}
           aria-describedby="story-create-hint"
           bind:this={createInput}
           bind:value={draftTitle}
         />
-        <LiquidButton text="Añadir" type="submit" disabled={!canCreate} />
+        <LiquidButton text={t('stories.add')} type="submit" disabled={!canCreate} />
       </div>
       <p id="story-create-hint" class="create__hint">
         {canCreate
           ? `${draftTitle.trim().length}/${STORY_TITLE_MAX}`
-          : 'Escribe un título para poder añadirla.'}
+          : t('stories.titleHint')}
       </p>
     </form>
   {/if}
@@ -158,9 +158,7 @@
         </svg>
       </span>
       <p class="empty__text">
-        {canManage
-          ? 'Añade la primera historia para empezar a votar.'
-          : `El ${MODERATOR_LABEL} aún no ha añadido historias.`}
+        {canManage ? t('stories.emptyManage') : t('stories.emptyWait')}
       </p>
     </div>
   {:else}
@@ -183,16 +181,16 @@
                 maxlength={STORY_TITLE_MAX}
                 bind:this={editInput}
                 bind:value={editTitle}
-                aria-label="Editar título"
+                aria-label={t('stories.editTitle')}
               />
               <button
                 type="submit"
                 class="item__action item__action--save"
                 disabled={!canSaveEdit}
               >
-                Guardar
+                {t('common.save')}
               </button>
-              <button type="button" class="item__action" onclick={cancelEdit}>Cancelar</button>
+              <button type="button" class="item__action" onclick={cancelEdit}>{t('common.cancel')}</button>
             </form>
           {:else}
             {#if canManage}
@@ -218,7 +216,7 @@
                 <button
                   type="button"
                   class="item__icon"
-                  aria-label={`Editar ${story.title}`}
+                  aria-label={t('stories.editAria', { title: story.title })}
                   onclick={() => startEdit(story)}
                 >
                   <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -231,7 +229,7 @@
                 <button
                   type="button"
                   class="item__icon item__icon--danger"
-                  aria-label={`Eliminar ${story.title}`}
+                  aria-label={t('stories.deleteAria', { title: story.title })}
                   onclick={() => ondelete?.(story.id)}
                 >
                   <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -250,7 +248,7 @@
   {/if}
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>Cerrar</button>
+    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
   {/snippet}
 </ModalShell>
 

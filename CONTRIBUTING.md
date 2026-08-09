@@ -1,18 +1,24 @@
-# Contribuir
+# Contributing
 
-Gracias por tu interés en **Planning Poker Free**. Este documento resume cómo proponer cambios de forma útil y revisable.
+Thanks for your interest in **Planning Poker Free**. This document summarizes how to propose useful, reviewable changes.
 
-Al participar, aceptas el [Código de conducta](CODE_OF_CONDUCT.md).
+<p>
+  <a href="CONTRIBUTING.es.md">Español</a>
+  ·
+  <a href="CONTRIBUTING.md">English</a>
+</p>
 
-## Antes de empezar
+By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-1. Revisa issues y PRs abiertos para evitar trabajo duplicado.
-2. Para cambios grandes (arquitectura, nuevas features de producto, breaking changes), abre primero un **issue** y comenta el enfoque.
-3. El nombre, el logo y la identidad visual están sujetos a [TRADEMARK.md](TRADEMARK.md): no los reutilices en forks como marca oficial.
+## Before you start
 
-## Configuración local
+1. Check open issues and PRs to avoid duplicate work.
+2. For large changes (architecture, major product features, breaking changes), open an **issue** first and discuss the approach.
+3. The name, logo, and visual identity are covered by [TRADEMARK.md](TRADEMARK.md): do not reuse them in forks as the official brand.
 
-Requisitos: **Node.js ≥ 24** (ver `.nvmrc`).
+## Local setup
+
+Requirements: **Node.js ≥ 24** (see `.nvmrc`).
 
 ```sh
 nvm use
@@ -21,11 +27,11 @@ npm run gen
 npm run dev
 ```
 
-Abre [http://localhost:5173](http://localhost:5173).
+Open [http://localhost:5173](http://localhost:5173).
 
-En desarrollo, Wrangler corre como sidecar para Durable Objects y WebSockets.
+In development, Wrangler runs as a sidecar for Durable Objects and WebSockets.
 
-### Comprobaciones antes de abrir un PR
+### Checks before opening a PR
 
 ```sh
 npm run format
@@ -34,26 +40,26 @@ npm run check
 npm run build
 ```
 
-## Flujo de contribución
+## Contribution flow
 
-1. Haz fork (si aplica) y crea una rama desde `main` con un nombre descriptivo (`fix/…`, `feat/…`, `docs/…`).
-2. Haz cambios pequeños y enfocados; un PR = un propósito.
-3. Sigue el estilo del código existente (Svelte 5, TypeScript, convenciones del repo).
-4. Incluye contexto en el PR: qué cambia, por qué, y cómo probarlo.
-5. No commits de secretos (`.env`, tokens, credenciales).
+1. Fork if needed and create a branch from `main` with a descriptive name (`fix/…`, `feat/…`, `docs/…`).
+2. Keep changes small and focused; one PR = one purpose.
+3. Follow existing code style (Svelte 5, TypeScript, repo conventions).
+4. Include context in the PR: what changed, why, and how to test it.
+5. Never commit secrets (`.env`, tokens, credentials).
 
-## Áreas sensibles
+## Sensitive areas
 
-| Área | Notas |
+| Area | Notes |
 | --- | --- |
-| `src/lib/server/room/Room.ts` | Lógica de sala, WebSockets, alarmas; cambios requieren prueba manual multi-pestaña |
-| Protocolo cliente/servidor | Mantén compatibilidad o documenta breaking changes |
-| Branding / assets de logo | Ver `TRADEMARK.md` |
+| `src/lib/server/room/Room.ts` | Room logic, WebSockets, alarms; changes need manual multi-tab testing |
+| Client/server protocol | Keep compatibility or document breaking changes |
+| Branding / logo assets | See `TRADEMARK.md` |
 
-## Reportes de seguridad
+## Security reports
 
-No abras issues públicos para vulnerabilidades. Sigue [SECURITY.md](SECURITY.md).
+Do not open public issues for vulnerabilities. Follow [SECURITY.md](SECURITY.md).
 
-## Licencia
+## License
 
-Al contribuir, aceptas que tus aportes se licencien bajo la [MIT](LICENSE) del proyecto.
+By contributing, you agree that your contributions are licensed under the project's [MIT](LICENSE) license.

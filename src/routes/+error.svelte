@@ -1,20 +1,35 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
+  import { ERROR_CODES, type ErrorCode } from '$lib/errors';
+  import { t, te } from '$lib/i18n';
+
+  function translateErrorMessage(message: string | undefined): string {
+    if (!message) return t('errorPage.errorDesc');
+    if (message in ERROR_CODES) return te(message as ErrorCode);
+    return message;
+  }
+
+  const title = $derived(
+    page.status === 404 ? t('errorPage.notFoundTitle') : t('errorPage.errorTitle')
+  );
+  const description = $derived(
+    page.status === 404
+      ? t('errorPage.notFoundDesc')
+      : translateErrorMessage(page.error?.message)
+  );
 </script>
 
 <svelte:head>
-  <title>{page.status === 404 ? 'Página no encontrada' : 'Error'} · Planning Poker Free</title>
+  <title>{title} · Planning Poker Free</title>
   <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 <section class="not-found">
   <img class="doge" src="/assets/gif/doge.gif" alt="Doge" />
   <h1 class="title">{page.status === 404 ? '404' : page.status}</h1>
-  <p class="description">
-    {page.status === 404 ? 'Página no encontrada' : (page.error?.message ?? 'Algo salió mal')}
-  </p>
-  <a class="back" href={resolve('/')}>Volver al inicio</a>
+  <p class="description">{description}</p>
+  <a class="back" href={resolve('/')}>{t('common.backToHome')}</a>
 </section>
 
 <style>

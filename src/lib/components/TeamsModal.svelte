@@ -1,6 +1,7 @@
 <script lang="ts">
   import ModalShell from '$lib/components/ModalShell.svelte';
   import TeamList from '$lib/components/TeamList.svelte';
+  import { t } from '$lib/i18n';
   import type { PlayerPublic, Team } from '$lib/room/protocol';
 
   type Props = {
@@ -27,18 +28,20 @@
 
   const description = $derived(
     teams.length === 0
-      ? 'Opcional. Úsalos para limitar quién vota en cada ronda.'
-      : `${teams.length} ${teams.length === 1 ? 'equipo' : 'equipos'} en la sala.`
+      ? t('teams.emptyDesc')
+      : teams.length === 1
+        ? t('teams.countOne')
+        : t('teams.countMany', { count: teams.length })
   );
 </script>
 
 <ModalShell
   {open}
-  title="Equipos"
+  title={t('teams.title')}
   titleId="teams-modal-title"
-  eyebrow="Sala"
+  eyebrow={t('moderation.eyebrow')}
   {description}
-  hint={creatable ? 'Crea equipos y asígnalos desde Participantes.' : undefined}
+  hint={creatable ? t('teams.hint') : undefined}
   size="lg"
   {onclose}
 >
@@ -47,9 +50,7 @@
     {players}
     title=""
     hint=""
-    emptyLabel={creatable
-      ? 'Añade el primer equipo para agrupar participantes.'
-      : 'Todavía no hay equipos.'}
+    emptyLabel={creatable ? t('teams.emptyManage') : t('teams.emptyWait')}
     {creatable}
     manageable={creatable}
     autofocusCreate={open && creatable}
@@ -59,6 +60,6 @@
   />
 
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={onclose}>Cerrar</button>
+    <button type="button" class="modal-ghost" onclick={onclose}>{t('common.close')}</button>
   {/snippet}
 </ModalShell>

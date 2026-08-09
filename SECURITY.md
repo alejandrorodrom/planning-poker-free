@@ -1,48 +1,54 @@
-# Seguridad
+# Security
 
-Tomamos en serio la seguridad de **Planning Poker Free**.
+We take the security of **Planning Poker Free** seriously.
 
-## Versiones soportadas
+<p>
+  <a href="SECURITY.es.md">Español</a>
+  ·
+  <a href="SECURITY.md">English</a>
+</p>
 
-Solo la rama `main` (última versión desplegada / del repositorio) recibe correcciones de seguridad.
+## Supported versions
 
-## Cómo reportar una vulnerabilidad
+Only the `main` branch (latest deployed / repository version) receives security fixes.
 
-**No** abras un issue público ni un PR que exponga el problema.
+## How to report a vulnerability
 
-Preferencias, en este orden:
+**Do not** open a public issue or a PR that exposes the problem.
 
-1. **GitHub Security Advisories** — reporta de forma privada desde la pestaña *Security* del repositorio (si está habilitado *Private vulnerability reporting*).
-2. Contacto privado con el mantenedor listado en el [README](README.md) (GitHub o LinkedIn).
+Preferred options, in this order:
 
-Incluye, si puedes:
+1. **GitHub Security Advisories** — report privately from the repository *Security* tab (if *Private vulnerability reporting* is enabled).
+2. Private contact with the maintainer listed in the [README](README.md) (GitHub or LinkedIn).
 
-- Descripción del impacto
-- Pasos para reproducir
-- Versión / commit afectado
-- PoC mínimo (sin dañar sistemas de terceros)
+Include, if you can:
 
-## Qué esperar
+- Impact description
+- Steps to reproduce
+- Affected version / commit
+- Minimal PoC (without harming third-party systems)
 
-- Acuse de recibo cuando sea posible
-- Evaluación del impacto y, si procede, un parche o advisory
-- Crédito en el aviso si lo deseas (indícalo en el reporte)
+## What to expect
 
-## Alcance orientativo
+- Acknowledgement when possible
+- Impact assessment and, if applicable, a patch or advisory
+- Credit in the advisory if you want it (say so in the report)
 
-En alcance (ejemplos):
+## Scope (indicative)
 
-- Bypass de salas privadas / contraseñas
-- Escalada de roles (moderación, votos)
-- XSS, inyección o abuso de WebSocket que afecte a otros participantes
-- Fugas de datos de sesión entre salas
+In scope (examples):
 
-Fuera de alcance (ejemplos):
+- Bypass of private rooms / passwords
+- Role escalation (moderation, votes)
+- XSS, injection, or WebSocket abuse that affects other participants
+- Session data leaks across rooms
 
-- DoS por volumen sin abuso de un bug concreto
-- Problemas solo en forks o despliegues de terceros no oficiales
-- Reportes sin pasos reproducibles
+Out of scope (examples):
 
-## Divulgación responsable
+- Volume DoS without a specific bug
+- Issues only in forks or unofficial third-party deployments
+- Reports without reproducible steps
 
-Te pedimos tiempo razonable para corregir antes de publicar detalles. Coordinaremos contigo la divulgación cuando haya fix o mitigación.
+## Responsible disclosure
+
+Please allow reasonable time to fix before publishing details. We will coordinate disclosure with you once a fix or mitigation is ready.

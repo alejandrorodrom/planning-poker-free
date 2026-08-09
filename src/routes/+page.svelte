@@ -4,8 +4,9 @@
   import { page } from '$app/state';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import SeoHead from '$lib/components/SeoHead.svelte';
+  import { ERROR_CODES, isErrorCode, type ErrorCode } from '$lib/errors';
   import { loadStoredAvatar } from '$lib/room/avatar';
-  import { DECKS, DEFAULT_DECK, type DeckId } from '$lib/room/decks';
+  import { DECK_IDS, DEFAULT_DECK, type DeckId } from '$lib/room/decks';
   import {
     PASSWORD_MAX,
     PLAYER_NAME_MAX,
@@ -14,18 +15,10 @@
   import type { EstimateRule, RevealMode } from '$lib/room/protocol';
   import { saveSession } from '$lib/room/session';
   import { isCanonicalHost } from '$lib/seo';
+  import { deckLabel } from '$lib/i18n/labels';
+  import { te, t } from '$lib/i18n';
 
   const indexable = $derived(isCanonicalHost(page.url.hostname));
-
-  const STEPS = [
-    { id: 1, title: 'Tu nombre', hint: 'Así te verá el equipo en la mesa.' },
-    {
-      id: 2,
-      title: 'Tu sala',
-      hint: 'Ponle un nombre claro al equipo. Pública por defecto; puedes protegerla con contraseña.'
-    },
-    { id: 3, title: 'Cómo votar', hint: 'Baraja, estimación y revelado. Puedes dejar los valores recomendados.' }
-  ] as const;
 
   let step = $state(1);
   let name = $state('');
@@ -35,73 +28,82 @@
   let deck = $state<DeckId>(DEFAULT_DECK);
   let estimateRule = $state<EstimateRule>('consensus');
   let revealMode = $state<RevealMode>('hidden');
-  let error = $state('');
+  let errorCode = $state<ErrorCode | null>(null);
+  let errorMessage = $state('');
   let loading = $state(false);
 
-  const deckOptions = Object.values(DECKS);
-  const currentStep = $derived(STEPS[step - 1]!);
+  const steps = $derived([
+    { id: 1, title: t('landing.step1Title'), hint: t('landing.step1Hint') },
+    { id: 2, title: t('landing.step2Title'), hint: t('landing.step2Hint') },
+    { id: 3, title: t('landing.step3Title'), hint: t('landing.step3Hint') }
+  ]);
+  const currentStep = $derived(steps[step - 1]!);
+  const errorText = $derived(errorCode ? te(errorCode) : errorMessage);
 
   $effect(() => {
-    if (!error) return;
-    if (error === 'Elige un nombre para mostrar' && name.trim()) {
-      error = '';
+    if (!errorCode) return;
+    if (errorCode === ERROR_CODES.display_name_required && name.trim()) {
+      errorCode = null;
       return;
     }
-    if (error === 'Elige un nombre para la sala' && roomName.trim()) {
-      error = '';
+    if (errorCode === ERROR_CODES.room_name_required && roomName.trim()) {
+      errorCode = null;
       return;
     }
-    if (error === 'Las salas privadas necesitan contraseña' && (!isPrivate || password.trim())) {
-      error = '';
+    if (errorCode === ERROR_CODES.password_required && (!isPrivate || password.trim())) {
+      errorCode = null;
     }
   });
 
   function goNext() {
-    error = '';
+    errorCode = null;
+    errorMessage = '';
     if (step === 1) {
       if (!name.trim()) {
-        error = 'Elige un nombre para mostrar';
+        errorCode = ERROR_CODES.display_name_required;
         return;
       }
     }
     if (step === 2) {
       if (!roomName.trim()) {
-        error = 'Elige un nombre para la sala';
+        errorCode = ERROR_CODES.room_name_required;
         return;
       }
       if (isPrivate && !password.trim()) {
-        error = 'Las salas privadas necesitan contraseña';
+        errorCode = ERROR_CODES.password_required;
         return;
       }
     }
-    if (step < STEPS.length) step += 1;
+    if (step < steps.length) step += 1;
   }
 
   function goBack() {
-    error = '';
+    errorCode = null;
+    errorMessage = '';
     if (step > 1) step -= 1;
   }
 
   async function createRoom() {
     const trimmed = name.trim();
     if (!trimmed) {
-      error = 'Elige un nombre para mostrar';
+      errorCode = ERROR_CODES.display_name_required;
       step = 1;
       return;
     }
     const trimmedRoom = roomName.trim();
     if (!trimmedRoom) {
-      error = 'Elige un nombre para la sala';
+      errorCode = ERROR_CODES.room_name_required;
       step = 2;
       return;
     }
     if (isPrivate && !password.trim()) {
-      error = 'Las salas privadas necesitan contraseña';
+      errorCode = ERROR_CODES.password_required;
       step = 2;
       return;
     }
 
-    error = '';
+    errorCode = null;
+    errorMessage = '';
     loading = true;
 
     try {
@@ -128,7 +130,12 @@
       };
 
       if (!res.ok || !data.id || !data.playerId || !data.token) {
-        error = data.message ?? 'No se pudo crear la sala';
+        if (isErrorCode(data.message)) {
+          errorCode = data.message;
+        } else {
+          errorCode = ERROR_CODES.create_room_failed;
+          errorMessage = data.message ?? '';
+        }
         return;
       }
 
@@ -141,7 +148,7 @@
 
       void goto(resolve('/room/[id]', { id: data.id }));
     } catch {
-      error = 'Error de red al crear la sala';
+      errorCode = ERROR_CODES.network_error;
     } finally {
       loading = false;
     }
@@ -160,19 +167,19 @@
   />
   <h1 class="hero__title">Planning Poker</h1>
   <p class="hero__paragraph">
-    Estima en tiempo real con tu equipo. Crea una sala, comparte el link y vota.
+    {t('landing.heroSubtitle')}
   </p>
 
   <form
     class="form"
     onsubmit={(event) => {
       event.preventDefault();
-      if (step < STEPS.length) goNext();
+      if (step < steps.length) goNext();
       else void createRoom();
     }}
   >
-    <div class="steps" aria-label="Progreso">
-      {#each STEPS as item (item.id)}
+    <div class="steps" aria-label={t('landing.progress')}>
+      {#each steps as item (item.id)}
         <span
           class="steps__dot"
           class:steps__dot--done={item.id < step}
@@ -181,103 +188,107 @@
       {/each}
     </div>
 
-    <p class="form__step-label">Paso {step} de {STEPS.length}</p>
+    <p class="form__step-label">{t('landing.stepOf', { step, total: steps.length })}</p>
     <h2 class="form__step-title">{currentStep.title}</h2>
     <p class="form__step-hint">{currentStep.hint}</p>
 
     {#if step === 1}
-      <label class="form__label" for="display-name">Nombre para mostrar</label>
+      <label class="form__label" for="display-name">{t('landing.displayNameLabel')}</label>
       <input
         id="display-name"
         class="form__input"
-        class:form__input--error={error === 'Elige un nombre para mostrar'}
+        class:form__input--error={errorCode === ERROR_CODES.display_name_required}
         type="text"
         maxlength={PLAYER_NAME_MAX}
         autocomplete="nickname"
         bind:value={name}
-        placeholder="Ej. Alex"
-        aria-invalid={error === 'Elige un nombre para mostrar'}
-        aria-describedby={error === 'Elige un nombre para mostrar' ? 'form-error' : undefined}
+        placeholder={t('landing.displayNamePlaceholder')}
+        aria-invalid={errorCode === ERROR_CODES.display_name_required}
+        aria-describedby={errorCode === ERROR_CODES.display_name_required ? 'form-error' : undefined}
       />
     {:else if step === 2}
-      <label class="form__label" for="room-name">Nombre de la sala</label>
+      <label class="form__label" for="room-name">{t('landing.roomNameLabel')}</label>
       <input
         id="room-name"
         class="form__input"
-        class:form__input--error={error === 'Elige un nombre para la sala'}
+        class:form__input--error={errorCode === ERROR_CODES.room_name_required}
         type="text"
         maxlength={ROOM_NAME_MAX}
         bind:value={roomName}
-        placeholder="Ej. Sprint 24 · Equipo Platform"
-        aria-invalid={error === 'Elige un nombre para la sala'}
-        aria-describedby={error === 'Elige un nombre para la sala' ? 'form-error' : undefined}
+        placeholder={t('landing.roomNamePlaceholder')}
+        aria-invalid={errorCode === ERROR_CODES.room_name_required}
+        aria-describedby={errorCode === ERROR_CODES.room_name_required ? 'form-error' : undefined}
       />
 
       <label class="form__choice">
         <input type="radio" name="privacy" checked={!isPrivate} onchange={() => (isPrivate = false)} />
         <span>
-          <strong>Pública</strong>
-          <small>Cualquiera con el link entra</small>
+          <strong>{t('landing.publicLabel')}</strong>
+          <small>{t('landing.publicHint')}</small>
         </span>
       </label>
       <label class="form__choice">
         <input type="radio" name="privacy" checked={isPrivate} onchange={() => (isPrivate = true)} />
         <span>
-          <strong>Privada</strong>
-          <small>Pide contraseña al unirse</small>
+          <strong>{t('landing.privateLabel')}</strong>
+          <small>{t('landing.privateHint')}</small>
         </span>
       </label>
 
       {#if isPrivate}
-        <label class="form__label" for="room-password">Contraseña</label>
+        <label class="form__label" for="room-password">{t('landing.passwordLabel')}</label>
         <input
           id="room-password"
           class="form__input"
-          class:form__input--error={error === 'Las salas privadas necesitan contraseña'}
+          class:form__input--error={errorCode === ERROR_CODES.password_required}
           type="password"
           maxlength={PASSWORD_MAX}
           autocomplete="new-password"
           bind:value={password}
-          placeholder="Contraseña de la sala"
-          aria-invalid={error === 'Las salas privadas necesitan contraseña'}
+          placeholder={t('landing.passwordPlaceholder')}
+          aria-invalid={errorCode === ERROR_CODES.password_required}
           aria-describedby={
-            error === 'Las salas privadas necesitan contraseña' ? 'form-error' : undefined
+            errorCode === ERROR_CODES.password_required ? 'form-error' : undefined
           }
         />
       {/if}
     {:else}
-      <label class="form__label" for="deck">Baraja</label>
+      <label class="form__label" for="deck">{t('landing.deckLabel')}</label>
       <select id="deck" class="form__input form__select" bind:value={deck}>
-        {#each deckOptions as option (option.id)}
-          <option value={option.id}>{option.label}</option>
+        {#each DECK_IDS as id (id)}
+          <option value={id}>{deckLabel(id)}</option>
         {/each}
       </select>
 
-      <label class="form__label" for="estimate-rule">Cálculo de la estimación</label>
+      <label class="form__label" for="estimate-rule">{t('landing.estimateRuleLabel')}</label>
       <select id="estimate-rule" class="form__input form__select" bind:value={estimateRule}>
-        <option value="consensus">Consenso (recomendado)</option>
-        <option value="mode">Moda</option>
-        <option value="median">Mediana</option>
-        <option value="mean">Media</option>
+        <option value="consensus">{t('landing.consensusRecommended')}</option>
+        <option value="mode">{t('landing.mode')}</option>
+        <option value="median">{t('landing.median')}</option>
+        <option value="mean">{t('landing.mean')}</option>
       </select>
 
-      <label class="form__label" for="reveal-mode">Revelado</label>
+      <label class="form__label" for="reveal-mode">{t('landing.revealModeLabel')}</label>
       <select id="reveal-mode" class="form__input form__select" bind:value={revealMode}>
-        <option value="hidden">Oculto hasta revelar</option>
-        <option value="live">Siempre visible</option>
+        <option value="hidden">{t('landing.hiddenUntilReveal')}</option>
+        <option value="live">{t('landing.alwaysVisible')}</option>
       </select>
     {/if}
 
     <div class="form__nav" class:form__nav--split={step > 1}>
-      {#if error}
-        <p id="form-error" class="form__error form__error--float" role="alert">{error}</p>
+      {#if errorText}
+        <p id="form-error" class="form__error form__error--float" role="alert">{errorText}</p>
       {/if}
       {#if step > 1}
-        <button type="button" class="form__back" onclick={goBack}>Atrás</button>
+        <button type="button" class="form__back" onclick={goBack}>{t('common.back')}</button>
       {/if}
       <div class="form__button">
         <LiquidButton
-          text={step < STEPS.length ? 'Continuar' : loading ? 'Creando…' : 'Crear sala'}
+          text={step < steps.length
+            ? t('common.continue')
+            : loading
+              ? t('common.creating')
+              : t('common.create')}
           type="submit"
         />
       </div>

@@ -2,8 +2,9 @@
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
   import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
+  import { t } from '$lib/i18n';
   import type { PlayerPublic, PlayerRole, Team } from '$lib/room/protocol';
-  import { MODERATOR_LABEL, sanitizeRoleLabel } from '$lib/room/roleLabel';
+  import { sanitizeRoleLabel } from '$lib/room/roleLabel';
 
   type Props = {
     open: boolean;
@@ -25,9 +26,9 @@
   const onlineCount = $derived(players.filter((p) => p.connection === 'connected').length);
 
   function connectionLabel(connection: PlayerPublic['connection']): string {
-    if (connection === 'connected') return 'En línea';
-    if (connection === 'pending') return 'Reconectando…';
-    return 'Desconectado';
+    if (connection === 'connected') return t('players.online');
+    if (connection === 'pending') return t('players.reconnecting');
+    return t('players.offline');
   }
 
   function teamLabel(teamId: string | null | undefined): string | null {
@@ -38,11 +39,11 @@
 
 <ModalShell
   {open}
-  title="Participantes"
+  title={t('players.title')}
   titleId="players-modal-title"
-  eyebrow="Sala"
-  description={`${onlineCount} en línea · ${players.length} en total`}
-  hint={isSm ? 'Asigna quién vota y en qué equipo está.' : undefined}
+  eyebrow={t('moderation.eyebrow')}
+  description={t('players.description', { online: onlineCount, total: players.length })}
+  hint={isSm ? t('players.hint') : undefined}
   size="lg"
   {onclose}
 >
@@ -61,11 +62,11 @@
             <div class="card__copy">
               <div class="card__name-row">
                 <span class="card__name">{player.name}</span>
-                {#if isMe}<span class="pill pill--you">yo</span>{/if}
+                {#if isMe}<span class="pill pill--you">{t('players.me')}</span>{/if}
               </div>
               <div class="card__badges">
                 {#if player.isScrumMaster}
-                  <span class="pill pill--moderator">{MODERATOR_LABEL}</span>
+                  <span class="pill pill--moderator">{t('roles.moderator')}</span>
                 {/if}
                 {#if tag}
                   <span class="pill">{tag}</span>
@@ -81,7 +82,7 @@
                 ></span>
                 {connectionLabel(player.connection)}
                 {#if !isSm}
-                  · {player.role === 'observer' ? 'Observa' : 'Vota'}
+                  · {player.role === 'observer' ? t('players.observes') : t('players.votes')}
                   {#if team} · {team}{/if}
                 {/if}
               </p>
@@ -94,7 +95,7 @@
               class="remove"
               onclick={() => onremove(player.id, player.name)}
             >
-              Quitar
+              {t('common.remove')}
             </button>
           {/if}
         </div>
@@ -102,7 +103,7 @@
         {#if isSm}
           <div class="card__controls" class:card__controls--teams={teams.length > 0}>
             <label class="field">
-              <span class="field__label">Rol</span>
+              <span class="field__label">{t('players.role')}</span>
               <select
                 class="field__select"
                 value={player.role}
@@ -112,13 +113,13 @@
                     role: (e.currentTarget as HTMLSelectElement).value as PlayerRole
                   })}
               >
-                <option value="voter">Votar</option>
-                <option value="observer">Observar</option>
+                <option value="voter">{t('join.voteLabel')}</option>
+                <option value="observer">{t('join.observeLabel')}</option>
               </select>
             </label>
             {#if teams.length > 0}
               <label class="field">
-                <span class="field__label">Equipo</span>
+                <span class="field__label">{t('join.teamLabel')}</span>
                 <select
                   class="field__select"
                   value={player.teamId ?? ''}
@@ -127,9 +128,9 @@
                     onassign({ playerId: player.id, teamId: v || null });
                   }}
                 >
-                  <option value="">Sin equipo</option>
-                  {#each teams as t (t.id)}
-                    <option value={t.id}>{t.name}</option>
+                  <option value="">{t('join.noTeam')}</option>
+                  {#each teams as teamOption (teamOption.id)}
+                    <option value={teamOption.id}>{teamOption.name}</option>
                   {/each}
                 </select>
               </label>
@@ -141,7 +142,7 @@
   </ul>
 
   {#snippet footer()}
-    <LiquidButton text="Cerrar" onclick={onclose} />
+    <LiquidButton text={t('common.close')} onclick={onclose} />
   {/snippet}
 </ModalShell>
 

@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { ERROR_CODES } from '$lib/errors';
 import { sanitizeAvatar } from '$lib/room/avatar';
 import { normalizeCreateRoomConfig } from '$lib/room/createConfig';
 import { randomId } from '$lib/server/room/crypto';
@@ -7,7 +8,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, platform }) => {
   const env = platform?.env;
-  if (!env?.ROOM) error(500, 'ROOM binding no disponible');
+  if (!env?.ROOM) error(500, ERROR_CODES.internal_error);
 
   const body = (await request.json()) as {
     name?: string;
@@ -23,13 +24,13 @@ export const POST: RequestHandler = async ({ request, platform }) => {
   };
 
   const hostName = body.name?.trim();
-  if (!hostName) error(400, 'Elige un nombre para mostrar');
+  if (!hostName) error(400, ERROR_CODES.display_name_required);
 
   const roomName = body.roomName?.trim();
-  if (!roomName) error(400, 'Elige un nombre para la sala');
+  if (!roomName) error(400, ERROR_CODES.room_name_required);
 
   if (body.isPrivate && !body.password?.trim()) {
-    error(400, 'Las salas privadas necesitan contraseña');
+    error(400, ERROR_CODES.password_required);
   }
 
   const roomId = randomId(4);
@@ -52,7 +53,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
   const data = await res.json();
   if (!res.ok) {
-    error(res.status, (data as { error?: string }).error ?? 'No se pudo crear la sala');
+    error(res.status, (data as { error?: string }).error ?? ERROR_CODES.create_room_failed);
   }
 
   return json(data);

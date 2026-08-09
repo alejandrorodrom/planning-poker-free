@@ -23,6 +23,7 @@
     type PlayerAvatarConfig
   } from '$lib/room/avatar';
   import { createAvatarDataUri } from '$lib/room/dicebearAvatar';
+  import { t } from '$lib/i18n';
 
   type Props = {
     value?: PlayerAvatarConfig;
@@ -31,13 +32,13 @@
 
   type TabId = 'style' | 'face' | 'clothes' | 'costumes' | 'colors';
 
-  const TABS: { id: TabId; label: string }[] = [
-    { id: 'style', label: 'Estilo' },
-    { id: 'face', label: 'Cara' },
-    { id: 'clothes', label: 'Ropa' },
-    { id: 'costumes', label: 'Disfraces' },
-    { id: 'colors', label: 'Colores' }
-  ];
+  const tabs = $derived([
+    { id: 'style' as const, label: t('avatar.tabStyle') },
+    { id: 'face' as const, label: t('avatar.tabFace') },
+    { id: 'clothes' as const, label: t('avatar.tabClothes') },
+    { id: 'costumes' as const, label: t('avatar.tabCostumes') },
+    { id: 'colors' as const, label: t('avatar.tabColors') }
+  ]);
 
   let { value = $bindable({ ...DEFAULT_AVATAR }), compact = false }: Props = $props();
 
@@ -130,13 +131,13 @@
       <PlayerAvatar avatar={value} size={compact ? 96 : 120} />
     </div>
     <button type="button" class="random" onclick={() => (value = randomAvatar())}>
-      Aleatorio
+      {t('avatar.random')}
     </button>
   </div>
 
   <div class="picker__main">
-    <div class="tabs" role="tablist" aria-label="Categorías del avatar">
-      {#each TABS as item (item.id)}
+    <div class="tabs" role="tablist" aria-label={t('avatar.categories')}>
+      {#each tabs as item (item.id)}
         <button
           type="button"
           class="tab"
@@ -168,7 +169,7 @@
         </div>
       {:else if tab === 'face'}
         <section class="section">
-          <h3 class="section__label">Ojos</h3>
+          <h3 class="section__label">{t('avatar.eyes')}</h3>
           <div class="gallery gallery--sm">
             {#each eyesThumbs as option (option.id)}
               <button
@@ -185,7 +186,7 @@
           </div>
         </section>
         <section class="section">
-          <h3 class="section__label">Cejas</h3>
+          <h3 class="section__label">{t('avatar.eyebrows')}</h3>
           <div class="gallery gallery--sm">
             {#each browsThumbs as option (option.id)}
               <button
@@ -202,7 +203,7 @@
           </div>
         </section>
         <section class="section">
-          <h3 class="section__label">Boca</h3>
+          <h3 class="section__label">{t('avatar.mouth')}</h3>
           <div class="gallery gallery--sm">
             {#each mouthThumbs as option (option.id)}
               <button
@@ -219,7 +220,7 @@
           </div>
         </section>
         <section class="section">
-          <h3 class="section__label">Barba / bigote</h3>
+          <h3 class="section__label">{t('avatar.facialHair')}</h3>
           <div class="gallery gallery--sm">
             {#each facialThumbs as option (option.id)}
               <button
@@ -237,7 +238,7 @@
         </section>
       {:else if tab === 'clothes'}
         <section class="section">
-          <h3 class="section__label">Ropa</h3>
+          <h3 class="section__label">{t('avatar.clothes')}</h3>
           <div class="gallery">
             {#each clothesThumbs as option (option.id)}
               <button
@@ -255,7 +256,7 @@
         </section>
         {#if showGraphic}
           <section class="section">
-            <h3 class="section__label">Estampado</h3>
+            <h3 class="section__label">{t('avatar.graphic')}</h3>
             <div class="gallery gallery--sm">
               {#each graphicThumbs as option (option.id)}
                 <button
@@ -274,7 +275,7 @@
         {/if}
       {:else if tab === 'costumes'}
         <section class="section">
-          <h3 class="section__label">Lentes</h3>
+          <h3 class="section__label">{t('avatar.glasses')}</h3>
           <div class="gallery">
             {#each accessoriesThumbs as option (option.id)}
               <button
@@ -292,7 +293,7 @@
           </div>
         </section>
         <section class="section">
-          <h3 class="section__label">Cabeza</h3>
+          <h3 class="section__label">{t('avatar.head')}</h3>
           <div class="gallery">
             {#each costumeThumbs as option (option.id)}
               <button
@@ -310,7 +311,7 @@
         </section>
       {:else}
         <section class="section">
-          <h3 class="section__label">{showHatColor ? 'Sombrero' : 'Cabello'}</h3>
+          <h3 class="section__label">{showHatColor ? t('avatar.hat') : t('avatar.hair')}</h3>
           <div class="swatches">
             {#each (showHatColor ? HAT_COLORS : HAIR_COLORS) as color (color.id)}
               <button
@@ -336,7 +337,7 @@
 
         {#if showHatColor}
           <section class="section">
-            <h3 class="section__label">Cabello</h3>
+            <h3 class="section__label">{t('avatar.hair')}</h3>
             <div class="swatches">
               {#each HAIR_COLORS as color (color.id)}
                 <button
@@ -355,7 +356,7 @@
 
         {#if showFacialHairColor}
           <section class="section">
-            <h3 class="section__label">Barba</h3>
+            <h3 class="section__label">{t('avatar.beard')}</h3>
             <div class="swatches">
               {#each FACIAL_HAIR_COLORS as color (color.id)}
                 <button
@@ -373,7 +374,7 @@
         {/if}
 
         <section class="section">
-          <h3 class="section__label">Ropa</h3>
+          <h3 class="section__label">{t('avatar.clothes')}</h3>
           <div class="swatches">
             {#each CLOTHES_COLORS as color (color.id)}
               <button
@@ -394,7 +395,7 @@
 
         {#if showAccessoriesColor}
           <section class="section">
-            <h3 class="section__label">Accesorio</h3>
+            <h3 class="section__label">{t('avatar.accessory')}</h3>
             <div class="swatches">
               {#each ACCESSORIES_COLORS as color (color.id)}
                 <button
@@ -415,7 +416,7 @@
         {/if}
 
         <section class="section">
-          <h3 class="section__label">Piel</h3>
+          <h3 class="section__label">{t('avatar.skin')}</h3>
           <div class="swatches">
             {#each SKIN_COLORS as color (color.id)}
               <button

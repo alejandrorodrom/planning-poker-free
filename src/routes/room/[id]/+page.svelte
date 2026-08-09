@@ -20,10 +20,12 @@
   import { loadStoredAvatar, saveStoredAvatar, type PlayerAvatarConfig } from '$lib/room/avatar';
   import { canCastVote } from '$lib/room/audience';
   import { RoomClient } from '$lib/room/client';
+  import { ERROR_CODES, isErrorCode, type ErrorCode } from '$lib/errors';
+  import { t, te } from '$lib/i18n';
   import { DECKS } from '$lib/room/decks';
   import type { Audience, ClientToServer, PlayerRole, RoomPublicState } from '$lib/room/protocol';
   import { storiesToCsv, storiesToMarkdown } from '$lib/room/resultsFormat';
-  import { MODERATOR_LABEL, sanitizeRoleLabel } from '$lib/room/roleLabel';
+  import { sanitizeRoleLabel } from '$lib/room/roleLabel';
   import { clearSession, loadSession, saveSession } from '$lib/room/session';
 
   const roomId = $derived(page.params.id ?? '');
@@ -32,7 +34,8 @@
   let roomState = $state<RoomPublicState | null>(null);
   let playerId = $state<string | null>(null);
   let connection = $state<'connecting' | 'open' | 'closed'>('connecting');
-  let error = $state('');
+  let errorCode = $state<ErrorCode | null>(null);
+  let errorMessage = $state('');
   let goneReason = $state<string | null>(null);
   let sessionTaken = $state(false);
   let removed = $state(false);
@@ -78,11 +81,23 @@
   let storiesOpen = $state(false);
   let moderationOpen = $state(false);
 
+  const errorText = $derived(errorCode ? te(errorCode) : errorMessage);
+
+  function clearError() {
+    errorCode = null;
+    errorMessage = '';
+  }
+
+  function setError(code: ErrorCode) {
+    errorMessage = '';
+    errorCode = code;
+  }
+
   const me = $derived(roomState?.players.find((p) => p.id === playerId));
   const isSm = $derived(Boolean(me?.isScrumMaster));
   const meRoleLabel = $derived.by(() => {
     if (!me) return '';
-    if (isSm) return MODERATOR_LABEL;
+    if (isSm) return t('roles.moderator');
     return sanitizeRoleLabel(me.roleLabel);
   });
   const deck = $derived(roomState ? DECKS[roomState.deck] : null);
@@ -107,23 +122,22 @@
   const leaveConfirmCopy = $derived.by(() => {
     if (isSm && otherConnectedCount > 0) {
       return {
-        title: 'Abandonar sala',
-        description: `Saldrás de la sesión. El rol de ${MODERATOR_LABEL} pasará a otra persona conectada. Si quieres cerrar la sala para todos, usa Finalizar sala.`,
-        confirmLabel: 'Abandonar'
+        title: t('room.leaveTitle'),
+        description: t('room.leaveConfirmTransfer'),
+        confirmLabel: t('room.leaveButton')
       };
     }
     if (isSm) {
       return {
-        title: 'Abandonar sala',
-        description:
-          'Saldrás de la sesión. La sala quedará vacía y se cerrará por inactividad si nadie entra.',
-        confirmLabel: 'Abandonar'
+        title: t('room.leaveTitle'),
+        description: t('room.leaveConfirmIdle'),
+        confirmLabel: t('room.leaveButton')
       };
     }
     return {
-      title: 'Abandonar sala',
-      description: 'Saldrás de la sesión. Podrás volver a unirte con el link si te invitan de nuevo.',
-      confirmLabel: 'Abandonar'
+      title: t('room.leaveTitle'),
+      description: t('room.leaveConfirmRejoin'),
+      confirmLabel: t('room.leaveButton')
     };
   });
   const timerLeftSeconds = $derived.by(() => {
@@ -135,7 +149,7 @@
   const timerLabel = $derived.by(() => {
     const timer = roomState?.activeRound?.timer;
     if (!timer) return null;
-    if (timer.status === 'cancelled') return 'Cancelado';
+    if (timer.status === 'cancelled') return t('room.timerCancelled');
     if (timer.status === 'finished') return '0:00';
     if (timerLeftSeconds == null) return null;
     const m = Math.floor(timerLeftSeconds / 60);
@@ -170,59 +184,61 @@
   const voteStatusMessage = $derived.by(() => {
     if (!roomState?.activeRound || !me || eligibleToVote) return null;
     if (roomState.activeRound.revealed) {
-      return `Las cartas ya se revelaron. Espera a que el ${MODERATOR_LABEL} cierre o vuelva a abrir la votación.`;
+      return t('room.cardsRevealedWait');
     }
     if (me.role === 'observer') {
       if (votingTeamNames.length) {
-        return `Estás observando. Ahora votan: ${formatTeamList(votingTeamNames)}.`;
+        return t('room.observingVoters', { names: formatTeamList(votingTeamNames) });
       }
-      return 'Estás observando esta ronda. No emites carta.';
+      return t('room.observingRound');
     }
     if (roomState.activeRound.audience.type === 'teams') {
       if (votingTeamNames.length) {
-        return `Esta ronda la votan ${formatTeamList(votingTeamNames)}.`;
+        return t('room.roundVoters', { names: formatTeamList(votingTeamNames) });
       }
-      return 'Esta ronda es solo para algunos equipos.';
+      return t('room.roundTeamsOnly');
     }
-    return 'Ahora mismo no puedes votar en esta ronda.';
+    return t('room.cannotVoteNow');
   });
 
   function formatTeamList(names: string[]): string {
     if (names.length === 0) return '';
     if (names.length === 1) return names[0]!;
-    if (names.length === 2) return `${names[0]} y ${names[1]}`;
-    return `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`;
+    const and = t('room.listAnd');
+    if (names.length === 2) return `${names[0]}${and}${names[1]}`;
+    return `${names.slice(0, -1).join(', ')}${and}${names.at(-1)}`;
   }
 
   function send(message: ClientToServer) {
-    if (error) error = '';
+    if (errorCode || errorMessage) clearError();
     client?.send(message);
   }
 
   $effect(() => {
-    if (!error) return;
+    if (!errorCode) return;
 
-    if (error === 'Elige un nombre' && joinName.trim()) {
-      error = '';
+    if (errorCode === ERROR_CODES.player_name_required && joinName.trim()) {
+      clearError();
       return;
     }
-    if (error === 'Elige la historia a votar' && (roundStoryId || roomState?.activeStoryId)) {
-      error = '';
+    if (errorCode === ERROR_CODES.story_required && (roundStoryId || roomState?.activeStoryId)) {
+      clearError();
       return;
     }
-    if (error === 'El nombre de la sala no puede estar vacío' && draftRoomName.trim()) {
-      error = '';
+    if (errorCode === ERROR_CODES.room_name_empty && draftRoomName.trim()) {
+      clearError();
       return;
     }
-    if (error === `Elige a quién ceder el rol de ${MODERATOR_LABEL}` && transferTargetId) {
-      error = '';
+    if (errorCode === ERROR_CODES.transfer_target_required && transferTargetId) {
+      clearError();
       return;
     }
     if (
-      (error === 'Elige la estimación de consenso' || error === 'No hay estimación para guardar') &&
+      (errorCode === ERROR_CODES.consensus_required ||
+        errorCode === ERROR_CODES.no_estimation_to_save) &&
       closeEstimate
     ) {
-      error = '';
+      clearError();
     }
   });
 
@@ -241,7 +257,7 @@
   async function bootstrap() {
     goneReason = null;
     sessionTaken = false;
-    error = '';
+    clearError();
 
     const hasSession = Boolean(loadSession(roomId));
     const maxAttempts = hasSession ? 8 : 3;
@@ -330,8 +346,15 @@
         }
       },
       onError(message, code) {
-        error = message;
-        if (code === 'session_invalid') {
+        if (code && isErrorCode(code)) {
+          setError(code);
+        } else if (isErrorCode(message)) {
+          setError(message);
+        } else {
+          errorCode = null;
+          errorMessage = message;
+        }
+        if (code === ERROR_CODES.session_invalid || code === 'session_invalid') {
           const session = loadSession(roomId);
           if (session && rejoinRetries < 3) {
             rejoinRetries += 1;
@@ -387,7 +410,7 @@
   function submitJoin() {
     const name = joinName.trim();
     if (!name) {
-      error = 'Elige un nombre';
+      setError(ERROR_CODES.player_name_required);
       return;
     }
     saveStoredAvatar(joinAvatar);
@@ -434,7 +457,7 @@
   function startRound() {
     const storyId = roundStoryId || roomState?.activeStoryId;
     if (!storyId) {
-      error = 'Elige la historia a votar';
+      setError(ERROR_CODES.story_required);
       storiesOpen = true;
       return;
     }
@@ -538,15 +561,17 @@
   async function copyRoomLink() {
     try {
       await navigator.clipboard.writeText(roomLink);
-      if (error === 'No se pudo copiar el link') error = '';
+      if (errorCode === ERROR_CODES.copy_link_failed) clearError();
       return true;
     } catch {
-      error = 'No se pudo copiar el link';
+      setError(ERROR_CODES.copy_link_failed);
       return false;
     }
   }
 
-  const displayRoomName = $derived(roomState?.name || roomMeta?.name || `Sala ${roomId}`);
+  const displayRoomName = $derived(
+    roomState?.name || roomMeta?.name || t('room.defaultRoomName', { id: roomId })
+  );
 
   function startEditRoomName() {
     draftRoomName = displayRoomName;
@@ -561,7 +586,7 @@
   function saveRoomName() {
     const next = draftRoomName.trim();
     if (!next) {
-      error = 'El nombre de la sala no puede estar vacío';
+      setError(ERROR_CODES.room_name_empty);
       return;
     }
     send({ type: 'update_config', name: next });
@@ -573,7 +598,7 @@
       if (navigator.share) {
         await navigator.share({
           title: displayRoomName,
-          text: `Únete a “${displayRoomName}” en Planning Poker`,
+          text: t('room.shareText', { name: displayRoomName }),
           url: roomLink
         });
         return;
@@ -604,17 +629,17 @@
   <RoomGone reason={goneReason} />
 {:else if sessionTaken}
   <RoomNotice
-    title="Sesión abierta en otra pestaña"
-    description="Esta pestaña ya no controla tu asiento. Usa la otra o recarga para continuar aquí."
+    title={t('room.sessionTakenTitle')}
+    description={t('room.sessionTakenDesc')}
   >
-    <LiquidButton text="Reintentar aquí" onclick={() => location.reload()} />
+    <LiquidButton text={t('room.retryHere')} onclick={() => location.reload()} />
   </RoomNotice>
 {:else if removed}
   <RoomNotice
-    title="Te quitaron de la sala"
-    description={`El ${MODERATOR_LABEL} te removió de esta sesión. Puedes volver al inicio o pedir un nuevo enlace para unirte otra vez.`}
+    title={t('room.removedTitle')}
+    description={t('room.removedDesc')}
   >
-    <LiquidButton text="Volver al inicio" href="/" />
+    <LiquidButton text={t('common.backToHome')} href="/" />
   </RoomNotice>
 {:else}
   <section class="room" class:room--arena={!needsJoin && Boolean(roomState)}>
@@ -636,18 +661,18 @@
       onsaveName={saveRoomName}
     />
 
-    {#if error && !needsJoin}
-      <div class="toast toast--error" role="alert">{error}</div>
+    {#if errorText && !needsJoin}
+      <div class="toast toast--error" role="alert">{errorText}</div>
     {/if}
 
     {#if showSmBanner && canClaim && connection === 'open' && !needsJoin}
       <div class="banner banner--warn">
         <p>
           {!roomState?.scrumMasterPlayerId
-            ? `No hay ${MODERATOR_LABEL}. ¿Asumir la moderación?`
-            : `El ${MODERATOR_LABEL} no está en la sala. ¿Asumir la moderación?`}
+            ? t('room.noModeratorBanner')
+            : t('room.moderatorLeftBanner')}
         </p>
-        <LiquidButton text="Asumir" onclick={() => send({ type: 'claim_scrum' })} />
+        <LiquidButton text={t('room.claimModeration')} onclick={() => send({ type: 'claim_scrum' })} />
       </div>
     {/if}
 
@@ -656,7 +681,7 @@
         roomName={displayRoomName}
         isPrivate={Boolean(roomMeta?.isPrivate)}
         teams={roomMeta?.teams ?? []}
-        {error}
+        errorCode={errorCode}
         bind:name={joinName}
         bind:password={joinPassword}
         bind:role={joinRole}
@@ -665,7 +690,7 @@
         avatar={joinAvatar}
         onsubmit={submitJoin}
         oneditAvatar={() => (avatarOpen = true)}
-        onclearPasswordError={() => (error = '')}
+        onclearPasswordError={clearError}
       />
 
       <AvatarModal
@@ -715,9 +740,9 @@
                   type="button"
                   class="board-fab"
                   onclick={() => (storiesOpen = true)}
-                  aria-label="Ver historias"
+                  aria-label={t('room.storiesFab')}
                 >
-                  Historias
+                  {t('room.storiesLabel')}
                   {#if roomState.stories.length}
                     <span class="board-fab__count">{roomState.stories.length}</span>
                   {/if}
@@ -726,18 +751,18 @@
                   type="button"
                   class="board-fab"
                   onclick={() => (playersOpen = true)}
-                  aria-label="Ver participantes"
+                  aria-label={t('room.playersFab')}
                 >
-                  Participantes
+                  {t('room.playersLabel')}
                   <span class="board-fab__count">{roomState.players.length}</span>
                 </button>
                 <button
                   type="button"
                   class="board-fab"
                   onclick={() => (teamsOpen = true)}
-                  aria-label="Ver equipos"
+                  aria-label={t('room.teamsFab')}
                 >
-                  Equipos
+                  {t('room.teamsLabel')}
                   {#if roomState.teams.length}
                     <span class="board-fab__count">{roomState.teams.length}</span>
                   {/if}
@@ -750,10 +775,10 @@
                 class="board-fab"
                 onclick={() => (resultsOpen = true)}
                 disabled={roomState.stories.length === 0}
-                aria-label="Ver resultados"
-                title={roomState.stories.length === 0 ? 'Añade historias para ver resultados' : undefined}
+                aria-label={t('room.resultsFab')}
+                title={roomState.stories.length === 0 ? t('room.resultsDisabledHint') : undefined}
               >
-                Resultados
+                {t('room.resultsLabel')}
                 {#if roomState.stories.some((s) => s.estimates.overall)}
                   <span class="board-fab__count"
                     >{roomState.stories.filter((s) => s.estimates.overall).length}</span
@@ -765,8 +790,8 @@
                   type="button"
                   class="board-fab board-fab--icon"
                   onclick={() => (moderationOpen = true)}
-                  aria-label="Moderación"
-                  title="Moderación"
+                  aria-label={t('room.moderationFab')}
+                  title={t('room.moderationFab')}
                 >
                   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                     <path
@@ -780,8 +805,8 @@
                 type="button"
                 class="board-fab board-fab--icon board-fab--leave"
                 onclick={requestLeave}
-                aria-label="Abandonar sala"
-                title="Abandonar sala"
+                aria-label={t('room.leaveFab')}
+                title={t('room.leaveFab')}
               >
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                   <path
@@ -852,7 +877,7 @@
         bind:transferTargetId
         ontransfer={() => {
           if (!transferTargetId) {
-            error = `Elige a quién ceder el rol de ${MODERATOR_LABEL}`;
+            setError(ERROR_CODES.transfer_target_required);
             return;
           }
           send({ type: 'transfer_scrum', targetPlayerId: transferTargetId });
@@ -877,7 +902,10 @@
         oncopyMd={() => copyResults('md')}
         oncopyCsv={() => copyResults('csv')}
         onclose={() => (resultsOpen = false)}
-        onerror={(message) => (error = message)}
+        onerror={(message) => {
+          errorCode = null;
+          errorMessage = message;
+        }}
       />
 
       <AvatarModal
@@ -894,37 +922,37 @@
       <ConfirmModal
         open={confirmDialog !== null}
         title={confirmDialog === 'close_room'
-          ? 'Finalizar sala'
+          ? t('room.finalizeRoom')
           : confirmDialog === 'remove_player'
-            ? 'Quitar participante'
+            ? t('room.removePlayer')
             : confirmDialog === 'delete_story'
-              ? 'Eliminar historia'
+              ? t('room.deleteStory')
               : confirmDialog === 'delete_team'
-                ? 'Eliminar equipo'
+                ? t('room.deleteTeam')
                 : confirmDialog === 'leave'
                   ? leaveConfirmCopy.title
-                  : 'Cancelar votación'}
+                  : t('room.cancelVoting')}
         description={confirmDialog === 'close_room'
-          ? 'Se cerrará la sesión y se borrarán los datos de la sala.'
+          ? t('room.finalizeRoomDesc')
           : confirmDialog === 'remove_player'
-            ? `Se quitará a “${removeTarget?.name ?? ''}” de la sala. Tendrá que volver a unirse con el link.`
+            ? t('room.removePlayerDesc', { name: removeTarget?.name ?? '' })
             : confirmDialog === 'delete_story'
-              ? `Se eliminará “${deleteStoryTarget?.title ?? ''}” y su estimación. Si hay una votación activa sobre ella, se cancelará.`
+              ? t('room.deleteStoryDesc', { title: deleteStoryTarget?.title ?? '' })
               : confirmDialog === 'delete_team'
-                ? `Se eliminará “${deleteTeamTarget?.name ?? ''}”. Los participantes asignados quedarán sin equipo.`
+                ? t('room.deleteTeamDesc', { name: deleteTeamTarget?.name ?? '' })
                 : confirmDialog === 'leave'
                   ? leaveConfirmCopy.description
-                  : 'Se cerrará la ronda y se descartarán los votos sin guardarlos.'}
+                  : t('room.cancelVotingDesc')}
         confirmLabel={confirmDialog === 'close_room'
-          ? 'Finalizar'
+          ? t('room.finalize')
           : confirmDialog === 'remove_player'
-            ? 'Quitar'
+            ? t('room.remove')
             : confirmDialog === 'delete_story' || confirmDialog === 'delete_team'
-              ? 'Eliminar'
+              ? t('common.delete')
               : confirmDialog === 'leave'
                 ? leaveConfirmCopy.confirmLabel
-                : 'Cancelar votación'}
-        cancelLabel="Volver"
+                : t('room.cancelVotingButton')}
+        cancelLabel={t('room.goBack')}
         onconfirm={acceptConfirm}
         oncancel={dismissConfirm}
       />
@@ -936,12 +964,10 @@
           <span class="connecting__card connecting__card--front">?</span>
         </div>
         <h2 class="connecting__title">
-          {connection === 'closed' ? 'Reconectando…' : 'Entrando a la sala'}
+          {connection === 'closed' ? t('room.reconnectingTitle') : t('room.enteringTitle')}
         </h2>
         <p class="connecting__copy">
-          {connection === 'closed'
-            ? 'Se perdió la conexión. Estamos intentando volver a entrar.'
-            : 'Estamos abriendo tu sesión. Esto suele tardar un instante.'}
+          {connection === 'closed' ? t('room.reconnectingDesc') : t('room.enteringDesc')}
         </p>
       </div>
     {/if}

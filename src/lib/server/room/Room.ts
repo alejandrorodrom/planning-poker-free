@@ -1,4 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
+import { AppError, ERROR_CODES, ERROR_MESSAGES_EN, type ErrorCode } from '$lib/errors';
 import { isInAudience } from '$lib/room/audience';
 import { sanitizeAvatar } from '$lib/room/avatar';
 import { normalizeCreateRoomConfig } from '$lib/room/createConfig';
@@ -324,15 +325,19 @@ export class Room extends DurableObject<Env> {
     try {
       msg = JSON.parse(message) as ClientToServer;
     } catch {
-      this.send(ws, { type: 'error', message: 'Mensaje inválido' });
+      this.sendError(ws, ERROR_CODES.invalid_message);
       return;
     }
 
     try {
       await this.onMessage(ws, msg);
     } catch (err) {
-      const text = err instanceof Error ? err.message : 'Error interno';
-      this.send(ws, { type: 'error', message: text });
+      if (err instanceof AppError) {
+        this.sendError(ws, err.code);
+        return;
+      }
+      const text = err instanceof Error ? err.message : ERROR_MESSAGES_EN.internal_error;
+      this.send(ws, { type: 'error', message: text, code: ERROR_CODES.internal_error });
     }
   }
 
@@ -466,8 +471,8 @@ export class Room extends DurableObject<Env> {
       case 'transfer_scrum':
         await this.requireSm(ws, async (actor) => {
           const target = this.state!.players.find((p) => p.id === msg.targetPlayerId);
-          if (!target) throw new Error('Participante no encontrado');
-          if (target.connection !== 'connected') throw new Error('El destino debe estar conectado');
+          if (!target) throw new AppError(ERROR_CODES.player_not_found);
+          if (target.connection !== 'connected') throw new AppError(ERROR_CODES.player_not_connected);
           this.state!.scrumMasterPlayerId = target.id;
           void actor;
         });
@@ -483,9 +488,9 @@ export class Room extends DurableObject<Env> {
       case 'create_team':
         await this.requireSm(ws, async () => {
           const name = sanitizeTeamName(msg.name);
-          if (!name) throw new Error('Nombre de equipo requerido');
+          if (!name) throw new AppError(ERROR_CODES.team_name_required);
           if (this.state!.teams.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
-            throw new Error('Ya existe un equipo con ese nombre');
+            throw new AppError(ERROR_CODES.team_exists);
           }
           this.state!.teams.push({ id: randomId(4), name });
         });
@@ -493,15 +498,15 @@ export class Room extends DurableObject<Env> {
       case 'rename_team':
         await this.requireSm(ws, async () => {
           const team = this.state!.teams.find((t) => t.id === msg.teamId);
-          if (!team) throw new Error('Equipo no encontrado');
+          if (!team) throw new AppError(ERROR_CODES.team_not_found);
           const name = sanitizeTeamName(msg.name);
-          if (!name) throw new Error('Nombre inválido');
+          if (!name) throw new AppError(ERROR_CODES.team_name_invalid);
           if (
             this.state!.teams.some(
               (t) => t.id !== team.id && t.name.toLowerCase() === name.toLowerCase()
             )
           ) {
-            throw new Error('Ya existe un equipo con ese nombre');
+            throw new AppError(ERROR_CODES.team_exists);
           }
           team.name = name;
           for (const story of this.state!.stories) {
@@ -514,7 +519,7 @@ export class Room extends DurableObject<Env> {
       case 'delete_team':
         await this.requireSm(ws, async () => {
           const idx = this.state!.teams.findIndex((t) => t.id === msg.teamId);
-          if (idx < 0) throw new Error('Equipo no encontrado');
+          if (idx < 0) throw new AppError(ERROR_CODES.team_not_found);
           const teamId = msg.teamId;
           this.state!.teams.splice(idx, 1);
           for (const player of this.state!.players) {
@@ -537,10 +542,10 @@ export class Room extends DurableObject<Env> {
       case 'assign_player':
         await this.requireSm(ws, async () => {
           const player = this.state!.players.find((p) => p.id === msg.playerId);
-          if (!player) throw new Error('Participante no encontrado');
+          if (!player) throw new AppError(ERROR_CODES.player_not_found);
           if (msg.teamId !== undefined) {
             if (msg.teamId !== null && !this.state!.teams.some((t) => t.id === msg.teamId)) {
-              throw new Error('Equipo no encontrado');
+              throw new AppError(ERROR_CODES.team_not_found);
             }
             player.teamId = msg.teamId;
           }
@@ -556,7 +561,7 @@ export class Room extends DurableObject<Env> {
       case 'create_story':
         await this.requireSm(ws, async () => {
           const title = sanitizeStoryTitle(msg.title);
-          if (!title) throw new Error('Título requerido');
+          if (!title) throw new AppError(ERROR_CODES.story_title_required);
           this.state!.stories.push({
             id: randomId(4),
             title,
@@ -571,9 +576,9 @@ export class Room extends DurableObject<Env> {
       case 'update_story':
         await this.requireSm(ws, async () => {
           const story = this.state!.stories.find((s) => s.id === msg.storyId);
-          if (!story) throw new Error('Historia no encontrada');
+          if (!story) throw new AppError(ERROR_CODES.story_not_found);
           const title = sanitizeStoryTitle(msg.title);
-          if (!title) throw new Error('Título requerido');
+          if (!title) throw new AppError(ERROR_CODES.story_title_required);
           story.title = title;
           if (msg.description !== undefined) {
             story.description = sanitizeStoryDescription(msg.description);
@@ -583,7 +588,7 @@ export class Room extends DurableObject<Env> {
       case 'delete_story':
         await this.requireSm(ws, async () => {
           const idx = this.state!.stories.findIndex((s) => s.id === msg.storyId);
-          if (idx < 0) throw new Error('Historia no encontrada');
+          if (idx < 0) throw new AppError(ERROR_CODES.story_not_found);
           const storyId = msg.storyId;
           if (this.state!.activeRound?.storyId === storyId) {
             this.state!.activeRound = undefined;
@@ -598,7 +603,7 @@ export class Room extends DurableObject<Env> {
       case 'select_story':
         await this.requireSm(ws, async () => {
           const story = this.state!.stories.find((s) => s.id === msg.storyId);
-          if (!story) throw new Error('Historia no encontrada');
+          if (!story) throw new AppError(ERROR_CODES.story_not_found);
           this.state!.activeStoryId = story.id;
         });
         break;
@@ -622,7 +627,7 @@ export class Room extends DurableObject<Env> {
         break;
       case 'reveal':
         await this.requireSm(ws, async () => {
-          if (!this.state!.activeRound) throw new Error('No hay ronda activa');
+          if (!this.state!.activeRound) throw new AppError(ERROR_CODES.no_active_round);
           if (this.state!.activeRound.revealed) return;
           this.doReveal();
         });
@@ -640,7 +645,7 @@ export class Room extends DurableObject<Env> {
       case 'skip_story':
         await this.requireSm(ws, async () => {
           const story = this.state!.stories.find((s) => s.id === msg.storyId);
-          if (!story) throw new Error('Historia no encontrada');
+          if (!story) throw new AppError(ERROR_CODES.story_not_found);
           story.status = 'skipped';
           if (this.state!.activeRound?.storyId === story.id) {
             this.state!.activeRound = undefined;
@@ -652,7 +657,7 @@ export class Room extends DurableObject<Env> {
         await this.requireSm(ws, async () => {
           if (typeof msg.name === 'string') {
             const nextName = sanitizeRoomName(msg.name);
-            if (!nextName) throw new Error('El nombre de la sala no puede estar vacío');
+            if (!nextName) throw new AppError(ERROR_CODES.room_name_empty);
             this.state!.name = nextName;
           }
           if (msg.deck && isDeckId(msg.deck)) this.state!.deck = msg.deck;
@@ -674,7 +679,7 @@ export class Room extends DurableObject<Env> {
         });
         return;
       default:
-        this.send(ws, { type: 'error', message: 'Acción no soportada' });
+        this.sendError(ws, ERROR_CODES.unsupported_action);
         return;
     }
 
@@ -687,7 +692,7 @@ export class Room extends DurableObject<Env> {
     ws: WebSocket,
     msg: Extract<ClientToServer, { type: 'join' }>
   ): Promise<void> {
-    if (!this.state) throw new Error('Sala no disponible');
+    if (!this.state) throw new AppError(ERROR_CODES.room_unavailable);
 
     if (msg.playerId && msg.token) {
       await this.handleRejoin(ws, { type: 'rejoin', playerId: msg.playerId, token: msg.token });
@@ -695,26 +700,26 @@ export class Room extends DurableObject<Env> {
     }
 
     const name = sanitizePlayerName(msg.name);
-    if (!name) throw new Error('Elige un nombre');
+    if (!name) throw new AppError(ERROR_CODES.player_name_required);
 
     if (
       this.state.players.some(
         (p) => p.name.toLowerCase() === name.toLowerCase() && p.connection === 'connected'
       )
     ) {
-      throw new Error('Ese nombre ya está en uso');
+      throw new AppError(ERROR_CODES.player_name_taken);
     }
 
     if (this.state.isPrivate) {
       if (!msg.password || !this.state.passwordSalt || !this.state.passwordHash) {
-        throw new Error('Contraseña requerida');
+        throw new AppError(ERROR_CODES.password_required);
       }
       const ok = await verifyPassword(msg.password, this.state.passwordSalt, this.state.passwordHash);
-      if (!ok) throw new Error('Contraseña incorrecta');
+      if (!ok) throw new AppError(ERROR_CODES.password_incorrect);
     }
 
     if (msg.teamId && !this.state.teams.some((t) => t.id === msg.teamId)) {
-      throw new Error('Equipo no encontrado');
+      throw new AppError(ERROR_CODES.team_not_found);
     }
 
     const playerId = randomId(8);
@@ -750,16 +755,16 @@ export class Room extends DurableObject<Env> {
     ws: WebSocket,
     msg: Extract<ClientToServer, { type: 'rejoin' }>
   ): Promise<void> {
-    if (!this.state) throw new Error('Sala no disponible');
+    if (!this.state) throw new AppError(ERROR_CODES.room_unavailable);
     const player = this.state.players.find((p) => p.id === msg.playerId);
     if (!player) {
-      this.send(ws, { type: 'error', message: 'Sesión no válida', code: 'session_invalid' });
+      this.sendError(ws, ERROR_CODES.session_invalid);
       return;
     }
 
     const tokenHash = await hashToken(msg.token);
     if (tokenHash !== player.tokenHash) {
-      this.send(ws, { type: 'error', message: 'Sesión no válida', code: 'session_invalid' });
+      this.sendError(ws, ERROR_CODES.session_invalid);
       return;
     }
 
@@ -835,10 +840,10 @@ export class Room extends DurableObject<Env> {
   private removePlayer(actorId: string, targetPlayerId: string): void {
     if (!this.state) return;
     if (targetPlayerId === actorId) {
-      throw new Error('No puedes quitarte a ti mismo');
+      throw new AppError(ERROR_CODES.cannot_remove_self);
     }
     const target = this.state.players.find((p) => p.id === targetPlayerId);
-    if (!target) throw new Error('Participante no encontrado');
+    if (!target) throw new AppError(ERROR_CODES.player_not_found);
 
     for (const [socket, session] of [...this.sockets.entries()]) {
       if (session.playerId !== targetPlayerId) continue;
@@ -880,7 +885,7 @@ export class Room extends DurableObject<Env> {
     }
 
     if (sm.connection === 'connected' || sm.connection === 'pending') {
-      throw new Error('El Moderador sigue en la sala');
+      throw new AppError(ERROR_CODES.moderator_in_room);
     }
 
     this.state.scrumMasterPlayerId = actor.id;
@@ -901,13 +906,13 @@ export class Room extends DurableObject<Env> {
 
   private async handleVote(ws: WebSocket, value: string): Promise<void> {
     const actor = this.requireConnected(ws);
-    if (!this.state?.activeRound) throw new Error('No hay ronda activa');
-    if (this.state.activeRound.revealed) throw new Error('La ronda ya fue revelada');
-    if (actor.role !== 'voter') throw new Error('Los observers no votan');
+    if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
+    if (this.state.activeRound.revealed) throw new AppError(ERROR_CODES.round_already_revealed);
+    if (actor.role !== 'voter') throw new AppError(ERROR_CODES.observers_cannot_vote);
     if (!isInAudience(actor, this.state.activeRound.audience)) {
-      throw new Error('No estás en la audiencia de esta ronda');
+      throw new AppError(ERROR_CODES.not_in_audience);
     }
-    if (!isValidCard(this.state.deck, value)) throw new Error('Carta inválida');
+    if (!isValidCard(this.state.deck, value)) throw new AppError(ERROR_CODES.invalid_card);
 
     this.state.activeRound.votes[actor.id] = value;
   }
@@ -920,7 +925,7 @@ export class Room extends DurableObject<Env> {
   ): void {
     if (!this.state) return;
     const story = this.state.stories.find((s) => s.id === storyId);
-    if (!story) throw new Error('Historia no encontrada');
+    if (!story) throw new AppError(ERROR_CODES.story_not_found);
 
     const resolvedAudience: Audience = audience ?? { type: 'all_voters' };
     story.status = 'voting';
@@ -957,8 +962,8 @@ export class Room extends DurableObject<Env> {
   }
 
   private setTimer(durationSeconds: number): void {
-    if (!this.state?.activeRound) throw new Error('No hay ronda activa');
-    if (this.state.activeRound.revealed) throw new Error('La ronda ya fue revelada');
+    if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
+    if (this.state.activeRound.revealed) throw new AppError(ERROR_CODES.round_already_revealed);
     const duration = Math.min(TIMER_MAX, Math.max(TIMER_MIN, Math.round(durationSeconds)));
     const endsAt = Date.now() + duration * 1000;
     this.state.activeRound.timer = { durationSeconds: duration, endsAt, status: 'running' };
@@ -967,7 +972,7 @@ export class Room extends DurableObject<Env> {
   }
 
   private abortRound(): void {
-    if (!this.state?.activeRound) throw new Error('No hay ronda activa');
+    if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
     const round = this.state.activeRound;
     const story = this.state.stories.find((s) => s.id === round.storyId);
     if (story && story.status === 'voting') {
@@ -997,31 +1002,31 @@ export class Room extends DurableObject<Env> {
   }
 
   private revote(timerSeconds?: number | null): void {
-    if (!this.state?.activeRound) throw new Error('No hay ronda activa');
+    if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
     const prev = this.state.activeRound;
     this.startRound(prev.storyId, prev.audience, timerSeconds, prev.autoRevealOnTimerEnd);
   }
 
   private closeVoting(estimate?: string, teamId?: string): void {
-    if (!this.state?.activeRound) throw new Error('No hay ronda activa');
+    if (!this.state?.activeRound) throw new AppError(ERROR_CODES.no_active_round);
     const round = this.state.activeRound;
-    if (!round.revealed) throw new Error('Debes revelar antes de cerrar');
+    if (!round.revealed) throw new AppError(ERROR_CODES.reveal_before_close);
 
     const story = this.state.stories.find((s) => s.id === round.storyId);
-    if (!story) throw new Error('Historia no encontrada');
+    if (!story) throw new AppError(ERROR_CODES.story_not_found);
 
     let value = estimate?.trim();
     if (!value) {
       if (this.state.estimateRule === 'consensus') {
-        throw new Error('Elige la estimación de consenso');
+        throw new AppError(ERROR_CODES.consensus_required);
       }
       value = round.suggestedEstimate;
     }
-    if (!value) throw new Error('No hay estimación para guardar');
+    if (!value) throw new AppError(ERROR_CODES.no_estimation_to_save);
 
     if (teamId) {
       const team = this.state.teams.find((t) => t.id === teamId);
-      if (!team) throw new Error('Equipo no encontrado');
+      if (!team) throw new AppError(ERROR_CODES.team_not_found);
       story.estimates.byTeam = [
         ...(story.estimates.byTeam ?? []).filter((e) => e.teamId !== teamId),
         { teamId, teamName: team.name, value }
@@ -1068,9 +1073,9 @@ export class Room extends DurableObject<Env> {
 
   private requireConnected(ws: WebSocket): InternalPlayer {
     const session = this.sockets.get(ws);
-    if (!session?.playerId || !this.state) throw new Error('No autenticado');
+    if (!session?.playerId || !this.state) throw new AppError(ERROR_CODES.not_authenticated);
     const player = this.state.players.find((p) => p.id === session.playerId);
-    if (!player || player.connection !== 'connected') throw new Error('No conectado');
+    if (!player || player.connection !== 'connected') throw new AppError(ERROR_CODES.not_connected);
     return player;
   }
 
@@ -1080,9 +1085,13 @@ export class Room extends DurableObject<Env> {
   ): Promise<void> {
     const actor = this.requireConnected(ws);
     if (!this.state || this.state.scrumMasterPlayerId !== actor.id) {
-      throw new Error('Solo el Moderador puede hacer eso');
+      throw new AppError(ERROR_CODES.moderator_only);
     }
     await fn(actor);
+  }
+
+  private sendError(ws: WebSocket, code: ErrorCode): void {
+    this.send(ws, { type: 'error', code, message: ERROR_MESSAGES_EN[code] });
   }
 
   private send(ws: WebSocket, msg: ServerToClient): void {

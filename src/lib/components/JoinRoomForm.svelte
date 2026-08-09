@@ -1,6 +1,8 @@
 <script lang="ts">
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
+  import { ERROR_CODES, type ErrorCode } from '$lib/errors';
+  import { t, te } from '$lib/i18n';
   import type { PlayerAvatarConfig } from '$lib/room/avatar';
   import { PLAYER_NAME_MAX, ROLE_LABEL_MAX } from '$lib/room/limits';
   import type { PlayerRole } from '$lib/room/protocol';
@@ -9,7 +11,7 @@
     roomName: string;
     isPrivate: boolean;
     teams: { id: string; name: string }[];
-    error: string;
+    errorCode: ErrorCode | null;
     name?: string;
     password?: string;
     role?: PlayerRole;
@@ -25,7 +27,7 @@
     roomName,
     isPrivate,
     teams,
-    error,
+    errorCode,
     name = $bindable(''),
     password = $bindable(''),
     role = $bindable<PlayerRole>('voter'),
@@ -36,6 +38,8 @@
     oneditAvatar,
     onclearPasswordError
   }: Props = $props();
+
+  const passwordIncorrect = $derived(errorCode === ERROR_CODES.password_incorrect);
 </script>
 
 <form
@@ -45,19 +49,19 @@
     onsubmit();
   }}
 >
-  <button type="submit" class="join__submit-sr">Entrar</button>
+  <button type="submit" class="join__submit-sr">{t('join.enter')}</button>
 
   <div class="join__intro">
-    <p class="join__eyebrow">{isPrivate ? 'Sala privada' : 'Sala pública'}</p>
-    <h2 class="join__title">Unirse a {roomName}</h2>
-    <p class="join__hint">Elige cómo te verán en la mesa y entra a estimar con el equipo.</p>
+    <p class="join__eyebrow">{isPrivate ? t('join.privateRoom') : t('join.publicRoom')}</p>
+    <h2 class="join__title">{t('join.joinTitle', { roomName })}</h2>
+    <p class="join__hint">{t('join.joinSubtitle')}</p>
   </div>
 
   <div
     class="join__avatar"
     role="button"
     tabindex="0"
-    aria-label="Editar avatar"
+    aria-label={t('join.editAvatar')}
     onclick={oneditAvatar}
     onkeydown={(event) => {
       if (event.key === 'Enter' || event.key === ' ') {
@@ -70,74 +74,74 @@
       <PlayerAvatar {avatar} size={72} />
     </span>
     <span class="join__avatar-meta">
-      <strong>Tu avatar</strong>
-      <small>Toca para personalizarlo</small>
+      <strong>{t('join.yourAvatar')}</strong>
+      <small>{t('join.tapToCustomize')}</small>
     </span>
   </div>
 
-  <label class="form__label" for="join-name">Nombre</label>
+  <label class="form__label" for="join-name">{t('join.nameLabel')}</label>
   <input
     id="join-name"
     class="form__input form__input--compact"
     maxlength={PLAYER_NAME_MAX}
     autocomplete="nickname"
-    placeholder="Ej. Alex"
+    placeholder={t('join.namePlaceholder')}
     bind:value={name}
   />
 
   {#if isPrivate}
-    <label class="form__label" for="join-pass">Contraseña</label>
+    <label class="form__label" for="join-pass">{t('join.passwordLabel')}</label>
     <input
       id="join-pass"
       class="form__input form__input--compact"
-      class:form__input--error={error === 'Contraseña incorrecta'}
+      class:form__input--error={passwordIncorrect}
       type="password"
       autocomplete="current-password"
-      placeholder="Contraseña de la sala"
-      aria-invalid={error === 'Contraseña incorrecta' ? 'true' : undefined}
-      aria-describedby={error ? 'join-error' : undefined}
+      placeholder={t('join.passwordPlaceholder')}
+      aria-invalid={passwordIncorrect ? 'true' : undefined}
+      aria-describedby={errorCode ? 'join-error' : undefined}
       bind:value={password}
       oninput={() => {
-        if (error === 'Contraseña incorrecta') onclearPasswordError?.();
+        if (passwordIncorrect) onclearPasswordError?.();
       }}
     />
   {/if}
 
-  <p class="form__label" id="join-role-label">Cómo participar</p>
+  <p class="form__label" id="join-role-label">{t('join.participationLabel')}</p>
   <div class="join__roles" role="radiogroup" aria-labelledby="join-role-label">
     <label class="form__choice">
       <input type="radio" name="join-role" value="voter" bind:group={role} />
       <span>
-        <strong>Votar</strong>
-        <small>Participas en las estimaciones</small>
+        <strong>{t('join.voteLabel')}</strong>
+        <small>{t('join.voteHint')}</small>
       </span>
     </label>
     <label class="form__choice">
       <input type="radio" name="join-role" value="observer" bind:group={role} />
       <span>
-        <strong>Observar</strong>
-        <small>Sigues la ronda sin votar</small>
+        <strong>{t('join.observeLabel')}</strong>
+        <small>{t('join.observeHint')}</small>
       </span>
     </label>
   </div>
 
-  <label class="form__label" for="join-label">Etiqueta (opcional)</label>
+  <label class="form__label" for="join-label">{t('join.roleLabelOptional')}</label>
   <input
     id="join-label"
     class="form__input form__input--compact"
-    placeholder="PO, BA, LT…"
+    placeholder={t('join.roleLabelPlaceholder')}
     maxlength={ROLE_LABEL_MAX}
     bind:value={roleLabel}
   />
 
   {#if teams.length > 0}
-    <label class="form__label" for="join-team">Equipo</label>
+    <label class="form__label" for="join-team">{t('join.teamLabel')}</label>
     <select
       id="join-team"
       class="form__input form__input--compact form__select"
       bind:value={teamId}
     >
-      <option value="">Sin equipo</option>
+      <option value="">{t('join.noTeam')}</option>
       {#each teams as team (team.id)}
         <option value={team.id}>{team.name}</option>
       {/each}
@@ -145,13 +149,13 @@
   {/if}
 
   <div class="join__feedback" aria-live="polite">
-    {#if error}
-      <p id="join-error" class="join__error" role="alert">{error}</p>
+    {#if errorCode}
+      <p id="join-error" class="join__error" role="alert">{te(errorCode)}</p>
     {/if}
   </div>
 
   <div class="join__actions">
-    <LiquidButton text="Entrar" type="submit" />
+    <LiquidButton text={t('join.enter')} type="submit" />
   </div>
 </form>
 

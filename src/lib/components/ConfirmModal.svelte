@@ -1,6 +1,7 @@
 <script lang="ts">
   import LiquidButton from './LiquidButton.svelte';
   import ModalShell from './ModalShell.svelte';
+  import { t } from '$lib/i18n';
 
   type Props = {
     open: boolean;
@@ -16,11 +17,14 @@
     open,
     title,
     description,
-    confirmLabel = 'Confirmar',
-    cancelLabel = 'Cancelar',
+    confirmLabel,
+    cancelLabel,
     onconfirm,
     oncancel
   }: Props = $props();
+
+  const resolvedConfirm = $derived(confirmLabel ?? t('common.confirm'));
+  const resolvedCancel = $derived(cancelLabel ?? t('common.cancel'));
 </script>
 
 <ModalShell
@@ -33,7 +37,7 @@
   onclose={oncancel}
 >
   {#snippet footer()}
-    <button type="button" class="modal-ghost" onclick={oncancel}>{cancelLabel}</button>
-    <LiquidButton text={confirmLabel} onclick={onconfirm} />
+    <button type="button" class="modal-ghost" onclick={oncancel}>{resolvedCancel}</button>
+    <LiquidButton text={resolvedConfirm} onclick={onconfirm} />
   {/snippet}
 </ModalShell>

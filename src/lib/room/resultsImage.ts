@@ -1,6 +1,7 @@
 import type { StoryPublic } from '$lib/room/protocol';
 import { isPointEstimate } from '$lib/room/decks';
-import { storyStatusLabel } from '$lib/room/storyStatus';
+import { storyStatusLabel } from '$lib/i18n/labels';
+import { t } from '$lib/i18n';
 
 const BRAND = '#165d70';
 const BRAND_DARK = '#0b5d70';
@@ -45,7 +46,7 @@ export async function downloadResultsImage(
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('No se pudo crear la imagen');
+  if (!ctx) throw new Error(t('results.canvasError'));
 
   const grad = ctx.createLinearGradient(0, 0, width, height);
   grad.addColorStop(0, '#e8f4f6');
@@ -72,15 +73,15 @@ export async function downloadResultsImage(
 
   ctx.fillStyle = BRAND_DARK;
   ctx.font = '400 42px Pattaya, Georgia, serif';
-  ctx.fillText(roomName.slice(0, 42) || 'Resultados', 56, 112);
+  ctx.fillText(roomName.slice(0, 42) || t('results.title'), 56, 112);
 
   const estimated = stories.filter((s) => s.estimates.overall).length;
   ctx.fillStyle = MUTED;
   ctx.font = '600 16px Montserrat, sans-serif';
   ctx.fillText(
     stories.length
-      ? `${estimated} de ${stories.length} historias estimadas`
-      : 'Sin historias todavía',
+      ? t('results.imageSubtitle', { estimated, total: stories.length })
+      : t('results.noStoriesYet'),
     56,
     188
   );
@@ -92,7 +93,7 @@ export async function downloadResultsImage(
     ctx.fill();
     ctx.fillStyle = MUTED;
     ctx.font = '600 18px Montserrat, sans-serif';
-    ctx.fillText('Aún no hay resultados para capturar.', 80, y + 40);
+    ctx.fillText(t('results.emptyCapture'), 80, y + 40);
   } else {
     for (const story of stories) {
       const done = Boolean(story.estimates.overall);
@@ -141,7 +142,7 @@ export async function downloadResultsImage(
   const blob = await new Promise<Blob | null>((resolve) =>
     canvas.toBlob((b) => resolve(b), 'image/png')
   );
-  if (!blob) throw new Error('No se pudo generar la imagen');
+  if (!blob) throw new Error(t('results.canvasError'));
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -152,7 +153,7 @@ export async function downloadResultsImage(
     .replace(/^-|-$/g, '')
     .slice(0, 40);
   a.href = url;
-  a.download = `resultados-${safe || 'sala'}.png`;
+  a.download = `${t('results.downloadPrefix')}-${safe || t('results.downloadFallback')}.png`;
   a.click();
   URL.revokeObjectURL(url);
 }

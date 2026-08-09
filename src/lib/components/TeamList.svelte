@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import LiquidButton from './LiquidButton.svelte';
+  import { t } from '$lib/i18n';
   import { TEAM_NAME_MAX } from '$lib/room/limits';
 
   type Team = { id: string; name: string };
@@ -25,18 +26,24 @@
   let {
     teams,
     players = [],
-    title = 'Equipos',
-    hint = 'Opcional. Úsalos para limitar quién vota en cada ronda.',
-    emptyLabel = 'Todavía no hay equipos.',
+    title,
+    hint,
+    emptyLabel,
     creatable = false,
     manageable = false,
-    createPlaceholder = 'Ej. Front, Back, Mobile',
-    createLabel = 'Añadir',
+    createPlaceholder,
+    createLabel,
     autofocusCreate = false,
     oncreate,
     onrename,
     ondelete
   }: Props = $props();
+
+  const resolvedTitle = $derived(title === undefined ? t('teams.title') : title);
+  const resolvedHint = $derived(hint === undefined ? t('teams.defaultHint') : hint);
+  const resolvedEmpty = $derived(emptyLabel === undefined ? t('teams.emptyWait') : emptyLabel);
+  const resolvedPlaceholder = $derived(createPlaceholder ?? t('teams.placeholder'));
+  const resolvedCreateLabel = $derived(createLabel ?? t('teams.add'));
 
   let draftName = $state('');
   let editingId = $state<string | null>(null);
@@ -89,11 +96,11 @@
 </script>
 
 <section class="teams">
-  {#if title}
-    <h3 class="teams__title">{title}</h3>
+  {#if resolvedTitle}
+    <h3 class="teams__title">{resolvedTitle}</h3>
   {/if}
-  {#if hint}
-    <p class="teams__hint">{hint}</p>
+  {#if resolvedHint}
+    <p class="teams__hint">{resolvedHint}</p>
   {/if}
 
   {#if creatable}
@@ -104,30 +111,30 @@
         submitCreate();
       }}
     >
-      <label class="create__label" for="team-create-name">Nuevo equipo</label>
+      <label class="create__label" for="team-create-name">{t('teams.newTeam')}</label>
       <div class="create__row">
         <input
           id="team-create-name"
           class="create__input"
           type="text"
           maxlength={TEAM_NAME_MAX}
-          placeholder={createPlaceholder}
+          placeholder={resolvedPlaceholder}
           aria-describedby="team-create-hint"
           bind:this={createInputEl}
           bind:value={draftName}
         />
-        <LiquidButton text={createLabel} type="submit" disabled={!canCreate} />
+        <LiquidButton text={resolvedCreateLabel} type="submit" disabled={!canCreate} />
       </div>
       <p id="team-create-hint" class="create__hint">
         {canCreate
           ? `${draftName.trim().length}/${TEAM_NAME_MAX}`
-          : 'Escribe un nombre para poder añadirlo.'}
+          : t('teams.nameHint')}
       </p>
     </form>
   {/if}
 
   {#if teams.length === 0}
-    <p class="teams__empty">{emptyLabel}</p>
+    <p class="teams__empty">{resolvedEmpty}</p>
   {:else}
     <ul class="teams__list">
       {#each teams as team (team.id)}
@@ -148,30 +155,31 @@
                 maxlength={TEAM_NAME_MAX}
                 bind:value={editName}
                 bind:this={editInputEl}
-                aria-label="Editar nombre del equipo"
+                aria-label={t('teams.editNameAria')}
               />
               <button
                 type="submit"
                 class="teams__text-btn teams__text-btn--save"
                 disabled={!canSaveEdit}
               >
-                Guardar
+                {t('common.save')}
               </button>
-              <button type="button" class="teams__text-btn" onclick={cancelEdit}>Cancelar</button>
+              <button type="button" class="teams__text-btn" onclick={cancelEdit}>{t('common.cancel')}</button>
             </form>
           {:else}
             <div class="teams__main">
               <span class="teams__name">{team.name}</span>
               <span class="teams__count">
-                {members.length}
-                {members.length === 1 ? 'persona' : 'personas'}
+                {members.length === 1
+                  ? t('teams.personOne')
+                  : t('teams.personMany', { count: members.length })}
               </span>
               {#if manageable}
                 <div class="teams__actions">
                   <button
                     type="button"
                     class="teams__icon"
-                    aria-label={`Editar ${team.name}`}
+                    aria-label={t('teams.editAria', { name: team.name })}
                     onclick={() => startEdit(team)}
                   >
                     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -184,7 +192,7 @@
                   <button
                     type="button"
                     class="teams__icon teams__icon--danger"
-                    aria-label={`Eliminar ${team.name}`}
+                    aria-label={t('teams.deleteAria', { name: team.name })}
                     onclick={() => ondelete?.(team.id)}
                   >
                     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -200,7 +208,7 @@
             {#if members.length}
               <p class="teams__members">{members.map((member) => member.name).join(', ')}</p>
             {:else}
-              <p class="teams__members teams__members--empty">Sin miembros aún</p>
+              <p class="teams__members teams__members--empty">{t('teams.noMembers')}</p>
             {/if}
           {/if}
         </li>

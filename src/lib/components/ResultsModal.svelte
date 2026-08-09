@@ -2,6 +2,7 @@
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import ModalShell from '$lib/components/ModalShell.svelte';
   import StoryStatusChip from '$lib/components/StoryStatusChip.svelte';
+  import { t } from '$lib/i18n';
   import { downloadResultsImage } from '$lib/room/resultsImage';
   import { formatEstimateLabel, isPointEstimate } from '$lib/room/decks';
   import type { StoryPublic } from '$lib/room/protocol';
@@ -33,8 +34,8 @@
   const estimatedCount = $derived(stories.filter((s) => s.estimates.overall).length);
   const description = $derived(
     stories.length === 0
-      ? 'Aún no hay historias en esta sesión.'
-      : `${estimatedCount} de ${stories.length} historias estimadas.`
+      ? t('results.emptyDesc')
+      : t('results.progressDesc', { estimated: estimatedCount, total: stories.length })
   );
 
   async function captureImage() {
@@ -42,9 +43,9 @@
     capturing = true;
     try {
       await downloadResultsImage(roomName, stories);
-      onflash?.('Imagen descargada');
+      onflash?.(t('results.imageDownloaded'));
     } catch {
-      onerror?.('No se pudo crear la captura');
+      onerror?.(t('results.captureFailed'));
     } finally {
       capturing = false;
     }
@@ -53,9 +54,9 @@
 
 <ModalShell
   {open}
-  title="Resultados"
+  title={t('results.title')}
   titleId="results-modal-title"
-  eyebrow="Sala"
+  eyebrow={t('moderation.eyebrow')}
   {description}
   size="lg"
   {onclose}
@@ -74,7 +75,7 @@
             d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4Zm8-9.7h-2.2l-1.4-1.8A2 2 0 0 0 14.8 3H9.2a2 2 0 0 0-1.6.7L6.2 5.5H4a2 2 0 0 0-2 2V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7.5a2 2 0 0 0-2-2ZM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"
           />
         </svg>
-        {capturing ? '…' : 'Foto'}
+        {capturing ? '…' : t('results.photo')}
       </button>
       <button type="button" class="export-btn" onclick={oncopyMd}>
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -100,7 +101,7 @@
   {#if stories.length === 0}
     <div class="empty">
       <span class="empty__mark" aria-hidden="true">∅</span>
-      <p>Cuando cierren la primera votación, verás aquí las estimaciones.</p>
+      <p>{t('results.emptyBody')}</p>
     </div>
   {:else}
     <ul class="results">
@@ -111,7 +112,7 @@
             {#if story.estimates.byTeam?.length}
               <span class="results__teams">
                 {story.estimates.byTeam
-                  .map((t) => `${t.teamName}: ${formatEstimateLabel(t.value)}`)
+                  .map((teamEst) => `${teamEst.teamName}: ${formatEstimateLabel(teamEst.value)}`)
                   .join(' · ')}
               </span>
             {/if}
@@ -119,7 +120,7 @@
           <div class="results__meta">
             <span class="results__value" class:results__value--empty={!story.estimates.overall}>
               {story.estimates.overall ?? '—'}{#if isPointEstimate(story.estimates.overall)}<span
-                  class="results__unit"> pts</span
+                  class="results__unit">{t('decks.pointsSuffix')}</span
                 >{/if}
             </span>
             <StoryStatusChip status={story.status} tone="results" />
@@ -130,7 +131,7 @@
   {/if}
 
   {#snippet footer()}
-    <LiquidButton text="Cerrar" onclick={onclose} />
+    <LiquidButton text={t('common.close')} onclick={onclose} />
   {/snippet}
 </ModalShell>
 

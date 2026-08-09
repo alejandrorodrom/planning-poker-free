@@ -1,15 +1,18 @@
 import type { StoryPublic } from './protocol';
 import { formatEstimateLabel } from './decks';
+import { t } from '$lib/i18n';
 
 export function storiesToMarkdown(stories: StoryPublic[]): string {
-  const lines = ['# Resultados Planning Poker', ''];
+  const lines = [t('results.markdownTitle'), ''];
   for (const story of stories) {
     const estimate = formatEstimateLabel(story.estimates.overall);
     const byTeam =
       story.estimates.byTeam
-        ?.map((t) => `${t.teamName}: ${formatEstimateLabel(t.value)}`)
+        ?.map((teamEst) => `${teamEst.teamName}: ${formatEstimateLabel(teamEst.value)}`)
         .join(', ') ?? '';
-    lines.push(`- **${story.title}** — ${estimate}${byTeam ? ` (${byTeam})` : ''} [${story.status}]`);
+    lines.push(
+      `- **${story.title}** — ${estimate}${byTeam ? ` (${byTeam})` : ''} [${story.status}]`
+    );
   }
   return lines.join('\n');
 }
@@ -21,7 +24,8 @@ export function storiesToCsv(stories: StoryPublic[]): string {
       story.title,
       story.status,
       story.estimates.overall ?? '',
-      story.estimates.byTeam?.map((t) => `${t.teamName}=${t.value}`).join(';') ?? ''
+      story.estimates.byTeam?.map((teamEst) => `${teamEst.teamName}=${teamEst.value}`).join(';') ??
+        ''
     ]);
   }
   return rows.map((r) => r.map((c) => `"${c.replaceAll('"', '""')}"`).join(',')).join('\n');

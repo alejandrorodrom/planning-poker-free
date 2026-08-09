@@ -3,13 +3,13 @@ import type { StoryStatus } from './protocol';
 export function storyStatusLabel(status: StoryStatus | string): string {
   switch (status) {
     case 'pending':
-      return 'Pendiente';
+      return 'Pending';
     case 'voting':
-      return 'Votando';
+      return 'Voting';
     case 'estimated':
-      return 'Estimada';
+      return 'Estimated';
     case 'skipped':
-      return 'Omitida';
+      return 'Skipped';
     default:
       return status;
   }

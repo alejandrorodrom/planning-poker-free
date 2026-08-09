@@ -1,8 +1,13 @@
+<script lang="ts">
+  import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
+  import { t } from '$lib/i18n';
+</script>
+
 <footer class="container-footer">
   <section class="footer">
     <p class="footer__left">
       <span class="footer__left-code" aria-hidden="true">&lt;/&gt;</span>
-      Desarrollado por
+      {t('footer.developedBy')}
       <a
         class="footer__left-author"
         href="https://www.linkedin.com/in/alejandro-rodriguez-romero"
@@ -13,6 +18,7 @@
       </a>
     </p>
     <div class="footer__right">
+      <LanguageSwitcher compact />
       <a
         class="footer__right-link"
         href="https://github.com/alejandrorodrom/planning-poker-free"
@@ -27,7 +33,7 @@
         href="https://github.com/sponsors/alejandrorodrom"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Patrocinar en GitHub Sponsors"
+        aria-label={t('footer.sponsorAria')}
       >
         <svg
           class="footer__sponsor-icon"
