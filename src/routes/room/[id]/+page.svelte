@@ -56,6 +56,7 @@
 
   let storyTitle = $state('');
   let closeEstimate = $state('');
+  let closeEstimateRoundKey = '';
   let timerSeconds = $state(60);
   let useRoundTimer = $state(true);
   let audienceMode = $state<'all' | 'teams'>('all');
@@ -213,6 +214,14 @@
     if (errorCode || errorMessage) clearError();
     client?.send(message);
   }
+
+  $effect(() => {
+    const round = roomState?.activeRound;
+    const key = round ? `${round.storyId}:${round.roundNumber}:${round.startedAt}` : '';
+    if (key === closeEstimateRoundKey) return;
+    closeEstimateRoundKey = key;
+    closeEstimate = '';
+  });
 
   $effect(() => {
     if (!errorCode) return;
