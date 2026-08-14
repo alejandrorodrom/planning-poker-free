@@ -71,7 +71,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.1",
     "vite": "^8.0.16",
-    "wrangler": "^4.97.0",
+    "wrangler": "^4.120.1",
     "yaml": "^2.9.0"
   },
   "overrides": {
