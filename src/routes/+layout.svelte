@@ -5,6 +5,8 @@
   import Footer from '$lib/components/Footer.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
   import { initLocale, syncLocaleFromBrowser } from '$lib/i18n';
+  import montserrat400 from '@fontsource/montserrat/files/montserrat-latin-400-normal.woff2?url';
+  import pattaya400 from '@fontsource/pattaya/files/pattaya-latin-400-normal.woff2?url';
 
   let { data, children } = $props();
 
@@ -23,6 +25,11 @@
   );
   const roomFooter = $derived(Boolean(page.route.id?.startsWith('/room')));
 </script>
+
+<svelte:head>
+  <link rel="preload" href={pattaya400} as="font" type="font/woff2" crossorigin="anonymous" />
+  <link rel="preload" href={montserrat400} as="font" type="font/woff2" crossorigin="anonymous" />
+</svelte:head>
 
 <div class="app-shell">
   {#if !hideNavbar}

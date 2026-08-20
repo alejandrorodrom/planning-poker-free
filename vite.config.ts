@@ -15,7 +15,8 @@ export default defineConfig({
         platformProxy: {
           configPath: '.platform-proxy-wrangler.jsonc'
         }
-      })
+      }),
+      inlineStyleThreshold: 14_000
     }),
     addWorkerExports({ entryPoint: 'src/lib/server/index.ts' })
   ]

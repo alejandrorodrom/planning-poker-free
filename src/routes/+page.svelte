@@ -205,7 +205,7 @@
       else void createRoom();
     }}
   >
-    <div class="steps" aria-label={t('landing.progress')}>
+    <div class="steps" aria-hidden="true">
       {#each steps as item (item.id)}
         <span
           class="steps__dot"
