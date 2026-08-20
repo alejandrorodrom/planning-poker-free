@@ -10,7 +10,14 @@
 </p>
 
 <p align="center">
+  <a href="https://planningpoker.free/">
+    <img alt="Probar en vivo — planningpoker.free" src="https://img.shields.io/badge/Probar%20en%20vivo-planningpoker.free-0F9D58?style=for-the-badge" />
+  </a>
+</p>
+
+<p align="center">
   <a href="https://planningpoker.free/"><strong>https://planningpoker.free</strong></a>
+  — crea una sala en segundos, sin registro
 </p>
 
 <p align="center">
@@ -20,7 +27,6 @@
 </p>
 
 <p align="center">
-  <a href="https://planningpoker.free/"><img alt="Live" src="https://img.shields.io/badge/live-planningpoker.free-0F9D58.svg" /></a>
   <a href="https://github.com/alejandrorodrom/planning-poker-free/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
   <a href="https://nodejs.org/"><img alt="Node.js >= 24" src="https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg" /></a>
   <a href="https://svelte.dev/"><img alt="Svelte 5" src="https://img.shields.io/badge/svelte-5-FF3E00.svg" /></a>
@@ -180,6 +186,7 @@ Usa las credenciales de **la cuenta donde quieras publicar** (incluida una recla
 3. Verifica [https://planningpoker.free](https://planningpoker.free) o la URL `*.workers.dev` en el log del job o de Wrangler.
 4. (Opcional) Prueba una rama en staging: *Actions → Deploy staging → Run workflow* → elige rama.
 5. Dominio custom (producción oficial): Cloudflare → Workers → Domains & Routes → Custom Domains → `planningpoker.free`.
+6. Redirect `www`: Cloudflare → Rules → Redirect Rules → Create rule → **If** `(http.host eq "www.planningpoker.free")` → **Then** URL dinámica `concat("https://planningpoker.free", http.request.uri.path)` → **301** → conservar query string. Así `www` redirige al apex aunque el Worker no tenga ese subdominio (evita el error 525).
 
 ## Arquitectura
 

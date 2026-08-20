@@ -58,6 +58,28 @@ export type Messages = {
     hiddenUntilReveal: string;
     alwaysVisible: string;
     createRoomButton: string;
+    howItWorksLink: string;
+    faqLink: string;
+    howItWorksTitle: string;
+    howItWorksDescription: string;
+    howStep1Title: string;
+    howStep1Body: string;
+    howStep2Title: string;
+    howStep2Body: string;
+    howStep3Title: string;
+    howStep3Body: string;
+    faqTitle: string;
+    faqDescription: string;
+    faq1Q: string;
+    faq1A: string;
+    faq2Q: string;
+    faq2A: string;
+    faq3Q: string;
+    faq3A: string;
+    faq4Q: string;
+    faq4A: string;
+    faq5Q: string;
+    faq5A: string;
   };
   join: {
     enter: string;

@@ -10,7 +10,14 @@
 </p>
 
 <p align="center">
+  <a href="https://planningpoker.free/">
+    <img alt="Try live — planningpoker.free" src="https://img.shields.io/badge/Try%20live-planningpoker.free-0F9D58?style=for-the-badge" />
+  </a>
+</p>
+
+<p align="center">
   <a href="https://planningpoker.free/"><strong>https://planningpoker.free</strong></a>
+  — create a room in seconds, no signup
 </p>
 
 <p align="center">
@@ -20,7 +27,6 @@
 </p>
 
 <p align="center">
-  <a href="https://planningpoker.free/"><img alt="Live" src="https://img.shields.io/badge/live-planningpoker.free-0F9D58.svg" /></a>
   <a href="https://github.com/alejandrorodrom/planning-poker-free/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
   <a href="https://nodejs.org/"><img alt="Node.js >= 24" src="https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg" /></a>
   <a href="https://svelte.dev/"><img alt="Svelte 5" src="https://img.shields.io/badge/svelte-5-FF3E00.svg" /></a>
@@ -180,6 +186,7 @@ Use credentials for **the account you want to publish to** (including one claime
 3. Verify [https://planningpoker.free](https://planningpoker.free) or the `*.workers.dev` URL in the job or Wrangler log.
 4. (Optional) Try a branch on staging: *Actions → Deploy staging → Run workflow* → pick a branch.
 5. Custom domain (official production): Cloudflare → Workers → Domains & Routes → Custom Domains → `planningpoker.free`.
+6. Redirect `www`: Cloudflare → Rules → Redirect Rules → Create rule → **If** `(http.host eq "www.planningpoker.free")` → **Then** dynamic URL `concat("https://planningpoker.free", http.request.uri.path)` → **301** → preserve query string. This sends `www` to the apex even when the Worker has no `www` custom domain (avoids 525 SSL errors).
 
 ## Architecture
 

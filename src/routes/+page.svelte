@@ -2,6 +2,8 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
+  import LandingFaqModal from '$lib/components/LandingFaqModal.svelte';
+  import LandingHowItWorksModal from '$lib/components/LandingHowItWorksModal.svelte';
   import LiquidButton from '$lib/components/LiquidButton.svelte';
   import SeoHead from '$lib/components/SeoHead.svelte';
   import { ERROR_CODES, isErrorCode, type ErrorCode } from '$lib/errors';
@@ -33,6 +35,8 @@
   let errorMessage = $state('');
   let loading = $state(false);
   let narrow = $state(false);
+  let howOpen = $state(false);
+  let faqOpen = $state(false);
 
   $effect(() => {
     const mq = window.matchMedia(mqMax(BP_MOBILE));
@@ -182,6 +186,15 @@
     <p class="hero__paragraph">
       {t('landing.heroSubtitle')}
     </p>
+    <p class="hero__links">
+      <button type="button" class="hero__link" onclick={() => (howOpen = true)}>
+        {t('landing.howItWorksLink')}
+      </button>
+      <span class="hero__sep" aria-hidden="true">·</span>
+      <button type="button" class="hero__link" onclick={() => (faqOpen = true)}>
+        {t('landing.faqLink')}
+      </button>
+    </p>
   {/if}
 
   <form
@@ -318,6 +331,9 @@
   </form>
 </section>
 
+<LandingHowItWorksModal open={howOpen} onclose={() => (howOpen = false)} />
+<LandingFaqModal open={faqOpen} onclose={() => (faqOpen = false)} />
+
 <style>
   .hero {
     display: flex;
@@ -349,9 +365,38 @@
     font-weight: 400;
     font-size: var(--text-md);
     text-align: center;
-    margin: 0 0 24px;
+    margin: 0 0 10px;
     line-height: var(--leading-normal);
     max-width: 36ch;
+  }
+
+  .hero__links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+  }
+
+  .hero__link {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--color-brand);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .hero__link:hover {
+    text-decoration: underline;
+  }
+
+  .hero__sep {
+    color: #9bb4bb;
   }
 
   .form {
@@ -472,8 +517,13 @@
     }
 
     .hero__paragraph {
-      margin: 0 0 14px;
+      margin: 0 0 8px;
       font-size: var(--text-sm);
+    }
+
+    .hero__links {
+      margin: 0 0 12px;
+      font-size: var(--text-xs);
     }
 
     .hero--dense .hero__logo {

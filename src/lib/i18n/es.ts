@@ -57,7 +57,37 @@ export const es: Messages = {
     mean: 'Media',
     hiddenUntilReveal: 'Oculto hasta revelar',
     alwaysVisible: 'Siempre visible',
-    createRoomButton: 'Crear sala'
+    createRoomButton: 'Crear sala',
+    howItWorksLink: 'Cómo funciona',
+    faqLink: 'FAQ',
+    howItWorksTitle: 'Cómo funciona',
+    howItWorksDescription: 'De cero a la primera estimación en menos de un minuto. Sin cuentas.',
+    howStep1Title: 'Crea una sala',
+    howStep1Body:
+      'Elige un nombre, nombra la sala y escoge la baraja. Obtienes un enlace para compartir al instante.',
+    howStep2Title: 'Invita al equipo',
+    howStep2Body:
+      'Pega el link en Slack, Teams o el chat de Zoom. Entran desde el navegador, sin instalar nada.',
+    howStep3Title: 'Vota y revela',
+    howStep3Body:
+      'Cada uno elige una carta en privado. Revelan juntas, discuten outliers y fijan la estimación.',
+    faqTitle: 'Preguntas frecuentes',
+    faqDescription: 'Respuestas cortas sobre Planning Poker online gratis.',
+    faq1Q: '¿Planning Poker Free es realmente gratis?',
+    faq1A:
+      'Sí. Puedes crear salas, invitar al equipo, votar y revelar sin registro, sin anuncios y sin plan de pago.',
+    faq2Q: '¿Necesito una cuenta?',
+    faq2A:
+      'No. Crea una sala, comparte el link y cada persona entra con un nombre. Las salas privadas pueden pedirte contraseña.',
+    faq3Q: '¿Qué barajas hay?',
+    faq3A:
+      'Fibonacci modificado, Fibonacci clásico, potencias de dos, tallas (T-shirt) y secuencial: las escalas habituales en estimación ágil.',
+    faq4Q: '¿Sirve para equipos remotos?',
+    faq4A:
+      'Sí. Corre en el navegador con sincronización en tiempo real por WebSocket. Úsalo junto a Zoom, Meet, Teams o Slack.',
+    faq5Q: '¿Es open source?',
+    faq5A:
+      'Sí. El código está en GitHub con licencia open source. Puedes revisarlo, contribuir o auto-hospedarlo si quieres.'
   },
   join: {
     enter: 'Entrar',

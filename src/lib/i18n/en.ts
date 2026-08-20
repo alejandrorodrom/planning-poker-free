@@ -57,7 +57,34 @@ export const en: Messages = {
     mean: 'Mean',
     hiddenUntilReveal: 'Hidden until reveal',
     alwaysVisible: 'Always visible',
-    createRoomButton: 'Create room'
+    createRoomButton: 'Create room',
+    howItWorksLink: 'How it works',
+    faqLink: 'FAQ',
+    howItWorksTitle: 'How it works',
+    howItWorksDescription: 'From zero to first estimate in under a minute. No accounts.',
+    howStep1Title: 'Create a room',
+    howStep1Body: 'Pick a display name, name the room, and choose your deck. You get a shareable link instantly.',
+    howStep2Title: 'Invite the team',
+    howStep2Body: 'Drop the link in Slack, Teams, or Zoom chat. Teammates join from any browser — no install.',
+    howStep3Title: 'Vote and reveal',
+    howStep3Body: 'Everyone picks a card in private. Reveal together, discuss outliers, and lock the estimate.',
+    faqTitle: 'Frequently asked questions',
+    faqDescription: 'Short answers about free Planning Poker online.',
+    faq1Q: 'Is Planning Poker Free really free?',
+    faq1A:
+      'Yes. You can create rooms, invite your team, vote, and reveal with no signup, no ads, and no paid plan required.',
+    faq2Q: 'Do I need an account?',
+    faq2A:
+      'No. Create a room, share the link, and everyone joins with a display name. Optional passwords protect private rooms.',
+    faq3Q: 'What decks are supported?',
+    faq3A:
+      'Modified Fibonacci, classic Fibonacci, powers of two, T-shirt sizes, and sequential values — common scales for agile estimation.',
+    faq4Q: 'Does it work for remote teams?',
+    faq4A:
+      'Yes. It runs in the browser with real-time WebSocket sync. Use it alongside Zoom, Meet, Teams, or Slack.',
+    faq5Q: 'Is it open source?',
+    faq5A:
+      'Yes. The code is on GitHub under an open-source license. You can review it, contribute, or self-host if you prefer.'
   },
   join: {
     enter: 'Enter',

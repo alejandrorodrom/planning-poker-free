@@ -15,6 +15,8 @@
     size?: Size;
     variant?: Variant;
     centered?: boolean;
+    /** Keep markup in the DOM when closed (SSR/SEO). Hidden and inert until opened. */
+    keepMounted?: boolean;
     onclose: () => void;
     onescape?: () => void;
     children?: Snippet;
@@ -32,12 +34,15 @@
     size = 'md',
     variant = 'panel',
     centered = false,
+    keepMounted = false,
     onclose,
     onescape,
     children,
     headerAside,
     footer
   }: Props = $props();
+
+  const mounted = $derived(open || keepMounted);
 
   function onKeydown(event: KeyboardEvent) {
     if (!open) return;
@@ -47,13 +52,19 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-{#if open}
+{#if mounted}
   <div
     class="modal-shell__overlay"
     class:modal-shell__overlay--soft={variant === 'soft'}
+    class:modal-shell__overlay--closed={!open}
+    class:modal-shell__overlay--animated={keepMounted}
+    hidden={!open && !keepMounted}
+    inert={!open}
   >
     <div class="modal-shell__frost" aria-hidden="true"></div>
-    <button type="button" class="modal-shell__backdrop" aria-label={t('common.close')} onclick={onclose}></button>
+    {#if open}
+      <button type="button" class="modal-shell__backdrop" aria-label={t('common.close')} onclick={onclose}></button>
+    {/if}
     <div
       class="modal-shell"
       class:modal-shell--panel={variant === 'panel'}
@@ -63,9 +74,12 @@
       class:modal-shell--md={size === 'md'}
       class:modal-shell--lg={size === 'lg'}
       class:modal-shell--xl={size === 'xl'}
+      class:modal-shell--enter={keepMounted && open}
+      class:modal-shell--exit={keepMounted && !open}
       role="dialog"
-      aria-modal="true"
+      aria-modal={open ? 'true' : undefined}
       aria-labelledby={titleId}
+      aria-hidden={!open}
       tabindex="-1"
     >
       <header
@@ -124,6 +138,35 @@
     padding: 16px;
   }
 
+  /* keepMounted closed: in DOM for SEO, invisible and non-interactive */
+  .modal-shell__overlay--closed:not(.modal-shell__overlay--animated) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    pointer-events: none;
+  }
+
+  .modal-shell__overlay--animated {
+    /* visibility waits for blur/panel exit; don't fade whole overlay (kills blur) */
+    transition: visibility 0s linear 320ms;
+  }
+
+  .modal-shell__overlay--animated:not(.modal-shell__overlay--closed) {
+    visibility: visible;
+    transition: visibility 0s linear 0s;
+  }
+
+  .modal-shell__overlay--animated.modal-shell__overlay--closed {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   .modal-shell__frost {
     position: absolute;
     inset: 0;
@@ -134,7 +177,28 @@
     pointer-events: none;
   }
 
-  .modal-shell__overlay--soft .modal-shell__frost {
+  .modal-shell__overlay--animated .modal-shell__frost {
+    background: rgba(8, 40, 48, 0);
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+    transition:
+      background 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      backdrop-filter 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      -webkit-backdrop-filter 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .modal-shell__overlay--animated:not(.modal-shell__overlay--closed) .modal-shell__frost {
+    background: rgba(8, 40, 48, 0.42);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .modal-shell__overlay--soft:not(.modal-shell__overlay--animated) .modal-shell__frost {
+    background: rgba(8, 32, 40, 0.48);
+  }
+
+  .modal-shell__overlay--animated.modal-shell__overlay--soft:not(.modal-shell__overlay--closed)
+    .modal-shell__frost {
     background: rgba(8, 32, 40, 0.48);
   }
 
@@ -158,6 +222,23 @@
     width: min(100%, 480px);
     transform: translateZ(0);
     animation: modal-rise-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .modal-shell__overlay--animated .modal-shell {
+    animation: none;
+    transition:
+      opacity 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .modal-shell--enter {
+    opacity: 1;
+    transform: translateZ(0) translateY(0) scale(1);
+  }
+
+  .modal-shell--exit {
+    opacity: 0;
+    transform: translateZ(0) translateY(14px) scale(0.97);
   }
 
   .modal-shell--sm {
@@ -370,6 +451,22 @@
       animation: none;
     }
 
+    .modal-shell__overlay--animated,
+    .modal-shell__overlay--animated .modal-shell__frost,
+    .modal-shell__overlay--animated .modal-shell {
+      transition: none;
+    }
+
+    .modal-shell__overlay--animated.modal-shell__overlay--closed .modal-shell__frost,
+    .modal-shell__overlay--animated .modal-shell__frost {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .modal-shell__overlay--animated:not(.modal-shell__overlay--closed) .modal-shell__frost {
+      background: rgba(8, 40, 48, 0.62);
+    }
+
     .modal-shell__frost {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
@@ -380,25 +477,22 @@
   /* BP_MOBILE — sync with src/lib/breakpoints.ts */
   @media (max-width: 720px) {
     .modal-shell__overlay {
-      padding: 10px;
-      align-items: stretch;
-    }
-
-    /* Confirm / compact dialogs: hug content like desktop */
-    .modal-shell__overlay:has(.modal-shell--simple) {
-      align-items: center;
+      padding: 16px 12px;
+      align-items: end;
       justify-items: center;
-      padding: 16px;
     }
 
     .modal-shell__overlay--soft {
-      padding: 10px;
+      padding: 12px;
     }
 
     .modal-shell {
       width: 100%;
-      max-height: min(92dvh, 720px);
-      border-radius: 18px;
+      height: auto;
+      max-height: min(88dvh, 720px);
+      border-radius: 22px 22px 14px 14px;
+      align-self: end;
+      justify-self: stretch;
     }
 
     .modal-shell--lg,
@@ -406,6 +500,14 @@
     .modal-shell--md,
     .modal-shell--sm {
       width: 100%;
+      height: auto;
+    }
+
+    /* Confirm / compact: float centered and hug content */
+    .modal-shell__overlay:has(.modal-shell--simple) {
+      align-items: center;
+      justify-items: center;
+      padding: 16px;
     }
 
     .modal-shell--simple,
@@ -414,6 +516,7 @@
       max-height: none;
       height: auto;
       align-self: center;
+      border-radius: 18px;
       padding: 22px 18px 18px;
     }
 
@@ -436,7 +539,7 @@
     }
 
     .modal-shell__header:not(.modal-shell__header--centered) {
-      padding: 14px 12px 10px;
+      padding: 18px 16px 12px;
     }
 
     .modal-shell__header--split .modal-shell__top {
@@ -458,11 +561,12 @@
     }
 
     .modal-shell__body {
-      padding: 10px;
+      flex: 0 1 auto;
+      padding: 4px 16px 18px;
     }
 
     .modal-shell__footer {
-      padding: 12px;
+      padding: 12px 16px 16px;
     }
 
     .modal-shell__footer :global(.button) {
@@ -470,6 +574,15 @@
       padding: 0.4em 1em;
       border-width: 2px;
       min-height: 40px;
+    }
+
+    /* Animated landing modals: slide up from bottom */
+    .modal-shell__overlay--animated .modal-shell--exit {
+      transform: translateZ(0) translateY(18px) scale(1);
+    }
+
+    .modal-shell__overlay--animated .modal-shell--enter {
+      transform: translateZ(0) translateY(0) scale(1);
     }
   }
 </style>

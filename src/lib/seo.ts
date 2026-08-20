@@ -2,6 +2,8 @@ import type { Locale } from '$lib/i18n/types';
 
 export const SITE_ORIGIN = 'https://planningpoker.free';
 
+export const CANONICAL_HOST = 'planningpoker.free';
+
 export const SITE_NAME = 'Planning Poker Free';
 
 export const SITE_IMAGE_PATH = '/og-image-en.jpg';
@@ -17,5 +19,5 @@ export function absoluteUrl(path = '/'): string {
 }
 
 export function isCanonicalHost(hostname: string): boolean {
-  return hostname === 'planningpoker.free' || hostname === 'www.planningpoker.free';
+  return hostname === CANONICAL_HOST;
 }
