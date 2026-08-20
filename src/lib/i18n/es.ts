@@ -22,9 +22,9 @@ export const es: Messages = {
     language: 'Idioma'
   },
   seo: {
-    title: 'Planning Poker Free — estimación ágil en tiempo real',
+    title: 'Planning Poker online gratis — Sin registro | Estimación en tiempo real',
     description:
-      'Planning Poker Free: estima historias de usuario en tiempo real con tu equipo Scrum. Sin cuentas, salas por enlace y open source.',
+      'Planning Poker gratis para equipos Scrum. Sin cuentas. Crea una sala, comparte el enlace y vota en tiempo real con Fibonacci o T-shirt. Open source.',
     imageAlt: 'Planning Poker — estimación ágil en tiempo real, simple y sin registro'
   },
   landing: {

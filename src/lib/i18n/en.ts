@@ -22,9 +22,9 @@ export const en: Messages = {
     language: 'Language'
   },
   seo: {
-    title: 'Free Planning Poker — Real-time Agile Estimation',
+    title: 'Free Online Planning Poker — No Signup | Real-time Estimation',
     description:
-      'Free Planning Poker: estimate user stories in real-time with your Scrum team. No accounts required, rooms via link, and open source.',
+      'Free online Planning Poker for Scrum teams. No accounts. Create a room, share the link, vote in real time with Fibonacci or T-shirt decks. Open source.',
     imageAlt: 'Planning Poker — Real-time agile estimation, simple and registration-free'
   },
   landing: {
