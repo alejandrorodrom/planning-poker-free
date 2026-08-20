@@ -1,7 +1,6 @@
 <script lang="ts">
   import { SITE_NAME, absoluteUrl, siteImagePath } from '$lib/seo';
-  import { faqPageJsonLd, howToJsonLd, landingFaqItems } from '$lib/seo/landing-faq';
-  import { getMessages, i18n, ogLocale, t } from '$lib/i18n';
+  import { i18n, ogLocale, t } from '$lib/i18n';
 
   type Props = {
     indexable?: boolean;
@@ -16,10 +15,6 @@
   const imageAlt = $derived(t('seo.imageAlt'));
   const og = $derived(ogLocale(i18n.locale));
   const image = $derived(absoluteUrl(siteImagePath(i18n.locale)));
-  const faqLd = $derived(
-    faqPageJsonLd(landingFaqItems(getMessages().landing), canonical)
-  );
-  const howToLd = $derived(howToJsonLd(getMessages().landing, canonical));
 </script>
 
 <svelte:head>
@@ -45,11 +40,4 @@
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={image} />
   <meta name="twitter:image:alt" content={imageAlt} />
-
-  {#if indexable}
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -- JSON-LD must be raw script text -->
-    {@html `<script type="application/ld+json">${faqLd}</script>`}
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -- JSON-LD must be raw script text -->
-    {@html `<script type="application/ld+json">${howToLd}</script>`}
-  {/if}
 </svelte:head>

@@ -1,4 +1,5 @@
-import { isCanonicalHost } from '$lib/seo';
+import { isCanonicalHost, absoluteUrl } from '$lib/seo';
+import { landingJsonLdHtml } from '$lib/seo/landing-faq';
 import { LOCALE_COOKIE, resolveLocale } from '$lib/i18n/detect';
 import { en } from '$lib/i18n/en';
 import { es } from '$lib/i18n/es';
@@ -30,6 +31,12 @@ export async function handle({
     acceptLanguage: event.request.headers.get('accept-language')
   });
   const seo = catalogs[locale].seo;
+  const path = event.url.pathname;
+  const host = event.url.hostname;
+  const jsonld =
+    isCanonicalHost(host) && path === '/'
+      ? landingJsonLdHtml(catalogs[locale].landing, absoluteUrl('/'))
+      : '';
 
   const response = await resolve(event, {
     transformPageChunk: ({ html }) =>
@@ -37,14 +44,12 @@ export async function handle({
         .replace('%lang%', locale)
         .replace(/%description%/g, seo.description)
         .replace('%inLanguage%', locale)
+        .replace('%jsonld%', jsonld)
   });
 
   if (response.status === 101 || ('webSocket' in response && response.webSocket)) {
     return response;
   }
-
-  const path = event.url.pathname;
-  const host = event.url.hostname;
 
   if (!isCanonicalHost(host) || path.startsWith('/room') || path.startsWith('/api')) {
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');

@@ -60,3 +60,17 @@ export function howToJsonLd(
     ]
   });
 }
+
+export function jsonLdScriptTag(json: string): string {
+  return `<script type="application/ld+json">${json.replace(/</g, '\\u003c')}</script>`;
+}
+
+export function landingJsonLdHtml(
+  landing: Messages['landing'],
+  pageUrl: string
+): string {
+  return (
+    jsonLdScriptTag(faqPageJsonLd(landingFaqItems(landing), pageUrl)) +
+    jsonLdScriptTag(howToJsonLd(landing, pageUrl))
+  );
+}
