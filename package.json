@@ -55,7 +55,7 @@
     "@fontsource/pattaya": "^5.3.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260804.1",
+    "@cloudflare/workers-types": "^5.20260818.1",
     "@eslint/js": "^10.0.1",
     "@oselvar/sveltekit-add-worker-exports": "^2.1.2",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
