@@ -10,6 +10,10 @@
   },
   "workers_dev": true,
   "preview_urls": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
   "durable_objects": {
     "bindings": [
       {
@@ -30,6 +34,10 @@
     "staging": {
       "name": "planning-poker-free-staging",
       "workers_dev": true,
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1
+      },
       "durable_objects": {
         "bindings": [
           {
