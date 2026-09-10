@@ -28,8 +28,6 @@
       "new_sqlite_classes": ["Room"]
     }
   ],
-  // Staging = Worker aparte (DOs propios). Preview URLs no aplican con Durable Objects.
-  // Deploy: wrangler deploy --env staging  →  planning-poker-free-staging.<subdominio>.workers.dev
   "env": {
     "staging": {
       "name": "planning-poker-free-staging",
