@@ -47,12 +47,27 @@ export async function handle({
         .replace('%jsonld%', jsonld)
   });
 
-  if (response.status === 101 || ('webSocket' in response && response.webSocket)) {
+  // DO/WebSocket responses have immutable headers; never mutate them.
+  if (
+    path.includes('/ws') ||
+    response.status === 101 ||
+    ('webSocket' in response && response.webSocket)
+  ) {
     return response;
   }
 
   if (!isCanonicalHost(host) || path.startsWith('/room') || path.startsWith('/api')) {
-    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    try {
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    } catch {
+      const headers = new Headers(response.headers);
+      headers.set('X-Robots-Tag', 'noindex, nofollow');
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers
+      });
+    }
   }
 
   return response;
