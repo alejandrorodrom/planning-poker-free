@@ -28,7 +28,7 @@
 
 <p align="center">
   <a href="https://github.com/alejandrorodrom/planning-poker-free/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-  <a href="https://nodejs.org/"><img alt="Node.js >= 24" src="https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg" /></a>
+  <a href="https://nodejs.org/"><img alt="Node.js >= 26" src="https://img.shields.io/badge/node-%3E%3D26-brightgreen.svg" /></a>
   <a href="https://svelte.dev/"><img alt="Svelte 5" src="https://img.shields.io/badge/svelte-5-FF3E00.svg" /></a>
   <a href="https://developers.cloudflare.com/workers/"><img alt="Cloudflare Workers" src="https://img.shields.io/badge/cloudflare-workers-F38020.svg" /></a>
 </p>
@@ -88,7 +88,7 @@ Built for estimation ceremonies, refinement, and remote teams.
 
 ## Requirements
 
-- **Node.js ≥ 24** (see [`.nvmrc`](.nvmrc))
+- **Node.js ≥ 26** (see [`.nvmrc`](.nvmrc))
 - To publish: a Cloudflare account, or a [temporary deploy](#temporary-deploy-no-cloudflare-account) without one
 
 ```sh

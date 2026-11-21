@@ -18,7 +18,7 @@ Al participar, aceptas el [Código de conducta](CODE_OF_CONDUCT.es.md).
 
 ## Configuración local
 
-Requisitos: **Node.js ≥ 24** (ver `.nvmrc`).
+Requisitos: **Node.js ≥ 26** (ver `.nvmrc`).
 
 ```sh
 nvm use

@@ -1,6 +1,6 @@
 import { t } from '$lib/i18n';
-import type { DeckId } from './decks';
-import type { StoryStatus } from './protocol';
+import type { DeckId } from '$lib/room/decks';
+import type { StoryStatus } from '$lib/room/protocol';
 
 export function deckLabel(deckId: DeckId): string {
   return t(`decks.${deckId}`);
