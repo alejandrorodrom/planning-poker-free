@@ -1,8 +1,8 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { ERROR_CODES, type ErrorCode } from '$lib/errors';
-  import { t, te } from '$lib/i18n';
+  import { ERROR_CODES, type ErrorCode } from '#lib/errors.ts';
+  import { t, te } from '#lib/i18n/index.ts';
 
   function translateErrorMessage(message: string | undefined): string {
     if (!message) return t('errorPage.errorDesc');
@@ -14,9 +14,7 @@
     page.status === 404 ? t('errorPage.notFoundTitle') : t('errorPage.errorTitle')
   );
   const description = $derived(
-    page.status === 404
-      ? t('errorPage.notFoundDesc')
-      : translateErrorMessage(page.error?.message)
+    page.status === 404 ? t('errorPage.notFoundDesc') : translateErrorMessage(page.error?.message)
   );
 </script>
 
@@ -29,7 +27,7 @@
   <img class="doge" src="/assets/gif/doge.gif" alt="Doge" />
   <h1 class="title">{page.status === 404 ? '404' : page.status}</h1>
   <p class="description">{description}</p>
-  <a class="back" href={resolve('/')}>{t('common.backToHome')}</a>
+  <a class="back" href={resolve('')}>{t('common.backToHome')}</a>
 </section>
 
 <style>

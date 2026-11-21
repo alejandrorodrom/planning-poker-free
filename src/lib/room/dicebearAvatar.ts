@@ -1,6 +1,6 @@
 import { Avatar, Style } from '@dicebear/core';
 import definition from '@dicebear/styles/avataaars.json' with { type: 'json' };
-import { sanitizeAvatar, type PlayerAvatarConfig } from '$lib/room/avatar';
+import { sanitizeAvatar, type PlayerAvatarConfig } from '#lib/room/avatar.ts';
 
 const style = new Style(definition);
 

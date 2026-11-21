@@ -1,8 +1,8 @@
-import { isCanonicalHost, absoluteUrl } from '$lib/seo';
-import { landingJsonLdHtml } from '$lib/seo/landing-faq';
-import { LOCALE_COOKIE, resolveLocale } from '$lib/i18n/detect';
-import { en } from '$lib/i18n/en';
-import { es } from '$lib/i18n/es';
+import { isCanonicalHost, absoluteUrl } from '#lib/seo.ts';
+import { landingJsonLdHtml } from '#lib/seo/landing-faq.ts';
+import { LOCALE_COOKIE, resolveLocale } from '#lib/i18n/detect.ts';
+import { en } from '#lib/i18n/en.ts';
+import { es } from '#lib/i18n/es.ts';
 
 const catalogs = { en, es } as const;
 

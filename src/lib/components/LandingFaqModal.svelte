@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import { landingFaqItems } from '$lib/seo/landing-faq';
-  import { getMessages, t } from '$lib/i18n';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import { landingFaqItems } from '#lib/seo/landing-faq.ts';
+  import { getMessages, t } from '#lib/i18n/index.ts';
 
   type Props = {
     open: boolean;
@@ -29,7 +29,7 @@
   titleId="landing-faq-modal-title"
   description={t('landing.faqDescription')}
   size="lg"
-  onclose={onclose}
+  {onclose}
 >
   <div class="faq">
     {#each faqs as item, index (item.question)}

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import { t } from '$lib/i18n';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import { t } from '#lib/i18n/index.ts';
 
   type Props = {
     open: boolean;
@@ -23,7 +23,7 @@
   titleId="landing-how-modal-title"
   description={t('landing.howItWorksDescription')}
   size="lg"
-  onclose={onclose}
+  {onclose}
 >
   <ol class="how" class:how--open={open}>
     {#each steps as step, index (step.title)}

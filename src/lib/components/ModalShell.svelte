@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { t } from '$lib/i18n';
+  import { t } from '#lib/i18n/index.ts';
 
   type Size = 'sm' | 'md' | 'lg' | 'xl';
   type Variant = 'panel' | 'simple' | 'soft';
@@ -63,7 +63,12 @@
   >
     <div class="modal-shell__frost" aria-hidden="true"></div>
     {#if open}
-      <button type="button" class="modal-shell__backdrop" aria-label={t('common.close')} onclick={onclose}></button>
+      <button
+        type="button"
+        class="modal-shell__backdrop"
+        aria-label={t('common.close')}
+        onclick={onclose}
+      ></button>
     {/if}
     <div
       class="modal-shell"
@@ -260,8 +265,7 @@
 
   .modal-shell--panel {
     background:
-      radial-gradient(ellipse 90% 60% at 0% 0%, rgba(33, 172, 195, 0.12), transparent 55%),
-      #fff;
+      radial-gradient(ellipse 90% 60% at 0% 0%, rgba(33, 172, 195, 0.12), transparent 55%), #fff;
     border: 1px solid rgba(22, 93, 112, 0.22);
     border-radius: 22px;
     box-shadow: 0 24px 60px rgba(11, 61, 74, 0.28);

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { SITE_NAME, absoluteUrl, siteImagePath } from '$lib/seo';
-  import { i18n, ogLocale, t } from '$lib/i18n';
+  import { SITE_NAME, absoluteUrl, siteImagePath } from '#lib/seo.ts';
+  import { i18n, ogLocale, t } from '#lib/i18n/index.ts';
 
   type Props = {
     indexable?: boolean;

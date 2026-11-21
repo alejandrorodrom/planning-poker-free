@@ -1,9 +1,4 @@
-export type DeckId =
-  | 'fibonacci'
-  | 'fibonacci_strict'
-  | 'powers_of_2'
-  | 'tshirt'
-  | 'sequential';
+export type DeckId = 'fibonacci' | 'fibonacci_strict' | 'powers_of_2' | 'tshirt' | 'sequential';
 
 export type DeckCard = {
   value: string;

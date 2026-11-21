@@ -1,6 +1,6 @@
 <script lang="ts">
-  import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
-  import { t } from '$lib/i18n';
+  import LanguageSwitcher from '#lib/components/LanguageSwitcher.svelte';
+  import { t } from '#lib/i18n/index.ts';
 
   type Props = {
     compact?: boolean;

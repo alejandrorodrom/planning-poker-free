@@ -18,7 +18,7 @@ Only the `main` branch (latest deployed / repository version) receives security 
 
 Preferred options, in this order:
 
-1. **GitHub Security Advisories** — report privately from the repository *Security* tab (if *Private vulnerability reporting* is enabled).
+1. **GitHub Security Advisories** — report privately from the repository _Security_ tab (if _Private vulnerability reporting_ is enabled).
 2. Private contact with the maintainer listed in the [README](README.md) (GitHub or LinkedIn).
 
 Include, if you can:

@@ -1,4 +1,4 @@
-import type { ErrorCode } from '$lib/errors';
+import type { ErrorCode } from '#lib/errors.ts';
 import { en } from './en';
 import { es } from './es';
 import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALES, isLocale } from './detect';

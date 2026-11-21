@@ -50,11 +50,11 @@ npm run build
 
 ## Sensitive areas
 
-| Area | Notes |
-| --- | --- |
+| Area                          | Notes                                                                 |
+| ----------------------------- | --------------------------------------------------------------------- |
 | `src/lib/server/room/Room.ts` | Room logic, WebSockets, alarms; changes need manual multi-tab testing |
-| Client/server protocol | Keep compatibility or document breaking changes |
-| Branding / logo assets | See `TRADEMARK.md` |
+| Client/server protocol        | Keep compatibility or document breaking changes                       |
+| Branding / logo assets        | See `TRADEMARK.md`                                                    |
 
 ## Security reports
 

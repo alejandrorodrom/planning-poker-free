@@ -1,4 +1,4 @@
-import type { Messages } from '$lib/i18n/types';
+import type { Messages } from '#lib/i18n/types.ts';
 
 export type FaqItem = { question: string; answer: string };
 
@@ -28,10 +28,7 @@ export function faqPageJsonLd(items: FaqItem[], pageUrl: string): string {
   });
 }
 
-export function howToJsonLd(
-  landing: Messages['landing'],
-  pageUrl: string
-): string {
+export function howToJsonLd(landing: Messages['landing'], pageUrl: string): string {
   return JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -65,10 +62,7 @@ export function jsonLdScriptTag(json: string): string {
   return `<script type="application/ld+json">${json.replace(/</g, '\\u003c')}</script>`;
 }
 
-export function landingJsonLdHtml(
-  landing: Messages['landing'],
-  pageUrl: string
-): string {
+export function landingJsonLdHtml(landing: Messages['landing'], pageUrl: string): string {
   return (
     jsonLdScriptTag(faqPageJsonLd(landingFaqItems(landing), pageUrl)) +
     jsonLdScriptTag(howToJsonLd(landing, pageUrl))

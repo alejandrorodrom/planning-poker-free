@@ -2,24 +2,20 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import LandingFaqModal from '$lib/components/LandingFaqModal.svelte';
-  import LandingHowItWorksModal from '$lib/components/LandingHowItWorksModal.svelte';
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import SeoHead from '$lib/components/SeoHead.svelte';
-  import { ERROR_CODES, isErrorCode, type ErrorCode } from '$lib/errors';
-  import { loadStoredAvatar } from '$lib/room/avatar';
-  import { DECK_IDS, DEFAULT_DECK, type DeckId } from '$lib/room/decks';
-  import {
-    PASSWORD_MAX,
-    PLAYER_NAME_MAX,
-    ROOM_NAME_MAX
-  } from '$lib/room/limits';
-  import type { EstimateRule, RevealMode } from '$lib/room/protocol';
-  import { saveSession } from '$lib/room/session';
-  import { isCanonicalHost } from '$lib/seo';
-  import { deckLabel } from '$lib/i18n/labels';
-  import { te, t } from '$lib/i18n';
-  import { BP_MOBILE, mqMax } from '$lib/breakpoints';
+  import LandingFaqModal from '#lib/components/LandingFaqModal.svelte';
+  import LandingHowItWorksModal from '#lib/components/LandingHowItWorksModal.svelte';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import SeoHead from '#lib/components/SeoHead.svelte';
+  import { ERROR_CODES, isErrorCode, type ErrorCode } from '#lib/errors.ts';
+  import { loadStoredAvatar } from '#lib/room/avatar.ts';
+  import { DECK_IDS, DEFAULT_DECK, type DeckId } from '#lib/room/decks.ts';
+  import { PASSWORD_MAX, PLAYER_NAME_MAX, ROOM_NAME_MAX } from '#lib/room/limits.ts';
+  import type { EstimateRule, RevealMode } from '#lib/room/protocol.ts';
+  import { saveSession } from '#lib/room/session.ts';
+  import { isCanonicalHost } from '#lib/seo.ts';
+  import { deckLabel } from '#lib/i18n/labels.ts';
+  import { te, t } from '#lib/i18n/index.ts';
+  import { BP_MOBILE, mqMax } from '#lib/breakpoints.ts';
 
   const indexable = $derived(isCanonicalHost(page.url.hostname));
 
@@ -171,7 +167,7 @@
   }
 </script>
 
-<SeoHead indexable={indexable} />
+<SeoHead {indexable} />
 
 <section class="hero" class:hero--dense={step > 1}>
   <img
@@ -231,7 +227,9 @@
         bind:value={name}
         placeholder={t('landing.displayNamePlaceholder')}
         aria-invalid={errorCode === ERROR_CODES.display_name_required}
-        aria-describedby={errorCode === ERROR_CODES.display_name_required ? 'form-error' : undefined}
+        aria-describedby={errorCode === ERROR_CODES.display_name_required
+          ? 'form-error'
+          : undefined}
       />
     {:else if step === 2}
       <label class="form__label" for="room-name">{t('landing.roomNameLabel')}</label>
@@ -255,14 +253,24 @@
         aria-label={`${t('landing.publicLabel')} / ${t('landing.privateLabel')}`}
       >
         <label class="form__choice">
-          <input type="radio" name="privacy" checked={!isPrivate} onchange={() => (isPrivate = false)} />
+          <input
+            type="radio"
+            name="privacy"
+            checked={!isPrivate}
+            onchange={() => (isPrivate = false)}
+          />
           <span>
             <strong>{t('landing.publicLabel')}</strong>
             <small>{t('landing.publicHint')}</small>
           </span>
         </label>
         <label class="form__choice">
-          <input type="radio" name="privacy" checked={isPrivate} onchange={() => (isPrivate = true)} />
+          <input
+            type="radio"
+            name="privacy"
+            checked={isPrivate}
+            onchange={() => (isPrivate = true)}
+          />
           <span>
             <strong>{t('landing.privateLabel')}</strong>
             <small>{t('landing.privateHint')}</small>
@@ -282,9 +290,7 @@
           bind:value={password}
           placeholder={t('landing.passwordPlaceholder')}
           aria-invalid={errorCode === ERROR_CODES.password_required}
-          aria-describedby={
-            errorCode === ERROR_CODES.password_required ? 'form-error' : undefined
-          }
+          aria-describedby={errorCode === ERROR_CODES.password_required ? 'form-error' : undefined}
         />
       {/if}
     {:else}

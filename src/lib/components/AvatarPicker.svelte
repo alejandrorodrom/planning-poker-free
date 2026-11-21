@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
+  import PlayerAvatar from '#lib/components/PlayerAvatar.svelte';
   import {
     ACCESSORIES_COLORS,
     AVATAR_ACCESSORIES,
@@ -21,9 +21,9 @@
     randomAvatar,
     type AvatarOption,
     type PlayerAvatarConfig
-  } from '$lib/room/avatar';
-  import { createAvatarDataUri } from '$lib/room/dicebearAvatar';
-  import { t } from '$lib/i18n';
+  } from '#lib/room/avatar.ts';
+  import { createAvatarDataUri } from '#lib/room/dicebearAvatar.ts';
+  import { t } from '#lib/i18n/index.ts';
 
   type Props = {
     value?: PlayerAvatarConfig;
@@ -313,7 +313,7 @@
         <section class="section">
           <h3 class="section__label">{showHatColor ? t('avatar.hat') : t('avatar.hair')}</h3>
           <div class="swatches">
-            {#each (showHatColor ? HAT_COLORS : HAIR_COLORS) as color (color.id)}
+            {#each showHatColor ? HAT_COLORS : HAIR_COLORS as color (color.id)}
               <button
                 type="button"
                 class="swatch"

@@ -1,7 +1,7 @@
 <script lang="ts">
   import LiquidButton from './LiquidButton.svelte';
   import RoomNotice from './RoomNotice.svelte';
-  import { t } from '$lib/i18n';
+  import { t } from '#lib/i18n/index.ts';
 
   type Props = {
     reason?: string;
@@ -36,7 +36,7 @@
 </script>
 
 <RoomNotice title={copy.title} description={copy.description}>
-  <LiquidButton text={t('roomGone.createNewRoom')} href="/" />
+  <LiquidButton text={t('roomGone.createNewRoom')} href="" />
   <a class="gone__link" href="/">{t('common.backToHome')}</a>
 </RoomNotice>
 

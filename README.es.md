@@ -55,16 +55,16 @@ Pensada para ceremonias de estimación, refinamiento y equipos remotos.
 
 ## Características
 
-| Área | Detalle |
-| --- | --- |
-| **Salas** | Públicas o privadas con contraseña; acceso por enlace `/room/{id}` |
-| **Sesión** | Rejoin automático vía `localStorage`; la última pestaña activa gana |
-| **Roles** | Moderador, votante y observador; cesión y claim de moderación |
-| **Barajas** | Fibonacci modificado, Fibonacci, potencias de 2, T-shirt, secuencial |
-| **Estimación** | Consenso, moda, mediana o media; voto oculto / revelado / auto-reveal |
-| **Equipos** | Audiencia por ronda (todos o equipos); resultados overall y por equipo |
-| **Export** | Copia de resultados en Markdown o CSV |
-| **i18n** | Interfaz en inglés y español; detección automática + selector de idioma |
+| Área           | Detalle                                                                 |
+| -------------- | ----------------------------------------------------------------------- |
+| **Salas**      | Públicas o privadas con contraseña; acceso por enlace `/room/{id}`      |
+| **Sesión**     | Rejoin automático vía `localStorage`; la última pestaña activa gana     |
+| **Roles**      | Moderador, votante y observador; cesión y claim de moderación           |
+| **Barajas**    | Fibonacci modificado, Fibonacci, potencias de 2, T-shirt, secuencial    |
+| **Estimación** | Consenso, moda, mediana o media; voto oculto / revelado / auto-reveal   |
+| **Equipos**    | Audiencia por ronda (todos o equipos); resultados overall y por equipo  |
+| **Export**     | Copia de resultados en Markdown o CSV                                   |
+| **i18n**       | Interfaz en inglés y español; detección automática + selector de idioma |
 
 ### Moderación
 
@@ -79,11 +79,11 @@ Pensada para ceremonias de estimación, refinamiento y equipos remotos.
 
 ## Stack
 
-| Capa | Tecnología |
-| --- | --- |
-| UI | [Svelte 5](https://svelte.dev/) + [SvelteKit](https://kit.svelte.dev/) |
-| Runtime | [Cloudflare Workers](https://developers.cloudflare.com/workers/) |
-| Estado en vivo | [Durable Objects](https://developers.cloudflare.com/durable-objects/) (`Room`, binding `ROOM`) |
+| Capa           | Tecnología                                                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| UI             | [Svelte 5](https://svelte.dev/) + [SvelteKit](https://kit.svelte.dev/)                                                            |
+| Runtime        | [Cloudflare Workers](https://developers.cloudflare.com/workers/)                                                                  |
+| Estado en vivo | [Durable Objects](https://developers.cloudflare.com/durable-objects/) (`Room`, binding `ROOM`)                                    |
 | Tipado Workers | `wrangler types` + [`@oselvar/sveltekit-add-worker-exports`](https://www.npmjs.com/package/@oselvar/sveltekit-add-worker-exports) |
 
 ## Requisitos
@@ -109,15 +109,15 @@ En desarrollo, el plugin de Workers levanta un sidecar de Wrangler para Durable 
 
 ### Scripts
 
-| Comando | Descripción |
-| --- | --- |
-| `npm run check` | `svelte-check` y sync de tipos |
-| `npm run lint` | Prettier + ESLint |
-| `npm run format` | Formato con Prettier |
-| `npm run build` | Build de producción (Workers + assets) |
-| `npm run preview` | Preview local con Wrangler |
-| `npm run deploy` | Build + deploy a Cloudflare (producción) |
-| `npm run deploy:staging` | Build + deploy al Worker de staging |
+| Comando                  | Descripción                              |
+| ------------------------ | ---------------------------------------- |
+| `npm run check`          | `svelte-check` y sync de tipos           |
+| `npm run lint`           | Prettier + ESLint                        |
+| `npm run format`         | Formato con Prettier                     |
+| `npm run build`          | Build de producción (Workers + assets)   |
+| `npm run preview`        | Preview local con Wrangler               |
+| `npm run deploy`         | Build + deploy a Cloudflare (producción) |
+| `npm run deploy:staging` | Build + deploy al Worker de staging      |
 
 ## Deploy
 
@@ -164,18 +164,18 @@ npm run deploy:staging   # staging (Worker aparte)
 
 ### GitHub Actions
 
-**Producción** — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): build y deploy en cada push a `main` (también *Actions → Deploy → Run workflow*). Environment de GitHub **`production`**.
+**Producción** — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): build y deploy en cada push a `main` (también _Actions → Deploy → Run workflow_). Environment de GitHub **`production`**.
 
-**Staging** — [`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml): solo *workflow_dispatch*. En *Actions → Deploy staging → Run workflow* eliges la **rama** a desplegar. Publica el Worker `planning-poker-free-staging` (Durable Objects propios, sin tocar producción). Environment de GitHub **`staging`**.
+**Staging** — [`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml): solo _workflow_dispatch_. En _Actions → Deploy staging → Run workflow_ eliges la **rama** a desplegar. Publica el Worker `planning-poker-free-staging` (Durable Objects propios, sin tocar producción). Environment de GitHub **`staging`**.
 
 URL de staging: `https://planning-poker-free-staging.<tu-subdominio>.workers.dev`.
 
 Secrets en cada environment (`Settings → Environments → production` / `staging`):
 
-| Secret | Origen |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens (*Edit Cloudflare Workers*) |
-| `CLOUDFLARE_ACCOUNT_ID` | Dashboard Workers → Account ID |
+| Secret                  | Origen                                                           |
+| ----------------------- | ---------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | Cloudflare → My Profile → API Tokens (_Edit Cloudflare Workers_) |
+| `CLOUDFLARE_ACCOUNT_ID` | Dashboard Workers → Account ID                                   |
 
 Usa las credenciales de **la cuenta donde quieras publicar** (incluida una reclamada tras un deploy temporal). Los secrets no se incluyen en el código: cada fork debe configurar los suyos.
 
@@ -184,7 +184,7 @@ Usa las credenciales de **la cuenta donde quieras publicar** (incluida una recla
 1. Configura los secrets en GitHub (si usas Actions). Para staging, crea el environment `staging` con los mismos secrets.
 2. Haz push a `main` o lanza el workflow de producción manualmente.
 3. Verifica [https://planningpoker.free](https://planningpoker.free) o la URL `*.workers.dev` en el log del job o de Wrangler.
-4. (Opcional) Prueba una rama en staging: *Actions → Deploy staging → Run workflow* → elige rama.
+4. (Opcional) Prueba una rama en staging: _Actions → Deploy staging → Run workflow_ → elige rama.
 5. Dominio custom (producción oficial): Cloudflare → Workers → Domains & Routes → Custom Domains → `planningpoker.free`.
 6. Redirect `www`: Cloudflare → Rules → Redirect Rules → Create rule → **If** `(http.host eq "www.planningpoker.free")` → **Then** URL dinámica `concat("https://planningpoker.free", http.request.uri.path)` → **301** → conservar query string. Así `www` redirige al apex aunque el Worker no tenga ese subdominio (evita el error 525).
 
@@ -207,19 +207,19 @@ Una instancia de `Room` por sala. El estado vive en el Durable Object; el flujo 
 
 ## Comunidad
 
-| Documento | Contenido |
-| --- | --- |
-| [CONTRIBUTING.es.md](CONTRIBUTING.es.md) | Entorno local y proceso de PRs |
-| [CODE_OF_CONDUCT.es.md](CODE_OF_CONDUCT.es.md) | Normas de participación |
-| [SECURITY.es.md](SECURITY.es.md) | Reporte privado de vulnerabilidades |
-| [TRADEMARK.es.md](TRADEMARK.es.md) | Uso del nombre y el logo |
+| Documento                                      | Contenido                           |
+| ---------------------------------------------- | ----------------------------------- |
+| [CONTRIBUTING.es.md](CONTRIBUTING.es.md)       | Entorno local y proceso de PRs      |
+| [CODE_OF_CONDUCT.es.md](CODE_OF_CONDUCT.es.md) | Normas de participación             |
+| [SECURITY.es.md](SECURITY.es.md)               | Reporte privado de vulnerabilidades |
+| [TRADEMARK.es.md](TRADEMARK.es.md)             | Uso del nombre y el logo            |
 
 ## Autores
 
-| Rol | Persona |
-| --- | --- |
+| Rol        | Persona                                                                               |
+| ---------- | ------------------------------------------------------------------------------------- |
 | Desarrollo | [Alejandro Rodriguez Romero](https://www.linkedin.com/in/alejandro-rodriguez-romero/) |
-| Imágenes | [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/) |
+| Imágenes   | [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/)   |
 
 ## Sponsors
 

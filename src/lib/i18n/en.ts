@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '$lib/errors';
+import { ERROR_CODES } from '#lib/errors.ts';
 import type { Messages } from './types';
 
 export const en: Messages = {
@@ -63,11 +63,14 @@ export const en: Messages = {
     howItWorksTitle: 'How it works',
     howItWorksDescription: 'From zero to first estimate in under a minute. No accounts.',
     howStep1Title: 'Create a room',
-    howStep1Body: 'Pick a display name, name the room, and choose your deck. You get a shareable link instantly.',
+    howStep1Body:
+      'Pick a display name, name the room, and choose your deck. You get a shareable link instantly.',
     howStep2Title: 'Invite the team',
-    howStep2Body: 'Drop the link in Slack, Teams, or Zoom chat. Teammates join from any browser — no install.',
+    howStep2Body:
+      'Drop the link in Slack, Teams, or Zoom chat. Teammates join from any browser — no install.',
     howStep3Title: 'Vote and reveal',
-    howStep3Body: 'Everyone picks a card in private. Reveal together, discuss outliers, and lock the estimate.',
+    howStep3Body:
+      'Everyone picks a card in private. Reveal together, discuss outliers, and lock the estimate.',
     faqTitle: 'Frequently asked questions',
     faqDescription: 'Short answers about free Planning Poker online.',
     faq1Q: 'Is Planning Poker Free really free?',
@@ -173,8 +176,7 @@ export const en: Messages = {
       '“{name}” will be removed from the room. They will need to rejoin with the link.',
     deleteStoryDesc:
       '“{title}” and its estimate will be deleted. If there is an active vote on it, it will be cancelled.',
-    deleteTeamDesc:
-      '“{name}” will be deleted. Assigned participants will be left without a team.',
+    deleteTeamDesc: '“{name}” will be deleted. Assigned participants will be left without a team.',
     cancelVotingDesc: 'The round will close and votes will be discarded without saving them.',
     finalize: 'End',
     remove: 'Remove',

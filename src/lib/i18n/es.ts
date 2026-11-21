@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '$lib/errors';
+import { ERROR_CODES } from '#lib/errors.ts';
 import type { Messages } from './types';
 
 export const es: Messages = {
@@ -172,12 +172,10 @@ export const es: Messages = {
     deleteTeam: 'Eliminar equipo',
     cancelVoting: 'Cancelar votación',
     finalizeRoomDesc: 'Se cerrará la sesión y se borrarán los datos de la sala.',
-    removePlayerDesc:
-      'Se quitará a “{name}” de la sala. Tendrá que volver a unirse con el link.',
+    removePlayerDesc: 'Se quitará a “{name}” de la sala. Tendrá que volver a unirse con el link.',
     deleteStoryDesc:
       'Se eliminará “{title}” y su estimación. Si hay una votación activa sobre ella, se cancelará.',
-    deleteTeamDesc:
-      'Se eliminará “{name}”. Los participantes asignados quedarán sin equipo.',
+    deleteTeamDesc: 'Se eliminará “{name}”. Los participantes asignados quedarán sin equipo.',
     cancelVotingDesc: 'Se cerrará la ronda y se descartarán los votos sin guardarlos.',
     finalize: 'Finalizar',
     remove: 'Quitar',
@@ -402,7 +400,8 @@ export const es: Messages = {
     [ERROR_CODES.story_not_found]: 'Historia no encontrada',
     [ERROR_CODES.story_required]: 'Elige la historia a votar',
     [ERROR_CODES.no_active_round]: 'No hay ronda activa',
-    [ERROR_CODES.round_in_progress]: 'Termina o cancela la ronda actual antes de cambiar de historia',
+    [ERROR_CODES.round_in_progress]:
+      'Termina o cancela la ronda actual antes de cambiar de historia',
     [ERROR_CODES.round_already_revealed]: 'La ronda ya fue revelada',
     [ERROR_CODES.observers_cannot_vote]: 'Los observers no votan',
     [ERROR_CODES.not_in_audience]: 'No estás en la audiencia de esta ronda',

@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '$lib/errors';
+import { ERROR_CODES } from '#lib/errors.ts';
 import type { ClientToServer, RoomPublicState, ServerToClient, StoryPublic } from './protocol';
 import { roomWebSocketUrl } from './wsUrl';
 
@@ -107,10 +107,7 @@ export class RoomClient {
 
   private scheduleReconnect(): void {
     if (this.closedByUser || this.reconnectTimer) return;
-    const delay = Math.min(
-      RECONNECT_MAX_MS,
-      RECONNECT_BASE_MS * 2 ** this.reconnectAttempt
-    );
+    const delay = Math.min(RECONNECT_MAX_MS, RECONNECT_BASE_MS * 2 ** this.reconnectAttempt);
     this.reconnectAttempt += 1;
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;

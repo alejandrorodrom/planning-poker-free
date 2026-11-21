@@ -1,14 +1,14 @@
-import { json, error } from '@sveltejs/kit';
-import { ERROR_CODES } from '$lib/errors';
-import { sanitizeAvatar } from '$lib/room/avatar';
-import { normalizeCreateRoomConfig } from '$lib/room/createConfig';
-import { randomId } from '$lib/server/room/crypto';
-import { roomStubFetch } from '$lib/server/room/stubFetch';
+import { error } from '@sveltejs/kit';
+import { env } from 'cloudflare:workers';
+import { ERROR_CODES } from '#lib/errors.ts';
+import { sanitizeAvatar } from '#lib/room/avatar.ts';
+import { normalizeCreateRoomConfig } from '#lib/room/createConfig.ts';
+import { randomId } from '#lib/server/room/crypto.ts';
+import { roomStubFetch } from '#lib/server/room/stubFetch.ts';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request, platform }) => {
-  const env = platform?.env;
-  if (!env?.ROOM) error(500, ERROR_CODES.internal_error);
+export const POST: RequestHandler = async ({ request }) => {
+  if (!env.ROOM) error(500, ERROR_CODES.internal_error);
 
   const body = (await request.json()) as {
     name?: string;
@@ -56,5 +56,5 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     error(res.status, (data as { error?: string }).error ?? ERROR_CODES.create_room_failed);
   }
 
-  return json(data);
+  return Response.json(data);
 };

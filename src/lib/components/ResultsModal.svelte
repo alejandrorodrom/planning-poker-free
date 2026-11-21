@@ -1,11 +1,11 @@
 <script lang="ts">
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import StoryStatusChip from '$lib/components/StoryStatusChip.svelte';
-  import { t } from '$lib/i18n';
-  import { downloadResultsImage } from '$lib/room/resultsImage';
-  import { formatEstimateLabel, isPointEstimate } from '$lib/room/decks';
-  import type { StoryPublic } from '$lib/room/protocol';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import StoryStatusChip from '#lib/components/StoryStatusChip.svelte';
+  import { t } from '#lib/i18n/index.ts';
+  import { downloadResultsImage } from '#lib/room/resultsImage.ts';
+  import { formatEstimateLabel, isPointEstimate } from '#lib/room/decks.ts';
+  import type { StoryPublic } from '#lib/room/protocol.ts';
 
   type Props = {
     open: boolean;
@@ -18,16 +18,7 @@
     onerror?: (message: string) => void;
   };
 
-  let {
-    open,
-    roomName,
-    stories,
-    oncopyMd,
-    oncopyCsv,
-    onclose,
-    onflash,
-    onerror
-  }: Props = $props();
+  let { open, roomName, stories, oncopyMd, oncopyCsv, onclose, onflash, onerror }: Props = $props();
 
   let capturing = $state(false);
 
@@ -94,13 +85,7 @@
         </svg>
         <span class="export-btn__label">MD</span>
       </button>
-      <button
-        type="button"
-        class="export-btn"
-        onclick={oncopyCsv}
-        aria-label="CSV"
-        title="CSV"
-      >
+      <button type="button" class="export-btn" onclick={oncopyCsv} aria-label="CSV" title="CSV">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
           <path
             fill="currentColor"

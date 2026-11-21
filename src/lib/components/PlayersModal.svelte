@@ -1,10 +1,10 @@
 <script lang="ts">
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
-  import { t } from '$lib/i18n';
-  import type { PlayerPublic, PlayerRole, Team } from '$lib/room/protocol';
-  import { sanitizeRoleLabel } from '$lib/room/roleLabel';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import PlayerAvatar from '#lib/components/PlayerAvatar.svelte';
+  import { t } from '#lib/i18n/index.ts';
+  import type { PlayerPublic, PlayerRole, Team } from '#lib/room/protocol.ts';
+  import { sanitizeRoleLabel } from '#lib/room/roleLabel.ts';
 
   type Props = {
     open: boolean;
@@ -12,11 +12,7 @@
     teams: Team[];
     meId: string | null;
     isSm: boolean;
-    onassign: (payload: {
-      playerId: string;
-      role?: PlayerRole;
-      teamId?: string | null;
-    }) => void;
+    onassign: (payload: { playerId: string; role?: PlayerRole; teamId?: string | null }) => void;
     onremove: (playerId: string, name: string) => void;
     onclose: () => void;
   };
@@ -83,18 +79,15 @@
                 {connectionLabel(player.connection)}
                 {#if !isSm}
                   · {player.role === 'observer' ? t('players.observes') : t('players.votes')}
-                  {#if team} · {team}{/if}
+                  {#if team}
+                    · {team}{/if}
                 {/if}
               </p>
             </div>
           </div>
 
           {#if isSm && !isMe}
-            <button
-              type="button"
-              class="remove"
-              onclick={() => onremove(player.id, player.name)}
-            >
+            <button type="button" class="remove" onclick={() => onremove(player.id, player.name)}>
               {t('common.remove')}
             </button>
           {/if}

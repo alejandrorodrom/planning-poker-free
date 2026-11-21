@@ -391,7 +391,16 @@ export const AVATAR_MOUTHS = opts(
 );
 
 export const AVATAR_ACCESSORIES = opts(
-  ['none', 'prescription01', 'prescription02', 'round', 'sunglasses', 'wayfarers', 'eyepatch', 'kurt'],
+  [
+    'none',
+    'prescription01',
+    'prescription02',
+    'round',
+    'sunglasses',
+    'wayfarers',
+    'eyepatch',
+    'kurt'
+  ],
   {
     none: 'Sin lentes',
     prescription01: 'Lentes 1',
@@ -553,7 +562,11 @@ export function sanitizeAvatar(input: unknown): PlayerAvatarConfig {
       DEFAULT_AVATAR.facialHairColor,
       HAIR_COLOR_SET
     ),
-    hatColor: normalizeHex(raw.hatColor ?? raw.clothesColor, DEFAULT_AVATAR.hatColor, HAT_COLOR_SET),
+    hatColor: normalizeHex(
+      raw.hatColor ?? raw.clothesColor,
+      DEFAULT_AVATAR.hatColor,
+      HAT_COLOR_SET
+    ),
     accessoriesColor: normalizeHex(
       raw.accessoriesColor,
       DEFAULT_AVATAR.accessoriesColor,

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { page } from '$app/state';
-  import '$lib/styles/global.css';
-  import Footer from '$lib/components/Footer.svelte';
-  import Navbar from '$lib/components/Navbar.svelte';
-  import { initLocale, syncLocaleFromBrowser } from '$lib/i18n';
+  import '#lib/styles/global.css';
+  import Footer from '#lib/components/Footer.svelte';
+  import Navbar from '#lib/components/Navbar.svelte';
+  import { initLocale, syncLocaleFromBrowser } from '#lib/i18n/index.ts';
   import montserrat400 from '@fontsource/montserrat/files/montserrat-latin-400-normal.woff2?url';
   import pattaya400 from '@fontsource/pattaya/files/pattaya-latin-400-normal.woff2?url';
 
@@ -20,9 +20,7 @@
     document.documentElement.lang = data.locale;
   });
 
-  const hideNavbar = $derived(
-    page.route.id === '/' || Boolean(page.route.id?.startsWith('/room'))
-  );
+  const hideNavbar = $derived(page.route.id === '/' || Boolean(page.route.id?.startsWith('/room')));
   const roomFooter = $derived(Boolean(page.route.id?.startsWith('/room')));
 </script>
 

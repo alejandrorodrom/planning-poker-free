@@ -10,9 +10,7 @@ export type ConnectionState = 'connected' | 'pending' | 'offline';
 export type StoryStatus = 'pending' | 'voting' | 'estimated' | 'skipped';
 export type CloseReason = 'idle' | 'expired' | 'host' | 'not_found';
 
-export type Audience =
-  | { type: 'all_voters' }
-  | { type: 'teams'; teamIds: string[] };
+export type Audience = { type: 'all_voters' } | { type: 'teams'; teamIds: string[] };
 
 export type RoundTimer = {
   durationSeconds: number;
@@ -103,13 +101,25 @@ export type ClientToServer =
   | { type: 'create_team'; name: string }
   | { type: 'rename_team'; teamId: string; name: string }
   | { type: 'delete_team'; teamId: string }
-  | { type: 'assign_player'; playerId: string; teamId?: string | null; role?: PlayerRole; roleLabel?: string }
+  | {
+      type: 'assign_player';
+      playerId: string;
+      teamId?: string | null;
+      role?: PlayerRole;
+      roleLabel?: string;
+    }
   | { type: 'remove_player'; playerId: string }
   | { type: 'create_story'; title: string; description?: string; suggestedTeamIds?: string[] }
   | { type: 'update_story'; storyId: string; title: string; description?: string }
   | { type: 'delete_story'; storyId: string }
   | { type: 'select_story'; storyId: string }
-  | { type: 'start_round'; storyId: string; audience?: Audience; timerSeconds?: number | null; autoRevealOnTimerEnd?: boolean }
+  | {
+      type: 'start_round';
+      storyId: string;
+      audience?: Audience;
+      timerSeconds?: number | null;
+      autoRevealOnTimerEnd?: boolean;
+    }
   | { type: 'set_timer'; durationSeconds: number }
   | { type: 'cancel_timer' }
   | { type: 'vote'; value: string }
@@ -118,7 +128,15 @@ export type ClientToServer =
   | { type: 'set_estimate'; estimate: string }
   | { type: 'close_voting'; estimate?: string; teamId?: string }
   | { type: 'skip_story'; storyId: string }
-  | { type: 'update_config'; name?: string; deck?: DeckId; estimateRule?: EstimateRule; revealMode?: RevealMode; autoRevealOnTimerEnd?: boolean; defaultTimerSeconds?: number | null }
+  | {
+      type: 'update_config';
+      name?: string;
+      deck?: DeckId;
+      estimateRule?: EstimateRule;
+      revealMode?: RevealMode;
+      autoRevealOnTimerEnd?: boolean;
+      defaultTimerSeconds?: number | null;
+    }
   | { type: 'close_room' };
 
 export type ServerToClient =

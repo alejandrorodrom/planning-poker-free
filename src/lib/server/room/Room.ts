@@ -1,17 +1,17 @@
 import { DurableObject } from 'cloudflare:workers';
-import { AppError, ERROR_CODES, ERROR_MESSAGES_EN, type ErrorCode } from '$lib/errors';
-import { isInAudience } from '$lib/room/audience';
-import { sanitizeAvatar } from '$lib/room/avatar';
-import { normalizeCreateRoomConfig } from '$lib/room/createConfig';
-import { deckCards, isDeckId, isValidCard, type DeckId } from '$lib/room/decks';
-import { computeSuggestedEstimate } from '$lib/room/estimate';
+import { AppError, ERROR_CODES, ERROR_MESSAGES_EN, type ErrorCode } from '#lib/errors.ts';
+import { isInAudience } from '#lib/room/audience.ts';
+import { sanitizeAvatar } from '#lib/room/avatar.ts';
+import { normalizeCreateRoomConfig } from '#lib/room/createConfig.ts';
+import { deckCards, isDeckId, isValidCard, type DeckId } from '#lib/room/decks.ts';
+import { computeSuggestedEstimate } from '#lib/room/estimate.ts';
 import {
   sanitizePlayerName,
   sanitizeRoomName,
   sanitizeStoryDescription,
   sanitizeStoryTitle,
   sanitizeTeamName
-} from '$lib/room/limits';
+} from '#lib/room/limits.ts';
 import {
   IDLE_TTL_MS,
   MAX_LIFETIME_MS,
@@ -35,8 +35,8 @@ import {
   type ServerToClient,
   type StoryPublic,
   type Team
-} from '$lib/room/protocol';
-import { sanitizeRoleLabel } from '$lib/room/roleLabel';
+} from '#lib/room/protocol.ts';
+import { sanitizeRoleLabel } from '#lib/room/roleLabel.ts';
 import { hashPassword, hashToken, randomId, verifyPassword } from './crypto';
 
 type InternalPlayer = {
@@ -449,7 +449,11 @@ export class Room extends DurableObject<Env> {
 
   private async onMessage(ws: WebSocket, msg: ClientToServer): Promise<void> {
     if (!this.state || this.state.closed) {
-      this.send(ws, { type: 'room_closed', reason: this.state?.closeReason ?? 'not_found', results: [] });
+      this.send(ws, {
+        type: 'room_closed',
+        reason: this.state?.closeReason ?? 'not_found',
+        results: []
+      });
       return;
     }
 
@@ -472,7 +476,8 @@ export class Room extends DurableObject<Env> {
         await this.requireSm(ws, async (actor) => {
           const target = this.state!.players.find((p) => p.id === msg.targetPlayerId);
           if (!target) throw new AppError(ERROR_CODES.player_not_found);
-          if (target.connection !== 'connected') throw new AppError(ERROR_CODES.player_not_connected);
+          if (target.connection !== 'connected')
+            throw new AppError(ERROR_CODES.player_not_connected);
           this.state!.scrumMasterPlayerId = target.id;
           void actor;
         });
@@ -533,9 +538,7 @@ export class Room extends DurableObject<Env> {
           const round = this.state!.activeRound;
           if (round?.audience.type === 'teams') {
             const teamIds = round.audience.teamIds.filter((id) => id !== teamId);
-            round.audience = teamIds.length
-              ? { type: 'teams', teamIds }
-              : { type: 'all_voters' };
+            round.audience = teamIds.length ? { type: 'teams', teamIds } : { type: 'all_voters' };
           }
         });
         break;
@@ -672,7 +675,8 @@ export class Room extends DurableObject<Env> {
           if (msg.estimateRule && isEstimateRule(msg.estimateRule)) {
             this.state!.estimateRule = msg.estimateRule;
           }
-          if (msg.revealMode && isRevealMode(msg.revealMode)) this.state!.revealMode = msg.revealMode;
+          if (msg.revealMode && isRevealMode(msg.revealMode))
+            this.state!.revealMode = msg.revealMode;
           if (typeof msg.autoRevealOnTimerEnd === 'boolean') {
             this.state!.autoRevealOnTimerEnd = msg.autoRevealOnTimerEnd;
           }
@@ -722,7 +726,11 @@ export class Room extends DurableObject<Env> {
       if (!msg.password || !this.state.passwordSalt || !this.state.passwordHash) {
         throw new AppError(ERROR_CODES.password_required);
       }
-      const ok = await verifyPassword(msg.password, this.state.passwordSalt, this.state.passwordHash);
+      const ok = await verifyPassword(
+        msg.password,
+        this.state.passwordSalt,
+        this.state.passwordHash
+      );
       if (!ok) throw new AppError(ERROR_CODES.password_incorrect);
     }
 

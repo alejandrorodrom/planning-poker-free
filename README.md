@@ -55,16 +55,16 @@ Built for estimation ceremonies, refinement, and remote teams.
 
 ## Features
 
-| Area | Detail |
-| --- | --- |
-| **Rooms** | Public or password-protected; join via `/room/{id}` |
-| **Session** | Auto-rejoin via `localStorage`; the last active tab wins |
-| **Roles** | Moderator, voter, and observer; transfer and claim moderation |
-| **Decks** | Modified Fibonacci, Fibonacci, powers of 2, T-shirt, sequential |
-| **Estimation** | Consensus, mode, median, or mean; hidden / live / auto-reveal |
-| **Teams** | Round audience (everyone or specific teams); overall and per-team results |
-| **Export** | Copy results as Markdown or CSV |
-| **i18n** | English and Spanish UI; auto-detect + language switcher |
+| Area           | Detail                                                                    |
+| -------------- | ------------------------------------------------------------------------- |
+| **Rooms**      | Public or password-protected; join via `/room/{id}`                       |
+| **Session**    | Auto-rejoin via `localStorage`; the last active tab wins                  |
+| **Roles**      | Moderator, voter, and observer; transfer and claim moderation             |
+| **Decks**      | Modified Fibonacci, Fibonacci, powers of 2, T-shirt, sequential           |
+| **Estimation** | Consensus, mode, median, or mean; hidden / live / auto-reveal             |
+| **Teams**      | Round audience (everyone or specific teams); overall and per-team results |
+| **Export**     | Copy results as Markdown or CSV                                           |
+| **i18n**       | English and Spanish UI; auto-detect + language switcher                   |
 
 ### Moderation
 
@@ -79,11 +79,11 @@ Built for estimation ceremonies, refinement, and remote teams.
 
 ## Stack
 
-| Layer | Technology |
-| --- | --- |
-| UI | [Svelte 5](https://svelte.dev/) + [SvelteKit](https://kit.svelte.dev/) |
-| Runtime | [Cloudflare Workers](https://developers.cloudflare.com/workers/) |
-| Live state | [Durable Objects](https://developers.cloudflare.com/durable-objects/) (`Room`, binding `ROOM`) |
+| Layer          | Technology                                                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| UI             | [Svelte 5](https://svelte.dev/) + [SvelteKit](https://kit.svelte.dev/)                                                            |
+| Runtime        | [Cloudflare Workers](https://developers.cloudflare.com/workers/)                                                                  |
+| Live state     | [Durable Objects](https://developers.cloudflare.com/durable-objects/) (`Room`, binding `ROOM`)                                    |
 | Workers typing | `wrangler types` + [`@oselvar/sveltekit-add-worker-exports`](https://www.npmjs.com/package/@oselvar/sveltekit-add-worker-exports) |
 
 ## Requirements
@@ -109,15 +109,15 @@ In development, the Workers plugin starts a Wrangler sidecar for Durable Objects
 
 ### Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run check` | `svelte-check` and type sync |
-| `npm run lint` | Prettier + ESLint |
-| `npm run format` | Format with Prettier |
-| `npm run build` | Production build (Workers + assets) |
-| `npm run preview` | Local preview with Wrangler |
-| `npm run deploy` | Build + deploy to Cloudflare (production) |
-| `npm run deploy:staging` | Build + deploy to the staging Worker |
+| Command                  | Description                               |
+| ------------------------ | ----------------------------------------- |
+| `npm run check`          | `svelte-check` and type sync              |
+| `npm run lint`           | Prettier + ESLint                         |
+| `npm run format`         | Format with Prettier                      |
+| `npm run build`          | Production build (Workers + assets)       |
+| `npm run preview`        | Local preview with Wrangler               |
+| `npm run deploy`         | Build + deploy to Cloudflare (production) |
+| `npm run deploy:staging` | Build + deploy to the staging Worker      |
 
 ## Deploy
 
@@ -164,18 +164,18 @@ npm run deploy:staging   # staging (separate Worker)
 
 ### GitHub Actions
 
-**Production** — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): build and deploy on every push to `main` (also *Actions → Deploy → Run workflow*). GitHub environment **`production`**.
+**Production** — [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): build and deploy on every push to `main` (also _Actions → Deploy → Run workflow_). GitHub environment **`production`**.
 
-**Staging** — [`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml): *workflow_dispatch* only. In *Actions → Deploy staging → Run workflow* you pick the **branch** to deploy. Publishes the `planning-poker-free-staging` Worker (own Durable Objects, production untouched). GitHub environment **`staging`**.
+**Staging** — [`.github/workflows/deploy-staging.yml`](.github/workflows/deploy-staging.yml): _workflow_dispatch_ only. In _Actions → Deploy staging → Run workflow_ you pick the **branch** to deploy. Publishes the `planning-poker-free-staging` Worker (own Durable Objects, production untouched). GitHub environment **`staging`**.
 
 Staging URL: `https://planning-poker-free-staging.<your-subdomain>.workers.dev`.
 
 Secrets in each environment (`Settings → Environments → production` / `staging`):
 
-| Secret | Source |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens (*Edit Cloudflare Workers*) |
-| `CLOUDFLARE_ACCOUNT_ID` | Workers dashboard → Account ID |
+| Secret                  | Source                                                           |
+| ----------------------- | ---------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | Cloudflare → My Profile → API Tokens (_Edit Cloudflare Workers_) |
+| `CLOUDFLARE_ACCOUNT_ID` | Workers dashboard → Account ID                                   |
 
 Use credentials for **the account you want to publish to** (including one claimed after a temporary deploy). Secrets are not in the repo: each fork must set its own.
 
@@ -184,7 +184,7 @@ Use credentials for **the account you want to publish to** (including one claime
 1. Configure GitHub secrets (if you use Actions). For staging, create the `staging` environment with the same secrets.
 2. Push to `main` or run the production workflow manually.
 3. Verify [https://planningpoker.free](https://planningpoker.free) or the `*.workers.dev` URL in the job or Wrangler log.
-4. (Optional) Try a branch on staging: *Actions → Deploy staging → Run workflow* → pick a branch.
+4. (Optional) Try a branch on staging: _Actions → Deploy staging → Run workflow_ → pick a branch.
 5. Custom domain (official production): Cloudflare → Workers → Domains & Routes → Custom Domains → `planningpoker.free`.
 6. Redirect `www`: Cloudflare → Rules → Redirect Rules → Create rule → **If** `(http.host eq "www.planningpoker.free")` → **Then** dynamic URL `concat("https://planningpoker.free", http.request.uri.path)` → **301** → preserve query string. This sends `www` to the apex even when the Worker has no `www` custom domain (avoids 525 SSL errors).
 
@@ -207,19 +207,19 @@ One `Room` instance per room. State lives in the Durable Object; the main flow n
 
 ## Community
 
-| Document | Content |
-| --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Local setup and PR process |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Participation guidelines |
-| [SECURITY.md](SECURITY.md) | Private vulnerability reporting |
-| [TRADEMARK.md](TRADEMARK.md) | Name and logo usage |
+| Document                                 | Content                         |
+| ---------------------------------------- | ------------------------------- |
+| [CONTRIBUTING.md](CONTRIBUTING.md)       | Local setup and PR process      |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Participation guidelines        |
+| [SECURITY.md](SECURITY.md)               | Private vulnerability reporting |
+| [TRADEMARK.md](TRADEMARK.md)             | Name and logo usage             |
 
 ## Authors
 
-| Role | Person |
-| --- | --- |
+| Role        | Person                                                                                |
+| ----------- | ------------------------------------------------------------------------------------- |
 | Development | [Alejandro Rodriguez Romero](https://www.linkedin.com/in/alejandro-rodriguez-romero/) |
-| Imagery | [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/) |
+| Imagery     | [Gabriela Rodriguez Romero](https://www.linkedin.com/in/gabriela-rodriguez-romero/)   |
 
 ## Sponsors
 

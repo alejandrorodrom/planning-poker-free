@@ -3,7 +3,6 @@
   "name": "planning-poker-free",
   "compatibility_date": "2026-08-06",
   "compatibility_flags": ["nodejs_als"],
-  "main": ".svelte-kit/cloudflare/_worker.js",
   "assets": {
     "binding": "ASSETS",
     "directory": ".svelte-kit/cloudflare"

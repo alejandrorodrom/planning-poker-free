@@ -1,10 +1,10 @@
 <script lang="ts">
-  import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
-  import { t } from '$lib/i18n';
-  import type { PlayerAvatarConfig } from '$lib/room/avatar';
-  import { ROOM_NAME_MAX } from '$lib/room/limits';
+  import LanguageSwitcher from '#lib/components/LanguageSwitcher.svelte';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import PlayerAvatar from '#lib/components/PlayerAvatar.svelte';
+  import { t } from '#lib/i18n/index.ts';
+  import type { PlayerAvatarConfig } from '#lib/room/avatar.ts';
+  import { ROOM_NAME_MAX } from '#lib/room/limits.ts';
 
   type Props = {
     roomName: string;
@@ -77,7 +77,9 @@
         />
         <div class="topbar__rename-actions">
           <LiquidButton text={t('common.save')} type="submit" />
-          <button type="button" class="linkish" onclick={oncancelEditName}>{t('common.cancel')}</button>
+          <button type="button" class="linkish" onclick={oncancelEditName}
+            >{t('common.cancel')}</button
+          >
         </div>
       </form>
     {:else}
@@ -112,13 +114,7 @@
       </button>
     {/if}
     {#if me}
-      <button
-        type="button"
-        class="you"
-        onclick={oneditAvatar}
-        title={meTitle}
-        aria-label={meTitle}
-      >
+      <button type="button" class="you" onclick={oneditAvatar} title={meTitle} aria-label={meTitle}>
         <span class="you__avatar" aria-hidden="true">
           <PlayerAvatar avatar={me.avatar} size={36} />
         </span>
@@ -130,7 +126,11 @@
         </span>
       </button>
     {:else if connection === 'connecting' || connection === 'closed'}
-      <span class="you you--plain you--connecting" role="status" title={connection === 'closed' ? t('room.reconnecting') : t('room.connecting')}>
+      <span
+        class="you you--plain you--connecting"
+        role="status"
+        title={connection === 'closed' ? t('room.reconnecting') : t('room.connecting')}
+      >
         <span class="connecting-dot" aria-hidden="true"></span>
         <span class="you__status-label"
           >{connection === 'closed' ? t('room.reconnecting') : t('room.connecting')}</span

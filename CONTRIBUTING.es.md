@@ -50,11 +50,11 @@ npm run build
 
 ## Áreas sensibles
 
-| Área | Notas |
-| --- | --- |
+| Área                          | Notas                                                                              |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
 | `src/lib/server/room/Room.ts` | Lógica de sala, WebSockets, alarmas; cambios requieren prueba manual multi-pestaña |
-| Protocolo cliente/servidor | Mantén compatibilidad o documenta breaking changes |
-| Branding / assets de logo | Ver `TRADEMARK.es.md` |
+| Protocolo cliente/servidor    | Mantén compatibilidad o documenta breaking changes                                 |
+| Branding / assets de logo     | Ver `TRADEMARK.es.md`                                                              |
 
 ## Reportes de seguridad
 

@@ -1,4 +1,4 @@
-import type { ErrorCode } from '$lib/errors';
+import type { ErrorCode } from '#lib/errors.ts';
 
 export type Locale = 'en' | 'es';
 

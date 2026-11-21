@@ -1,11 +1,11 @@
 <script lang="ts">
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import PlayerAvatar from '$lib/components/PlayerAvatar.svelte';
-  import { ERROR_CODES, type ErrorCode } from '$lib/errors';
-  import { t, te } from '$lib/i18n';
-  import type { PlayerAvatarConfig } from '$lib/room/avatar';
-  import { PLAYER_NAME_MAX, ROLE_LABEL_MAX } from '$lib/room/limits';
-  import type { PlayerRole } from '$lib/room/protocol';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import PlayerAvatar from '#lib/components/PlayerAvatar.svelte';
+  import { ERROR_CODES, type ErrorCode } from '#lib/errors.ts';
+  import { t, te } from '#lib/i18n/index.ts';
+  import type { PlayerAvatarConfig } from '#lib/room/avatar.ts';
+  import { PLAYER_NAME_MAX, ROLE_LABEL_MAX } from '#lib/room/limits.ts';
+  import type { PlayerRole } from '#lib/room/protocol.ts';
 
   type Props = {
     roomName: string;

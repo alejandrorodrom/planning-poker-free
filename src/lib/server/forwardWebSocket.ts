@@ -9,4 +9,3 @@ export async function forwardWebSocket(
   const id = namespace.idFromName(name);
   return namespace.get(id).fetch(request);
 }
-

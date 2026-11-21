@@ -18,7 +18,7 @@ Solo la rama `main` (última versión desplegada / del repositorio) recibe corre
 
 Preferencias, en este orden:
 
-1. **GitHub Security Advisories** — reporta de forma privada desde la pestaña *Security* del repositorio (si está habilitado *Private vulnerability reporting*).
+1. **GitHub Security Advisories** — reporta de forma privada desde la pestaña _Security_ del repositorio (si está habilitado _Private vulnerability reporting_).
 2. Contacto privado con el mantenedor listado en el [README](README.es.md) (GitHub o LinkedIn).
 
 Incluye, si puedes:

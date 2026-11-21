@@ -1,7 +1,7 @@
-import type { StoryPublic } from '$lib/room/protocol';
-import { isPointEstimate } from '$lib/room/decks';
-import { storyStatusLabel } from '$lib/i18n/labels';
-import { t } from '$lib/i18n';
+import type { StoryPublic } from '#lib/room/protocol.ts';
+import { isPointEstimate } from '#lib/room/decks.ts';
+import { storyStatusLabel } from '#lib/i18n/labels.ts';
+import { t } from '#lib/i18n/index.ts';
 
 const BRAND = '#165d70';
 const BRAND_DARK = '#0b5d70';

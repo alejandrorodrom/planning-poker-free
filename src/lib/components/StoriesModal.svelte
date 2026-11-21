@@ -1,12 +1,12 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import StoryStatusChip from '$lib/components/StoryStatusChip.svelte';
-  import { t } from '$lib/i18n';
-  import { formatEstimateLabel } from '$lib/room/decks';
-  import { STORY_TITLE_MAX } from '$lib/room/limits';
-  import type { StoryPublic } from '$lib/room/protocol';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import StoryStatusChip from '#lib/components/StoryStatusChip.svelte';
+  import { t } from '#lib/i18n/index.ts';
+  import { formatEstimateLabel } from '#lib/room/decks.ts';
+  import { STORY_TITLE_MAX } from '#lib/room/limits.ts';
+  import type { StoryPublic } from '#lib/room/protocol.ts';
 
   type Props = {
     open: boolean;
@@ -129,9 +129,7 @@
         <LiquidButton text={t('stories.add')} type="submit" disabled={!canCreate} />
       </div>
       <p id="story-create-hint" class="create__hint">
-        {canCreate
-          ? `${draftTitle.trim().length}/${STORY_TITLE_MAX}`
-          : t('stories.titleHint')}
+        {canCreate ? `${draftTitle.trim().length}/${STORY_TITLE_MAX}` : t('stories.titleHint')}
       </p>
     </form>
   {/if}
@@ -189,14 +187,12 @@
                 bind:value={editTitle}
                 aria-label={t('stories.editTitle')}
               />
-              <button
-                type="submit"
-                class="item__action item__action--save"
-                disabled={!canSaveEdit}
-              >
+              <button type="submit" class="item__action item__action--save" disabled={!canSaveEdit}>
                 {t('common.save')}
               </button>
-              <button type="button" class="item__action" onclick={cancelEdit}>{t('common.cancel')}</button>
+              <button type="button" class="item__action" onclick={cancelEdit}
+                >{t('common.cancel')}</button
+              >
             </form>
           {:else}
             {#if canManage}
@@ -302,7 +298,9 @@
     outline: none;
     background: white;
     color: #0b3d4a;
-    transition: border-color 160ms ease, box-shadow 160ms ease;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease;
   }
 
   .create__input::placeholder {

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import AvatarPicker from '$lib/components/AvatarPicker.svelte';
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import { t } from '$lib/i18n';
-  import { sanitizeAvatar, type PlayerAvatarConfig } from '$lib/room/avatar';
+  import AvatarPicker from '#lib/components/AvatarPicker.svelte';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import { t } from '#lib/i18n/index.ts';
+  import { sanitizeAvatar, type PlayerAvatarConfig } from '#lib/room/avatar.ts';
 
   type Props = {
     open: boolean;

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import ModalShell from '$lib/components/ModalShell.svelte';
-  import { t } from '$lib/i18n';
-  import type { PlayerPublic } from '$lib/room/protocol';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import ModalShell from '#lib/components/ModalShell.svelte';
+  import { t } from '#lib/i18n/index.ts';
+  import type { PlayerPublic } from '#lib/room/protocol.ts';
 
   type Props = {
     open: boolean;
@@ -26,9 +26,7 @@
     onclose
   }: Props = $props();
 
-  const candidates = $derived(
-    players.filter((p) => p.id !== meId && p.connection === 'connected')
-  );
+  const candidates = $derived(players.filter((p) => p.id !== meId && p.connection === 'connected'));
 </script>
 
 <ModalShell
@@ -71,7 +69,9 @@
         <h3 id="danger-title" class="danger__title">{t('moderation.dangerTitle')}</h3>
         <p class="danger__text">{t('moderation.dangerText')}</p>
       </div>
-      <button type="button" class="danger__btn" onclick={onfinalize}>{t('room.finalizeRoom')}</button>
+      <button type="button" class="danger__btn" onclick={onfinalize}
+        >{t('room.finalizeRoom')}</button
+      >
     </section>
   </div>
 

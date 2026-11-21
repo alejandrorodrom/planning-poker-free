@@ -1,9 +1,6 @@
 import type { Audience, ConnectionState, PlayerRole } from './protocol';
 
-export function isInAudience(
-  player: { teamId?: string | null },
-  audience: Audience
-): boolean {
+export function isInAudience(player: { teamId?: string | null }, audience: Audience): boolean {
   if (audience.type === 'all_voters') return true;
   return Boolean(player.teamId && audience.teamIds.includes(player.teamId));
 }

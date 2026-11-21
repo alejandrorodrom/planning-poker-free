@@ -1,8 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import LiquidButton from './LiquidButton.svelte';
-  import { t } from '$lib/i18n';
-  import { TEAM_NAME_MAX } from '$lib/room/limits';
+  import { t } from '#lib/i18n/index.ts';
+  import { TEAM_NAME_MAX } from '#lib/room/limits.ts';
 
   type Team = { id: string; name: string };
   type Player = { id: string; name: string; teamId?: string | null };
@@ -126,9 +126,7 @@
         <LiquidButton text={resolvedCreateLabel} type="submit" disabled={!canCreate} />
       </div>
       <p id="team-create-hint" class="create__hint">
-        {canCreate
-          ? `${draftName.trim().length}/${TEAM_NAME_MAX}`
-          : t('teams.nameHint')}
+        {canCreate ? `${draftName.trim().length}/${TEAM_NAME_MAX}` : t('teams.nameHint')}
       </p>
     </form>
   {/if}
@@ -164,7 +162,9 @@
               >
                 {t('common.save')}
               </button>
-              <button type="button" class="teams__text-btn" onclick={cancelEdit}>{t('common.cancel')}</button>
+              <button type="button" class="teams__text-btn" onclick={cancelEdit}
+                >{t('common.cancel')}</button
+              >
             </form>
           {:else}
             <div class="teams__main">

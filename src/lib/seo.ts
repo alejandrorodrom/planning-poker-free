@@ -1,4 +1,4 @@
-import type { Locale } from '$lib/i18n/types';
+import type { Locale } from '#lib/i18n/types.ts';
 
 export const SITE_ORIGIN = 'https://planningpoker.free';
 

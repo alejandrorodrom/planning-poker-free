@@ -1,6 +1,6 @@
-import { t } from '$lib/i18n';
-import type { DeckId } from '$lib/room/decks';
-import type { StoryStatus } from '$lib/room/protocol';
+import { t } from '#lib/i18n/index.ts';
+import type { DeckId } from '#lib/room/decks.ts';
+import type { StoryStatus } from '#lib/room/protocol.ts';
 
 export function deckLabel(deckId: DeckId): string {
   return t(`decks.${deckId}`);

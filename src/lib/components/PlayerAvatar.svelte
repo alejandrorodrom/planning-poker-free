@@ -1,10 +1,6 @@
 <script lang="ts">
-  import {
-    DEFAULT_AVATAR,
-    sanitizeAvatar,
-    type PlayerAvatarConfig
-  } from '$lib/room/avatar';
-  import { createAvatarDataUri } from '$lib/room/dicebearAvatar';
+  import { DEFAULT_AVATAR, sanitizeAvatar, type PlayerAvatarConfig } from '#lib/room/avatar.ts';
+  import { createAvatarDataUri } from '#lib/room/dicebearAvatar.ts';
 
   type Props = {
     avatar?: PlayerAvatarConfig | null;

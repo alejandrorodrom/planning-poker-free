@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { i18n, setLocale, t, type Locale } from '$lib/i18n';
+  import { i18n, setLocale, t, type Locale } from '#lib/i18n/index.ts';
 
   type Props = {
     compact?: boolean;
@@ -17,7 +17,12 @@
   }
 </script>
 
-<div class="lang-switch" class:lang-switch--compact={compact} role="group" aria-label={t('common.language')}>
+<div
+  class="lang-switch"
+  class:lang-switch--compact={compact}
+  role="group"
+  aria-label={t('common.language')}
+>
   {#each options as option, index (option.value)}
     {#if index > 0}
       <span class="lang-switch__sep" aria-hidden="true">|</span>

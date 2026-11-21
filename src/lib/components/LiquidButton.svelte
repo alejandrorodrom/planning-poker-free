@@ -1,10 +1,10 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import type { Pathname } from '$app/types';
+  import type { Path } from '$app/types';
 
   type Props = {
     text: string;
-    href?: Pathname;
+    href?: Path;
     type?: 'button' | 'submit' | 'reset';
     class?: string;
     disabled?: boolean;

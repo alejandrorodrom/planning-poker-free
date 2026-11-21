@@ -1,6 +1,6 @@
 import type { StoryPublic } from './protocol';
 import { formatEstimateLabel } from './decks';
-import { t } from '$lib/i18n';
+import { t } from '#lib/i18n/index.ts';
 
 export function storiesToMarkdown(stories: StoryPublic[]): string {
   const lines = [t('results.markdownTitle'), ''];

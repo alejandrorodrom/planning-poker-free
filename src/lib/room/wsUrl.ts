@@ -1,4 +1,4 @@
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 
 export function roomWebSocketUrl(roomId: string): string {
   if (dev && typeof __DEV_WORKER_PORT__ !== 'undefined') {

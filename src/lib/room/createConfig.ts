@@ -1,10 +1,5 @@
 import { DEFAULT_DECK, isDeckId, type DeckId } from './decks';
-import {
-  isEstimateRule,
-  isRevealMode,
-  type EstimateRule,
-  type RevealMode
-} from './protocol';
+import { isEstimateRule, isRevealMode, type EstimateRule, type RevealMode } from './protocol';
 
 export type CreateRoomConfigInput = {
   deck?: unknown;

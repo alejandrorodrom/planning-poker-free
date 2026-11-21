@@ -9,7 +9,9 @@ export function computeSuggestedEstimate(
   if (rule === 'consensus') return undefined;
 
   const deck = DECKS[deckId];
-  const values = Object.values(votes).filter((v): v is string => typeof v === 'string' && v.length > 0);
+  const values = Object.values(votes).filter(
+    (v): v is string => typeof v === 'string' && v.length > 0
+  );
   const usable = values.filter((value) => {
     const card = deck.cards.find((c) => c.value === value);
     return card && !card.special;
@@ -33,8 +35,7 @@ export function computeSuggestedEstimate(
   if (rule === 'median') {
     const sorted = [...nums].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    const median =
-      sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
+    const median = sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
     return nearestCard(deckId, median);
   }
 

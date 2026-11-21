@@ -3,30 +3,35 @@
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { onDestroy, onMount } from 'svelte';
-  import AvatarModal from '$lib/components/AvatarModal.svelte';
-  import ConfirmModal from '$lib/components/ConfirmModal.svelte';
-  import InviteModal from '$lib/components/InviteModal.svelte';
-  import JoinRoomForm from '$lib/components/JoinRoomForm.svelte';
-  import LiquidButton from '$lib/components/LiquidButton.svelte';
-  import ModerationModal from '$lib/components/ModerationModal.svelte';
-  import PlayersModal from '$lib/components/PlayersModal.svelte';
-  import ResultsModal from '$lib/components/ResultsModal.svelte';
-  import RoomGone from '$lib/components/RoomGone.svelte';
-  import RoomNotice from '$lib/components/RoomNotice.svelte';
-  import RoomTopbar from '$lib/components/RoomTopbar.svelte';
-  import RoundArena from '$lib/components/RoundArena.svelte';
-  import StoriesModal from '$lib/components/StoriesModal.svelte';
-  import TeamsModal from '$lib/components/TeamsModal.svelte';
-  import { loadStoredAvatar, saveStoredAvatar, type PlayerAvatarConfig } from '$lib/room/avatar';
-  import { canCastVote } from '$lib/room/audience';
-  import { RoomClient } from '$lib/room/client';
-  import { ERROR_CODES, isErrorCode, type ErrorCode } from '$lib/errors';
-  import { t, te } from '$lib/i18n';
-  import { DECKS } from '$lib/room/decks';
-  import type { Audience, ClientToServer, PlayerRole, RoomPublicState } from '$lib/room/protocol';
-  import { storiesToCsv, storiesToMarkdown } from '$lib/room/resultsFormat';
-  import { sanitizeRoleLabel } from '$lib/room/roleLabel';
-  import { clearSession, loadSession, saveSession } from '$lib/room/session';
+  import AvatarModal from '#lib/components/AvatarModal.svelte';
+  import ConfirmModal from '#lib/components/ConfirmModal.svelte';
+  import InviteModal from '#lib/components/InviteModal.svelte';
+  import JoinRoomForm from '#lib/components/JoinRoomForm.svelte';
+  import LiquidButton from '#lib/components/LiquidButton.svelte';
+  import ModerationModal from '#lib/components/ModerationModal.svelte';
+  import PlayersModal from '#lib/components/PlayersModal.svelte';
+  import ResultsModal from '#lib/components/ResultsModal.svelte';
+  import RoomGone from '#lib/components/RoomGone.svelte';
+  import RoomNotice from '#lib/components/RoomNotice.svelte';
+  import RoomTopbar from '#lib/components/RoomTopbar.svelte';
+  import RoundArena from '#lib/components/RoundArena.svelte';
+  import StoriesModal from '#lib/components/StoriesModal.svelte';
+  import TeamsModal from '#lib/components/TeamsModal.svelte';
+  import { loadStoredAvatar, saveStoredAvatar, type PlayerAvatarConfig } from '#lib/room/avatar.ts';
+  import { canCastVote } from '#lib/room/audience.ts';
+  import { RoomClient } from '#lib/room/client.ts';
+  import { ERROR_CODES, isErrorCode, type ErrorCode } from '#lib/errors.ts';
+  import { t, te } from '#lib/i18n/index.ts';
+  import { DECKS } from '#lib/room/decks.ts';
+  import type {
+    Audience,
+    ClientToServer,
+    PlayerRole,
+    RoomPublicState
+  } from '#lib/room/protocol.ts';
+  import { storiesToCsv, storiesToMarkdown } from '#lib/room/resultsFormat.ts';
+  import { sanitizeRoleLabel } from '#lib/room/roleLabel.ts';
+  import { clearSession, loadSession, saveSession } from '#lib/room/session.ts';
 
   const roomId = $derived(page.params.id ?? '');
 
@@ -67,7 +72,13 @@
   let now = $state(Date.now());
   let tick: ReturnType<typeof setInterval> | undefined;
   let confirmDialog = $state<
-    null | 'cancel_round' | 'close_room' | 'remove_player' | 'leave' | 'delete_story' | 'delete_team'
+    | null
+    | 'cancel_round'
+    | 'close_room'
+    | 'remove_player'
+    | 'leave'
+    | 'delete_story'
+    | 'delete_team'
   >(null);
   let removeTarget = $state<{ id: string; name: string } | null>(null);
   let deleteStoryTarget = $state<{ id: string; title: string } | null>(null);
@@ -517,7 +528,8 @@
 
   function copyResults(format: 'md' | 'csv') {
     if (!roomState) return;
-    const text = format === 'md' ? storiesToMarkdown(roomState.stories) : storiesToCsv(roomState.stories);
+    const text =
+      format === 'md' ? storiesToMarkdown(roomState.stories) : storiesToCsv(roomState.stories);
     void navigator.clipboard.writeText(text);
   }
 
@@ -574,7 +586,7 @@
     client?.send({ type: 'leave' });
     clearSession(roomId);
     client?.close();
-    void goto(resolve('/'));
+    void goto(resolve(''));
   }
 
   const roomLink = $derived(`${page.url.origin}/room/${roomId}`);
@@ -641,7 +653,6 @@
       audienceTeamIds = [...audienceTeamIds, id];
     }
   }
-
 </script>
 
 <svelte:head>
@@ -652,18 +663,12 @@
 {#if goneReason}
   <RoomGone reason={goneReason} />
 {:else if sessionTaken}
-  <RoomNotice
-    title={t('room.sessionTakenTitle')}
-    description={t('room.sessionTakenDesc')}
-  >
+  <RoomNotice title={t('room.sessionTakenTitle')} description={t('room.sessionTakenDesc')}>
     <LiquidButton text={t('room.retryHere')} onclick={() => location.reload()} />
   </RoomNotice>
 {:else if removed}
-  <RoomNotice
-    title={t('room.removedTitle')}
-    description={t('room.removedDesc')}
-  >
-    <LiquidButton text={t('common.backToHome')} href="/" />
+  <RoomNotice title={t('room.removedTitle')} description={t('room.removedDesc')}>
+    <LiquidButton text={t('common.backToHome')} href="" />
   </RoomNotice>
 {:else}
   <section class="room" class:room--arena={!needsJoin && Boolean(roomState)}>
@@ -696,7 +701,10 @@
             ? t('room.noModeratorBanner')
             : t('room.moderatorLeftBanner')}
         </p>
-        <LiquidButton text={t('room.claimModeration')} onclick={() => send({ type: 'claim_scrum' })} />
+        <LiquidButton
+          text={t('room.claimModeration')}
+          onclick={() => send({ type: 'claim_scrum' })}
+        />
       </div>
     {/if}
 
@@ -705,7 +713,7 @@
         roomName={displayRoomName}
         isPrivate={Boolean(roomMeta?.isPrivate)}
         teams={roomMeta?.teams ?? []}
-        errorCode={errorCode}
+        {errorCode}
         bind:name={joinName}
         bind:password={joinPassword}
         bind:role={joinRole}
